@@ -88,18 +88,30 @@ func checkMatches(content []string, targets []string) bool {
 func (s *Setup) CalculateSemver() SemVer {
 	for _, commit := range s.Commits {
 		s.Semver.Patch++
+		if varDebug {
+			fmt.Println("DEBUG: Incrementing patch (DEFAULT) on ", commit.Message)
+		}
 		commitSlice := strings.Split(commit.Message, " ")
 		matchPatch := checkMatches(commitSlice, s.Wording.Patch)
 		matchMinor := checkMatches(commitSlice, s.Wording.Minor)
 		matchMajor := checkMatches(commitSlice, s.Wording.Major)
 		if matchPatch {
+			if varDebug {
+				fmt.Println("DEBUG: Incrementing patch (WORDING) on ", commit.Message)
+			}
 			s.Semver.Patch++
 		}
 		if matchMinor {
+			if varDebug {
+				fmt.Println("DEBUG: Incrementing minor (WORDING) on ", commit.Message)
+			}
 			s.Semver.Minor++
 			s.Semver.Patch = 1
 		}
 		if matchMajor {
+			if varDebug {
+				fmt.Println("DEBUG: Incrementing major (WORDING) on ", commit.Message)
+			}
 			s.Semver.Major++
 			s.Semver.Minor = 0
 			s.Semver.Patch = 1
@@ -111,23 +123,44 @@ func (s *Setup) CalculateSemver() SemVer {
 func (s *Setup) ListCommits() ([]CommitDetails, error) {
 	var ref *plumbing.Reference
 	var err error
-	if zero.IsZero(s.Force.Commit) {
-		ref, err = s.RepositoryHandler.Head()
-	} else {
-		ref = plumbing.NewHashReference("start_commit", plumbing.NewHash(s.Force.Commit))
-	}
+
+	// if zero.IsZero(s.Force.Commit) {
+	ref, err = s.RepositoryHandler.Head()
+	// } else {
+	// 	if varDebug {
+	// 		fmt.Println("DEBUG: Forced start from commit", s.Force.Commit)
+	// 	}
+	// 	ref = plumbing.NewHashReference("start_commit", plumbing.NewHash(s.Force.Commit))
+	// }
 	if err != nil {
 		return []CommitDetails{}, err
 	}
-	commitsList, err := s.RepositoryHandler.Log(&git.LogOptions{From: ref.Hash(), Order: git.LogOrderBSF})
+	commitsList, err := s.RepositoryHandler.Log(&git.LogOptions{From: ref.Hash()})
 	if err != nil {
 		return []CommitDetails{}, err
 	}
+
+	var tmpResults []CommitDetails
 	commitsList.ForEach(func(c *object.Commit) error {
-		s.Commits = append(s.Commits, CommitDetails{Hash: c.Hash.String(), Author: c.Author.String(), Message: c.Message, Timestamp: c.Author.When})
-		sort.Slice(s.Commits, func(i, j int) bool { return s.Commits[i].Timestamp.Unix() < s.Commits[j].Timestamp.Unix() })
+		tmpResults = append(tmpResults, CommitDetails{Hash: c.Hash.String(), Author: c.Author.String(), Message: c.Message, Timestamp: c.Author.When})
+		sort.Slice(tmpResults, func(i, j int) bool { return tmpResults[i].Timestamp.Unix() < tmpResults[j].Timestamp.Unix() })
 		return nil
 	})
+
+	if varDebug {
+		fmt.Println("\n---COMMITS BEFORE CUT---\n", tmpResults)
+	}
+
+	for commitId, cmt := range tmpResults {
+		if zero.IsZero(s.Force.Commit) || (!zero.IsZero(s.Force.Commit) && cmt.Hash == s.Force.Commit) {
+			s.Commits = tmpResults[commitId:]
+		}
+	}
+
+	if varDebug {
+		fmt.Println("\n---COMMITS AFTER CUT---\n", s.Commits)
+	}
+
 	return s.Commits, err
 }
 
@@ -159,12 +192,21 @@ func (s *Setup) Prepare() error {
 
 func (s *Setup) ForcedVersioning() {
 	if !zero.IsZero(s.Force.Major) {
+		if varDebug {
+			fmt.Println("DEBUG: Forced versioning (MAJOR)", s.Force.Major)
+		}
 		s.Semver.Major = s.Force.Major
 	}
 	if !zero.IsZero(s.Force.Minor) {
+		if varDebug {
+			fmt.Println("DEBUG: Forced versioning (MINOR)", s.Force.Minor)
+		}
 		s.Semver.Minor = s.Force.Minor
 	}
 	if !zero.IsZero(s.Force.Patch) {
+		if varDebug {
+			fmt.Println("DEBUG: Forced versioning (PATCH)", s.Force.Patch)
+		}
 		s.Semver.Patch = s.Force.Patch
 	}
 }

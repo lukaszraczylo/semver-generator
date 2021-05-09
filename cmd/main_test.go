@@ -290,7 +290,7 @@ func (suite *Tests) TestSetup_ListCommits() {
 			fields: fields{
 				RepositoryName: "https://github.com/lukaszraczylo/simple-gql-client",
 				Force: Force{
-					Commit: "69fbe2df696f40281b9104ff073d26186cde1024",
+					Commit: "97d3682ed94168600926f9ff6da650403d1f3317",
 				},
 			},
 			noCommits: false,
@@ -336,8 +336,8 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 				RepositoryName: "https://github.com/lukaszraczylo/simple-gql-client",
 			},
 			wantSemver: wantSemver{
-				Major: 5,
-				Minor: 1,
+				Major: 1,
+				Minor: 2,
 				Patch: 1,
 			},
 		},
@@ -346,13 +346,13 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 			fields: fields{
 				RepositoryName: "https://github.com/lukaszraczylo/simple-gql-client",
 				Force: Force{
-					Commit: "69fbe2df696f40281b9104ff073d26186cde1024",
+					Commit: "97d3682ed94168600926f9ff6da650403d1f3317",
 				},
 			},
 			wantSemver: wantSemver{
-				Major: 3,
-				Minor: 0,
-				Patch: 5,
+				Major: 1,
+				Minor: 2,
+				Patch: 1,
 			},
 		},
 		{
