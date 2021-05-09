@@ -14,4 +14,4 @@ WORKDIR /go/src/app
 COPY --from=baseimg /go/src/app/semver-gen .
 COPY --from=baseimg /go/src/app/config-release.yaml config.yaml
 COPY entrypoint.sh entrypoint.sh
-CMD ["./semver-gen"]
+ENTRYPOINT ["./entrypoint.sh"]
