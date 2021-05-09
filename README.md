@@ -46,6 +46,7 @@ Flags:
 
 * 0.0.1 - PATCH - starting commit
 * 0.0.2 - PATCH - another commit
+* 0.0.4 - PATCH - another commit with word 'Update' => DOUBLE increment PATCH
 * 0.1.0 - MINOR - after commit with word 'Change' => increment MINOR, reset PATCH
 * 0.1.1 - PATCH - additional commit
 * 1.0.1 - MAJOR - commit with word 'BREAKING' = > INCREMENT MAJOR, reset MINOR
