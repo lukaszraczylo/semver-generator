@@ -26,4 +26,4 @@ fi
 
 OUT_SEMVER_GEN=$(./semver-gen generate generate $FLAGS)
 OUT_SEMVER=$(echo $OUT_SEMVER_GEN | sed -e 's|SEMVER ||g')
-echo "::set-output name=semver::$OUT_SEMVER"
+echo "::set-output name=SEMVER::$OUT_SEMVER"

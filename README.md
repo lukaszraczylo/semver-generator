@@ -5,6 +5,8 @@ Project created overnight, to prove that management of semantic versioning is NO
 - [Semantic version generator](#semantic-version-generator)
   - [How does it work](#how-does-it-work)
   - [Usage](#usage)
+    - [As a binary](#as-a-binary)
+    - [As a github action](#as-a-github-action)
     - [Calculations example](#calculations-example)
     - [Example configuration](#example-configuration)
   - [Good to know](#good-to-know)
@@ -16,6 +18,8 @@ Project created overnight, to prove that management of semantic versioning is NO
 * Returns the semantic version which can be included in the release
 
 ### Usage
+
+#### As a binary
 
 ```bash
 bash$ ./semver-gen generate -r https://github.com/nextapps-de/winbox
@@ -40,6 +44,27 @@ Flags:
   -h, --help                help for semver-gen
   -l, --local               Use local repository
   -r, --repository string   Remote repository URL. (default "https://github.com/lukaszraczylo/simple-gql-client")
+```
+
+#### As a github action
+
+```yaml
+jobs:
+  obain-semver:
+    runs-on: ubuntu-latest
+    name: Generate semver
+    outputs:
+      RELEASE_VERSION: ${{ steps.semver.outputs.SEMVER }}
+    steps:
+      - name: Run
+        uses: lukaszraczylo/semver-generator
+        id: semver
+        with:
+          config_file: config.yaml
+          # then...
+          repository_url: https://github.com/lukaszraczylo/simple-gql-client
+          # or...
+          repository_local: true
 ```
 
 #### Calculations example
