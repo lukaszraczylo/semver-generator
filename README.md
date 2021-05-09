@@ -28,7 +28,7 @@ bash$ ./semver-gen generate -l
 SEMVER 5.1.1
 ```
 
-** Local repository flag `-l` will always take precedence over remote repository URL **
+**Local repository flag `-l` will always take precedence over remote repository URL**
 
 ```yaml
 Usage:
@@ -106,10 +106,10 @@ wording:
     - the # For testing purposes
 ```
 
-* version: is not respected at the moment, introduced for potential backwards compatibility in future
-* force: sets the "starting" version, you don't need to specify this section as the default is always `0`
-* force.commit allows you to set commit hash from which the calculations should start
-* wording: words the program should look for in the git commits to increment (patch|minor|major)
+* `version`: is not respected at the moment, introduced for potential backwards compatibility in future
+* `force`: sets the "starting" version, you don't need to specify this section as the default is always `0`
+* `force.commit`: allows you to set commit hash from which the calculations should start
+* `wording`: words the program should look for in the git commits to increment (patch|minor|major)
 
 ### Good to know
 
