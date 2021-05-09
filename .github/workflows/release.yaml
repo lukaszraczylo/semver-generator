@@ -161,15 +161,14 @@ jobs:
         with:
           fetch-depth: 0
       - name: Compile binary
-        uses: thatisuday/go-cross-build@v1
-        env:
-          INPUT_LDFLAGS: "-s -w -X main.PKG_VERSION=${{ needs.prepare.outputs.RELEASE_VERSION }}"
+        uses: thatisuday/go-cross-build@v1.0.2
         with:
           platforms: linux/amd64,darwin/amd64,windows/amd64,linux/arm64,darwin/amd64
           name: semver-gen
           package: ./
           compress: false
           dest: dist
+          ldflags: -s -w -X main.PKG_VERSION=${{ needs.prepare.outputs.RELEASE_VERSION }}
       - name: Get list of the commits since last release
         run: |
           echo "$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%h %s")" > .release_notes
