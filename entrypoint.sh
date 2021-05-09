@@ -5,7 +5,6 @@ FLAGS=""
 
 if [[ -z "$INPUT_CONFIG_FILE" ]]; then
   echo "Set the configuration file path."
-  exit 1
 else
   FLAGS="${FLAGS} -c $INPUT_CONFIG_FILE"
 fi
@@ -13,7 +12,6 @@ fi
 if [[ -z "$INPUT_REPOSITORY_URL" ]] && [[ -z "$INPUT_REPOSITORY_LOCAL" ]];
 then
   echo "You need to set either remote repository or repository local flags."
-  exit 1
 fi
 
 if [[ ! -z "$INPUT_REPOSITORY_URL" ]]; then
@@ -22,6 +20,10 @@ fi
 
 if [[ ! -z "$INPUT_REPOSITORY_LOCAL" ]]; then
   FLAGS="${FLAGS} -l"
+fi
+
+if [[ "${FLAGS}" == "" && "$*" == "" ]]; then
+  exit 1
 fi
 
 OUT_SEMVER_GEN=$(/go/src/app/semver-gen generate $FLAGS $*)
