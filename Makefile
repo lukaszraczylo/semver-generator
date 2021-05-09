@@ -1,10 +1,10 @@
 all: build
 
 build:
-	@go build -o semver *.go
+	@go build -o semver-gen *.go
 
 run: build
-	@./semver
+	@./semver-gen
 
 test:
 	@go test ./... -v -race -cover
