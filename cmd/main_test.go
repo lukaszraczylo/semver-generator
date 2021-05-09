@@ -285,11 +285,23 @@ func (suite *Tests) TestSetup_ListCommits() {
 			noCommits: true,
 			wantErr:   true,
 		},
+		{
+			name: "List commits starting with certain hash",
+			fields: fields{
+				RepositoryName: "https://github.com/lukaszraczylo/simple-gql-client",
+				Force: Force{
+					Commit: "69fbe2df696f40281b9104ff073d26186cde1024",
+				},
+			},
+			noCommits: false,
+			wantErr:   false,
+		},
 	}
 	for _, tt := range tests {
 		suite.T().Run(tt.name, func(t *testing.T) {
 			s := &Setup{
 				RepositoryName: tt.fields.RepositoryName,
+				Force:          tt.fields.Force,
 			}
 			s.Prepare()
 			listOfCommits, err := s.ListCommits()
@@ -306,6 +318,7 @@ func (suite *Tests) TestSetup_ListCommits() {
 func (suite *Tests) TestSetup_CalculateSemver() {
 	type fields struct {
 		RepositoryName string
+		Force          Force
 	}
 	type wantSemver struct {
 		Major int
@@ -329,6 +342,20 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 			},
 		},
 		{
+			name: "Test on existing repository, starting with certain hash",
+			fields: fields{
+				RepositoryName: "https://github.com/lukaszraczylo/simple-gql-client",
+				Force: Force{
+					Commit: "69fbe2df696f40281b9104ff073d26186cde1024",
+				},
+			},
+			wantSemver: wantSemver{
+				Major: 3,
+				Minor: 0,
+				Patch: 5,
+			},
+		},
+		{
 			name: "Test on non-existing repository",
 			fields: fields{
 				RepositoryName: "https://github.com/lukaszraczylo/simple-gql-client-dead",
@@ -344,6 +371,7 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 		suite.T().Run(tt.name, func(t *testing.T) {
 			s := &Setup{
 				RepositoryName: tt.fields.RepositoryName,
+				Force:          tt.fields.Force,
 			}
 			s.ReadConfig("../config.yaml")
 			s.Prepare()

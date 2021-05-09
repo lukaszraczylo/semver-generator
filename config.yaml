@@ -1,6 +1,7 @@
 version: 1
 force:
   major: 1
+  # commit: 69fbe2df696f40281b9104ff073d26186cde1024
 wording:
   patch:
     - update
