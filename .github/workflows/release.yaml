@@ -174,7 +174,7 @@ jobs:
           echo "$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%h %s")" > .release_notes
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v0.1.7
         if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
