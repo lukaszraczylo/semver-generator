@@ -152,6 +152,56 @@ jobs:
           image: "${{ needs.prepare.outputs.DOCKER_IMAGE }}:${{ needs.prepare.outputs.GITHUB_SHA }}"
           fail-build: true
 
+  build-action:
+    needs: [ prepare, test, code_scans ]
+    name: Docker image build (multiarch)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.ACTOR }}
+          password: ${{ secrets.GHCR_TOKEN }}
+      - name: Prepare for push
+        id: prep
+        run: |
+          TAGS="${{ needs.prepare.outputs.DOCKER_IMAGE  }}-action:${{ needs.prepare.outputs.GITHUB_SHA }},${{ needs.prepare.outputs.DOCKER_IMAGE  }}-action:${{ needs.prepare.outputs.RELEASE_VERSION }},${{ needs.prepare.outputs.DOCKER_IMAGE  }}-action:latest"
+          echo ::set-output name=tags::${TAGS}
+          BRANCH=$(echo ${GITHUB_REF##*/} | tr '[A-Z]' '[a-z]')
+          LABELS="org.opencontainers.image.revision=${{ needs.prepare.outputs.GITHUB_SHA }}"
+          LABELS="$LABELS,org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          LABELS="$LABELS,org.opencontainers.image.version=$VERSION"
+          LABELS="$LABELS,com.github.repo.branch=$BRANCH"
+          LABELS="$LABELS,com.github.repo.dockerfile=Dockerfile-action"
+          echo ::set-output name=labels::${LABELS}
+          BUILD_ARGS="BRANCH=$BRANCH"
+          echo ::set-output name=args::${BUILD_ARGS}
+      - name: Build image
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          platforms: linux/arm64,linux/amd64
+          push: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
+          tags: ${{ steps.prep.outputs.tags }}
+          file: Dockerfile-action
+          build-args: |
+            GITHUB_AUTH_TOKEN=${{ secrets.GHCR_TOKEN }}
+            MICROSERVICE_NAME=${{ github.event.repository.name }}
+            GITHUB_COMMIT_NUMBER=${{ needs.prepare.outputs.GITHUB_COMMIT_NUMBER }}
+            GITHUB_SHA=${{ needs.prepare.outputs.GITHUB_SHA }}
+            ${{ steps.prep.outputs.args }}
+          labels: ${{ steps.prep.outputs.labels }}
+          no-cache: false
+
   build-binary:
     needs: [ prepare, test, code_scans ]
     name: Binary compilation and release
