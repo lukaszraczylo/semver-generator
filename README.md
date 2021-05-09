@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Generate semver
     outputs:
-      RELEASE_VERSION: ${{ steps.semver.outputs.SEMVER }}
+      RELEASE_VERSION: ${{ steps.semver.outputs.semantic_version }}
     steps:
       - name: Run
         uses: lukaszraczylo/semver-generator@1.0.14

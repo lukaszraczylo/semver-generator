@@ -25,5 +25,4 @@ if [[ ! -z "$INPUT_REPOSITORY_LOCAL" ]]; then
 fi
 
 OUT_SEMVER_GEN=$(./semver-gen generate generate $FLAGS)
-OUT_SEMVER=$(echo $OUT_SEMVER_GEN | sed -e 's|SEMVER ||g')
-echo "::set-output name=SEMVER::$OUT_SEMVER"
+echo "::set-output name=semantic_version::$(echo $OUT_SEMVER_GEN | sed -e 's|SEMVER ||g')"
