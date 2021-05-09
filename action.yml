@@ -21,4 +21,4 @@ outputs:
     description: 'Calculated semantic version'
 runs:
   using: 'docker'
-  image: Dockerfile-action
+  image: ./Dockerfile-action
