@@ -9,6 +9,7 @@ Project created overnight, to prove that management of semantic versioning is NO
   - [Usage](#usage)
     - [As a binary](#as-a-binary)
     - [As a github action](#as-a-github-action)
+    - [As a docker container](#as-a-docker-container)
     - [Calculations example](#calculations-example)
     - [Example configuration](#example-configuration)
   - [Good to know](#good-to-know)
@@ -22,6 +23,11 @@ Project created overnight, to prove that management of semantic versioning is NO
 ### Usage
 
 #### As a binary
+
+You can download latest versions of the binaries from the [release page](https://github.com/lukaszraczylo/semver-generator/releases/latest).
+
+**Supported OS and architectures:**
+Darwin ARM64/AMD64, Linux ARM64/AMD64, Windows AMD64
 
 ```bash
 bash$ ./semver-gen generate -r https://github.com/nextapps-de/winbox
@@ -43,9 +49,11 @@ Available Commands:
 
 Flags:
   -c, --config string       Path to config file (default "config.yaml")
+  -d, --debug               Enable debug mode
   -h, --help                help for semver-gen
   -l, --local               Use local repository
   -r, --repository string   Remote repository URL. (default "https://github.com/lukaszraczylo/simple-gql-client")
+  -v, --version             Display version
 ```
 
 #### As a github action
@@ -75,6 +83,15 @@ jobs:
         run: |
           echo "Semantic version detected: ${{ steps.semver.outputs.semantic_version }}"
 ```
+
+#### As a docker container
+
+```bash
+docker pull ghcr.io/lukaszraczylo/semver-generator:latest
+```
+
+**Docker supported architectures:**
+Linux/arm64, Linux/amd64
 
 #### Calculations example
 
