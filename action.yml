@@ -17,9 +17,8 @@ outputs:
     description: 'Calculated semantic version'
 runs:
   using: 'docker'
-  image: 'Dockerfile'
+  image: 'ghcr.io/lukaszraczylo/semver-generator:latest'
   args:
-    - generate
     - ${{ inputs.config_file }}
     - ${{ inputs.repository_url }}
     - ${{ inputs.repository_local }}
