@@ -19,6 +19,7 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.config-file }}
-    - ${{ inputs.repository-url }}
-    - ${{ inputs.repository-local }}
+    - generate
+    - ${{ inputs.config_file }}
+    - ${{ inputs.repository_url }}
+    - ${{ inputs.repository_local }}
