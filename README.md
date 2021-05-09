@@ -50,21 +50,28 @@ Flags:
 
 ```yaml
 jobs:
-  obain-semver:
+  prepare:
+    name: Preparing build context
     runs-on: ubuntu-latest
-    name: Generate semver
     outputs:
       RELEASE_VERSION: ${{ steps.semver.outputs.semantic_version }}
     steps:
-      - name: Run
-        uses: lukaszraczylo/semver-generator@1.0.14
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - name: Semver run
         id: semver
+        uses: lukaszraczylo/semver-generator@1.0.29
         with:
           config_file: config.yaml
-          # then...
-          repository_url: https://github.com/lukaszraczylo/simple-gql-client
-          # or...
+          # either...
           repository_local: true
+          # or...
+          repository_url: https://github.com/lukaszraczylo/simple-gql-client
+      - name: Semver check
+        run: |
+          echo "Semantic version detected: ${{ steps.semver.outputs.semantic_version }}"
 ```
 
 #### Calculations example
