@@ -1,7 +1,7 @@
 version: 1
 force:
   major: 1
-  # commit: 69fbe2df696f40281b9104ff073d26186cde1024
+  commit: 97d3682ed94168600926f9ff6da650403d1f3317
 wording:
   patch:
     - update
@@ -13,4 +13,3 @@ wording:
     - improve
   major:
     - breaking
-    - the # For testing purposes

@@ -75,14 +75,14 @@ jobs:
       - name: Run unit tests
         run: |
           make test CI_RUN=${CI}
-      - name: Codeclimate
-        uses: paambaati/codeclimate-action@v2.7.5
-        with:
-          coverageCommand: go test -race -coverprofile=cover.out -covermode=atomic -v -bench=. ./...
-          coverageLocations:
-            "${{github.workspace}}/cover.out:gocov"
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_KEY }}
+      # - name: Codeclimate
+      #   uses: paambaati/codeclimate-action@v2.7.5
+      #   with:
+      #     coverageCommand: go test -race -coverprofile=cover.out -covermode=atomic -v -bench=. ./...
+      #     coverageLocations:
+      #       "${{github.workspace}}/cover.out:gocov"
+      #   env:
+      #     CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_KEY }}
 
   code_scans:
     needs: [ prepare ]

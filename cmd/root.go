@@ -58,6 +58,7 @@ var (
 	varRepoName, varLocalCfg string
 	varUseLocal              bool
 	varShowVersion           bool
+	varDebug                 bool
 )
 
 func init() {
@@ -68,5 +69,6 @@ func init() {
 		rootCmd.PersistentFlags().StringVarP(&varLocalCfg, "config", "c", "config.yaml", "Path to config file")
 		rootCmd.PersistentFlags().BoolVarP(&varUseLocal, "local", "l", false, "Use local repository")
 		rootCmd.PersistentFlags().BoolVarP(&varShowVersion, "version", "v", false, "Display version")
+		rootCmd.PersistentFlags().BoolVarP(&varDebug, "debug", "d", false, "Enable debug mode")
 	}
 }
