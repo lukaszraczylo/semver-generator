@@ -99,7 +99,7 @@ jobs:
 
   build:
     needs: [ prepare, test, code_scans ]
-    name: Docker image build (multiarch)
+    name: Docker image build (regular:multiarch)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -154,7 +154,7 @@ jobs:
 
   build-action:
     needs: [ prepare, test, code_scans ]
-    name: Docker image build (multiarch)
+    name: Docker image build (action:multiarch)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
