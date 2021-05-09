@@ -5,6 +5,7 @@ on:
   push:
     paths-ignore:
     - '**.md'
+    - 'action.yml'
     branches:
       - "master"
       - "main"
