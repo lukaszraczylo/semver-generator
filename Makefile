@@ -8,3 +8,6 @@ run: build
 
 test:
 	@go test ./... -v -race -cover
+
+update:
+	@go get -u ./...

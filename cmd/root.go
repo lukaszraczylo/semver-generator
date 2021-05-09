@@ -22,11 +22,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var cfgFile string
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "semver-gen",
+	Use:   "semver-gen generate [flags]",
 	Short: "An effortless semantic version generator",
 	Long: `semver-gen // Lukasz Raczylo, raczylo.com
 
@@ -39,12 +37,32 @@ func Execute() {
 	cobra.CheckErr(rootCmd.Execute())
 }
 
+func (r *Setup) setupCobra() {
+	r.RepositoryName, err = rootCmd.Flags().GetString("repository")
+	if err != nil {
+		panic(err)
+	}
+	r.LocalConfigFile, err = rootCmd.Flags().GetString("config")
+	if err != nil {
+		panic(err)
+	}
+	r.UseLocal = varUseLocal
+	if err != nil {
+		panic(err)
+	}
+}
+
+var (
+	varRepoName, varLocalCfg string
+	varUseLocal              bool
+)
+
 func init() {
 	repo = &Setup{}
 	if !strings.HasSuffix(os.Args[0], ".test") {
-		rootCmd.PersistentFlags().StringVarP(&repo.RepositoryName, "repository", "r", "https://github.com/lukaszraczylo/simple-gql-client", "Repository URL. If not specified local dir will be used.")
-		rootCmd.PersistentFlags().StringVarP(&repo.LocalConfigFile, "config", "c", "config.yaml", "Path to config file")
-		rootCmd.PersistentFlags().BoolVarP(&repo.Generate, "generate", "g", true, "Generate semantic version")
-		main()
+		cobra.OnInitialize(repo.setupCobra)
+		rootCmd.PersistentFlags().StringVarP(&varRepoName, "repository", "r", "https://github.com/lukaszraczylo/simple-gql-client", "Remote repository URL.")
+		rootCmd.PersistentFlags().StringVarP(&varLocalCfg, "config", "c", "config.yaml", "Path to config file")
+		rootCmd.PersistentFlags().BoolVarP(&varUseLocal, "local", "l", false, "Use local repository")
 	}
 }

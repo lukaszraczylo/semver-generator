@@ -1,0 +1,24 @@
+# action.yml
+name: 'Semantic Version Generator'
+description: 'Automagic semantic version generator'
+inputs:
+  config-file:
+    description: 'Configuration file'
+    required: false
+  repository-url:
+    description: 'Repository URL'
+    required: false
+    default: 'https://github.com/lukaszraczylo/simple-gql-client'
+  repository-local:
+    description: 'Use already cloned repository'
+    required: false
+outputs:
+  semantic-version: # id of output
+    description: 'Calculated semantic version'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.config-file }}
+    - ${{ inputs.repository-url }}
+    - ${{ inputs.repository-local }}

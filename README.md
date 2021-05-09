@@ -18,18 +18,28 @@ Project created overnight, to prove that management of semantic versioning is NO
 ### Usage
 
 ```bash
- bash$ ./semver-gen -g
+bash$ ./semver-gen generate -r https://github.com/nextapps-de/winbox
+SEMVER 9.0.10
+bash$ ./semver-gen generate -l
 SEMVER 5.1.1
 ```
 
-Available flags:
+** Local repository flag `-l` will always take precedence over remote repository URL **
 
 ```yaml
+Usage:
+  semver-gen generate [flags]
+  semver-gen [command]
+
+Available Commands:
+  generate    Generates semantic version
+  help        Help about any command
+
 Flags:
   -c, --config string       Path to config file (default "config.yaml")
-  -g, --generate            Generate semantic version
-  -h, --help                help for this command
-  -r, --repository string   Repository URL. If not specified local dir will be used. (default "https://github.com/lukaszraczylo/simple-gql-client")
+  -h, --help                help for semver-gen
+  -l, --local               Use local repository
+  -r, --repository string   Remote repository URL. (default "https://github.com/lukaszraczylo/simple-gql-client")
 ```
 
 #### Calculations example

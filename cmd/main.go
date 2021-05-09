@@ -64,6 +64,7 @@ type Setup struct {
 	Force               Force
 	Generate            bool
 	LocalConfigFile     string
+	UseLocal            bool
 }
 
 type CommitDetails struct {
@@ -90,18 +91,15 @@ func (s *Setup) CalculateSemver() SemVer {
 		matchMajor := checkMatches(commitSlice, s.Wording.Major)
 		if matchPatch {
 			s.Semver.Patch++
-			// fmt.Println("Patch version bumped:", commit.Message)
 		}
 		if matchMinor {
 			s.Semver.Minor++
 			s.Semver.Patch = 1
-			// fmt.Println("Minor version bumped:", commit.Message)
 		}
 		if matchMajor {
 			s.Semver.Major++
 			s.Semver.Minor = 0
 			s.Semver.Patch = 1
-			// fmt.Println("Major version bumped:", commit.Message)
 		}
 	}
 	return s.Semver
@@ -125,14 +123,27 @@ func (s *Setup) ListCommits() ([]CommitDetails, error) {
 }
 
 func (s *Setup) Prepare() error {
-	u, _ := url.Parse(s.RepositoryName)
-	s.RepositoryLocalPath = fmt.Sprintf("/tmp/foo/%s", u.Path)
-	os.RemoveAll(s.RepositoryLocalPath)
-	s.RepositoryHandler, err = git.PlainClone(s.RepositoryLocalPath, false, &git.CloneOptions{
-		URL: s.RepositoryName,
-	})
-	if err != nil {
-		fmt.Println("Unable to reach repository", err.Error())
+	if !repo.UseLocal {
+		u, err := url.Parse(s.RepositoryName)
+		if err != nil {
+			fmt.Println("Unable to parse repository URL", err.Error())
+			return err
+		}
+		s.RepositoryLocalPath = fmt.Sprintf("/tmp/foo/%s", u.Path)
+		os.RemoveAll(s.RepositoryLocalPath)
+		s.RepositoryHandler, err = git.PlainClone(s.RepositoryLocalPath, false, &git.CloneOptions{
+			URL: s.RepositoryName,
+		})
+		if err != nil {
+			fmt.Println("Unable to reach repository", err.Error())
+			return err
+		}
+	} else {
+		s.RepositoryHandler, err = git.PlainOpen(s.RepositoryLocalPath)
+		if err != nil {
+			fmt.Println("Unable to reach repository", err.Error())
+			return err
+		}
 	}
 	return err
 }
@@ -163,10 +174,6 @@ func (s *Setup) ReadConfig(file string) error {
 
 func (s *Setup) getSemver() string {
 	return fmt.Sprintf("%d.%d.%d", s.Semver.Major, s.Semver.Minor, s.Semver.Patch)
-}
-
-func (s *Setup) parseFlags() {
-
 }
 
 func main() {
