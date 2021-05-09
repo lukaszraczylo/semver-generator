@@ -92,6 +92,7 @@ force:
   major: 1
   minor: 0
   patch: 1
+  commit: 69fbe2df696f40281b9104ff073d26186cde1024
 wording:
   patch:
     - update
@@ -107,6 +108,7 @@ wording:
 
 * version: is not respected at the moment, introduced for potential backwards compatibility in future
 * force: sets the "starting" version, you don't need to specify this section as the default is always `0`
+* force.commit allows you to set commit hash from which the calculations should start
 * wording: words the program should look for in the git commits to increment (patch|minor|major)
 
 ### Good to know

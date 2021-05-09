@@ -25,6 +25,7 @@ import (
 	"time"
 
 	git "github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/lithammer/fuzzysearch/fuzzy"
 	"github.com/lukaszraczylo/zero"
@@ -44,9 +45,10 @@ type Wording struct {
 }
 
 type Force struct {
-	Patch int
-	Minor int
-	Major int
+	Patch  int
+	Minor  int
+	Major  int
+	Commit string
 }
 
 type SemVer struct {
@@ -107,7 +109,13 @@ func (s *Setup) CalculateSemver() SemVer {
 }
 
 func (s *Setup) ListCommits() ([]CommitDetails, error) {
-	ref, err := s.RepositoryHandler.Head()
+	var ref *plumbing.Reference
+	var err error
+	if zero.IsZero(s.Force.Commit) {
+		ref, err = s.RepositoryHandler.Head()
+	} else {
+		ref = plumbing.NewHashReference("start_commit", plumbing.NewHash(s.Force.Commit))
+	}
 	if err != nil {
 		return []CommitDetails{}, err
 	}
