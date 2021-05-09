@@ -30,7 +30,9 @@ var rootCmd = &cobra.Command{
 
 Effortless semantic version generator with git commit keywords matching, allowing you to focus on the development.
 Visit https://github.com/lukaszraczylo/semver-generator for more information, documentation and examples.`,
-	Run: func(cmd *cobra.Command, args []string) {},
+	Run: func(cmd *cobra.Command, args []string) {
+		main()
+	},
 }
 
 func Execute() {
@@ -55,6 +57,7 @@ func (r *Setup) setupCobra() {
 var (
 	varRepoName, varLocalCfg string
 	varUseLocal              bool
+	varShowVersion           bool
 )
 
 func init() {
@@ -64,5 +67,6 @@ func init() {
 		rootCmd.PersistentFlags().StringVarP(&varRepoName, "repository", "r", "https://github.com/lukaszraczylo/simple-gql-client", "Remote repository URL.")
 		rootCmd.PersistentFlags().StringVarP(&varLocalCfg, "config", "c", "config.yaml", "Path to config file")
 		rootCmd.PersistentFlags().BoolVarP(&varUseLocal, "local", "l", false, "Use local repository")
+		rootCmd.PersistentFlags().BoolVarP(&varShowVersion, "version", "v", false, "Display version")
 	}
 }

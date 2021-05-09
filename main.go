@@ -17,6 +17,11 @@ package main
 
 import "github.com/lukaszraczylo/semver-generator/cmd"
 
+var (
+	PKG_VERSION string
+)
+
 func main() {
+	cmd.PKG_VERSION = PKG_VERSION
 	cmd.Execute()
 }

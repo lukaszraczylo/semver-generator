@@ -32,8 +32,9 @@ import (
 )
 
 var (
-	err  error
-	repo *Setup
+	err         error
+	repo        *Setup
+	PKG_VERSION string
 )
 
 type Wording struct {
@@ -177,6 +178,10 @@ func (s *Setup) getSemver() string {
 }
 
 func main() {
+	if varShowVersion {
+		fmt.Println("semver-gen", PKG_VERSION, "\tMore information: https://github.com/lukaszraczylo/semver-generator")
+		return
+	}
 	if repo.Generate {
 		err := repo.ReadConfig(repo.LocalConfigFile)
 		if err != nil {
