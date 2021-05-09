@@ -57,7 +57,7 @@ jobs:
       RELEASE_VERSION: ${{ steps.semver.outputs.SEMVER }}
     steps:
       - name: Run
-        uses: lukaszraczylo/semver-generator
+        uses: lukaszraczylo/semver-generator@1.0.14
         id: semver
         with:
           config_file: config.yaml
