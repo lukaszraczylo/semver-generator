@@ -194,3 +194,16 @@ jobs:
           body_path: .release_notes
           draft: false
           prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
+      - name: Create Release v1
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: dist/semver-gen-*
+          tag_name: v1
+          name: v1
+          body_path: .release_notes
+          draft: false
+          prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
