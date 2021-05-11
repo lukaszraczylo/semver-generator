@@ -181,19 +181,6 @@ jobs:
       - name: Get list of the commits since last release
         run: |
           echo "$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%h %s")" > .release_notes
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          files: dist/semver-gen-*
-          tag_name: ${{ needs.prepare.outputs.RELEASE_VERSION }}
-          name: ${{ needs.prepare.outputs.RELEASE_VERSION }}
-          body_path: .release_notes
-          draft: false
-          prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
       - name: Create Release v1
         id: create_release_v1
         uses: softprops/action-gh-release@v1
@@ -204,6 +191,19 @@ jobs:
           files: dist/semver-gen-*
           tag_name: v1
           name: v1
+          body_path: .release_notes
+          draft: false
+          prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: dist/semver-gen-*
+          tag_name: ${{ needs.prepare.outputs.RELEASE_VERSION }}
+          name: ${{ needs.prepare.outputs.RELEASE_VERSION }}
           body_path: .release_notes
           draft: false
           prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
