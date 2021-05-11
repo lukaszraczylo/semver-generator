@@ -31,14 +31,17 @@ type Tests struct {
 }
 
 var (
-	assert *assertions.Assertions
+	assert          *assertions.Assertions
+	testCurrentPath string
 )
 
 func (suite *Tests) SetupTest() {
+	os.Chdir(testCurrentPath)
 	assert = assertions.New(suite.T())
 }
 
 func TestSuite(t *testing.T) {
+	testCurrentPath, _ = os.Getwd()
 	suite.Run(t, new(Tests))
 }
 
@@ -257,6 +260,7 @@ func (suite *Tests) TestSetup_ListCommits() {
 		RepositoryName      string
 		RepositoryLocalPath string
 		RepositoryHandler   *git.Repository
+		LocalConfigFile     string
 		Commits             []CommitDetails
 		Semver              SemVer
 		Wording             Wording
@@ -299,10 +303,10 @@ func (suite *Tests) TestSetup_ListCommits() {
 	}
 	for _, tt := range tests {
 		suite.T().Run(tt.name, func(t *testing.T) {
-			s := &Setup{
-				RepositoryName: tt.fields.RepositoryName,
-				Force:          tt.fields.Force,
-			}
+			s := &Setup{}
+			s.ReadConfig(tt.fields.LocalConfigFile)
+			s.RepositoryName = tt.fields.RepositoryName
+			s.Force = tt.fields.Force
 			s.Prepare()
 			listOfCommits, err := s.ListCommits()
 			if !tt.wantErr {
@@ -317,8 +321,9 @@ func (suite *Tests) TestSetup_ListCommits() {
 
 func (suite *Tests) TestSetup_CalculateSemver() {
 	type fields struct {
-		RepositoryName string
-		Force          Force
+		RepositoryName  string
+		Force           Force
+		LocalConfigFile string
 	}
 	type wantSemver struct {
 		Major int
@@ -333,50 +338,54 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 		{
 			name: "Test on existing repository",
 			fields: fields{
-				RepositoryName: "https://github.com/lukaszraczylo/simple-gql-client",
+				RepositoryName:  "https://github.com/lukaszraczylo/semver-generator-test-repo",
+				LocalConfigFile: "meta.yaml",
+				Force: Force{
+					Commit: "",
+				},
 			},
 			wantSemver: wantSemver{
-				Major: 1,
-				Minor: 3,
-				Patch: 1,
+				Major: 0,
+				Minor: 0,
+				Patch: 7,
 			},
 		},
 		{
 			name: "Test on existing repository, starting with certain hash",
 			fields: fields{
-				RepositoryName: "https://github.com/lukaszraczylo/simple-gql-client",
+				RepositoryName:  "https://github.com/lukaszraczylo/semver-generator-test-repo",
+				LocalConfigFile: "meta.yaml",
 				Force: Force{
-					Commit: "97d3682ed94168600926f9ff6da650403d1f3317",
+					Commit: "45f9a23cec39e94503841638aee3efecd45111cf",
 				},
 			},
 			wantSemver: wantSemver{
-				Major: 1,
-				Minor: 3,
+				Major: 2,
+				Minor: 4,
 				Patch: 1,
 			},
 		},
 		{
 			name: "Test on non-existing repository",
 			fields: fields{
-				RepositoryName: "https://github.com/lukaszraczylo/simple-gql-client-dead",
+				RepositoryName: "https://github.com/lukaszraczylo/semver-generator-test-repo-dead",
 			},
 			wantSemver: wantSemver{
 				Major: 1, // 1 because config file enforces MAJOR version
-				Minor: 0,
+				Minor: 1, // 1 because config file enforces MINOR version
 				Patch: 0,
 			},
 		},
 	}
 	for _, tt := range tests {
 		suite.T().Run(tt.name, func(t *testing.T) {
-			s := &Setup{
-				RepositoryName: tt.fields.RepositoryName,
-				Force:          tt.fields.Force,
-			}
-			s.ReadConfig("../config.yaml")
+			s := &Setup{}
+			s.ReadConfig(tt.fields.LocalConfigFile)
+			s.RepositoryName = tt.fields.RepositoryName
 			s.Prepare()
-			s.ListCommits()
 			s.ForcedVersioning()
+			s.Force = tt.fields.Force
+			s.ListCommits()
 			semver := s.CalculateSemver()
 			assert.Equal(tt.wantSemver.Major, semver.Major, "Unexpected MAJOR semver result in "+tt.name)
 			assert.Equal(tt.wantSemver.Minor, semver.Minor, "Unexpected MINOR semver result in "+tt.name)

@@ -7,6 +7,7 @@ Project created overnight, to prove that management of semantic versioning is NO
 - [Semantic version generator](#semantic-version-generator)
   - [How does it work](#how-does-it-work)
   - [Usage](#usage)
+    - [Authentication](#authentication)
     - [As a binary](#as-a-binary)
     - [As a github action](#as-a-github-action)
     - [As a docker container](#as-a-docker-container)
@@ -21,6 +22,16 @@ Project created overnight, to prove that management of semantic versioning is NO
 * Returns the semantic version which can be included in the release
 
 ### Usage
+
+#### Authentication
+
+If you intend to use this project with remote repositories ( regardless of them being private or public ) you need to authenticate with your repository.
+To do so you can utilise the following environment variables ( they are NOT github specific, for other providers you can use the password )
+
+```bash
+export GITHUB_USERNAME=lukaszraczylo
+export GITHUB_TOKEN=yourPersonalApiToken
+```
 
 #### As a binary
 
@@ -48,7 +59,7 @@ Available Commands:
   help        Help about any command
 
 Flags:
-  -c, --config string       Path to config file (default "config.yaml")
+  -c, --config string       Path to config file (default "semver.yaml")
   -d, --debug               Enable debug mode
   -h, --help                help for semver-gen
   -l, --local               Use local repository
@@ -72,9 +83,9 @@ jobs:
           fetch-depth: '0'
       - name: Semver run
         id: semver
-        uses: lukaszraczylo/semver-generator@1.0.44
+        uses: lukaszraczylo/semver-generator@PLACE_LATEST_TAG_HERE
         with:
-          config_file: config.yaml
+          config_file: semver.yaml
           # either...
           repository_local: true
           # or...
