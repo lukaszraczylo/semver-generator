@@ -26,6 +26,8 @@ if [[ "${FLAGS}" == "" && "$*" == "" ]]; then
   exit 1
 fi
 
+cd /github/workspace
 OUT_SEMVER_GEN=$(/go/src/app/semver-gen generate $FLAGS $*)
+[ $? -eq 0 ] || exit 1
 echo "::set-output name=semantic_version::$(echo $OUT_SEMVER_GEN | sed -e 's|SEMVER ||g')"
 echo $OUT_SEMVER_GEN
