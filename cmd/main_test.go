@@ -337,7 +337,7 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 			},
 			wantSemver: wantSemver{
 				Major: 1,
-				Minor: 2,
+				Minor: 3,
 				Patch: 1,
 			},
 		},
@@ -351,7 +351,7 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 			},
 			wantSemver: wantSemver{
 				Major: 1,
-				Minor: 2,
+				Minor: 3,
 				Patch: 1,
 			},
 		},

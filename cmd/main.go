@@ -152,8 +152,10 @@ func (s *Setup) ListCommits() ([]CommitDetails, error) {
 	}
 
 	for commitId, cmt := range tmpResults {
-		if zero.IsZero(s.Force.Commit) || (!zero.IsZero(s.Force.Commit) && cmt.Hash == s.Force.Commit) {
+		if s.Force.Commit != "" && cmt.Hash == s.Force.Commit {
 			s.Commits = tmpResults[commitId:]
+		} else {
+			s.Commits = tmpResults
 		}
 	}
 
