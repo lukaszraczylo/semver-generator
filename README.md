@@ -84,6 +84,8 @@ jobs:
       - name: Semver run
         id: semver
         uses: lukaszraczylo/semver-generator@PLACE_LATEST_TAG_HERE
+        # you can also use v1 tag which _should_ automatically upgrade to latest
+        # uses: lukaszraczylo/semver-generator@v1
         with:
           config_file: semver.yaml
           # either...
