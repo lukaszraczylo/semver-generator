@@ -66,7 +66,7 @@ func init() {
 	if !strings.HasSuffix(os.Args[0], ".test") {
 		cobra.OnInitialize(repo.setupCobra)
 		rootCmd.PersistentFlags().StringVarP(&varRepoName, "repository", "r", "https://github.com/lukaszraczylo/simple-gql-client", "Remote repository URL.")
-		rootCmd.PersistentFlags().StringVarP(&varLocalCfg, "config", "c", "config.yaml", "Path to config file")
+		rootCmd.PersistentFlags().StringVarP(&varLocalCfg, "config", "c", "semver.yaml", "Path to config file")
 		rootCmd.PersistentFlags().BoolVarP(&varUseLocal, "local", "l", false, "Use local repository")
 		rootCmd.PersistentFlags().BoolVarP(&varShowVersion, "version", "v", false, "Display version")
 		rootCmd.PersistentFlags().BoolVarP(&varDebug, "debug", "d", false, "Enable debug mode")

@@ -27,6 +27,7 @@ import (
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/lithammer/fuzzysearch/fuzzy"
 	"github.com/lukaszraczylo/zero"
 	"github.com/spf13/viper"
@@ -81,40 +82,43 @@ func checkMatches(content []string, targets []string) bool {
 	var r []string
 	for _, tgt := range targets {
 		r = fuzzy.FindFold(tgt, content)
+		if len(r) > 0 {
+			return true
+		}
 	}
-	return (len(r) > 0)
+	return false
 }
 
 func (s *Setup) CalculateSemver() SemVer {
 	for _, commit := range s.Commits {
 		s.Semver.Patch++
 		if varDebug {
-			fmt.Println("DEBUG: Incrementing patch (DEFAULT) on ", commit.Message)
+			fmt.Println("DEBUG: Incrementing patch (DEFAULT) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver())
 		}
-		commitSlice := strings.Split(commit.Message, " ")
+		commitSlice := strings.Fields(commit.Message)
 		matchPatch := checkMatches(commitSlice, s.Wording.Patch)
 		matchMinor := checkMatches(commitSlice, s.Wording.Minor)
 		matchMajor := checkMatches(commitSlice, s.Wording.Major)
 		if matchPatch {
-			if varDebug {
-				fmt.Println("DEBUG: Incrementing patch (WORDING) on ", commit.Message)
-			}
 			s.Semver.Patch++
+			if varDebug {
+				fmt.Println("DEBUG: Incrementing patch (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver())
+			}
 		}
 		if matchMinor {
-			if varDebug {
-				fmt.Println("DEBUG: Incrementing minor (WORDING) on ", commit.Message)
-			}
 			s.Semver.Minor++
 			s.Semver.Patch = 1
+			if varDebug {
+				fmt.Println("DEBUG: Incrementing minor (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver())
+			}
 		}
 		if matchMajor {
-			if varDebug {
-				fmt.Println("DEBUG: Incrementing major (WORDING) on ", commit.Message)
-			}
 			s.Semver.Major++
 			s.Semver.Minor = 0
 			s.Semver.Patch = 1
+			if varDebug {
+				fmt.Println("DEBUG: Incrementing major (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver())
+			}
 		}
 	}
 	return s.Semver
@@ -124,14 +128,7 @@ func (s *Setup) ListCommits() ([]CommitDetails, error) {
 	var ref *plumbing.Reference
 	var err error
 
-	// if zero.IsZero(s.Force.Commit) {
 	ref, err = s.RepositoryHandler.Head()
-	// } else {
-	// 	if varDebug {
-	// 		fmt.Println("DEBUG: Forced start from commit", s.Force.Commit)
-	// 	}
-	// 	ref = plumbing.NewHashReference("start_commit", plumbing.NewHash(s.Force.Commit))
-	// }
 	if err != nil {
 		return []CommitDetails{}, err
 	}
@@ -170,25 +167,31 @@ func (s *Setup) Prepare() error {
 	if !repo.UseLocal {
 		u, err := url.Parse(s.RepositoryName)
 		if err != nil {
-			fmt.Println("Unable to parse repository URL", err.Error())
+			fmt.Println("Unable to parse repository URL", s.RepositoryName, "Error:", err.Error())
 			return err
 		}
-		s.RepositoryLocalPath = fmt.Sprintf("/tmp/foo/%s", u.Path)
+		s.RepositoryLocalPath = fmt.Sprintf("/tmp/semver/%s", u.Path)
 		os.RemoveAll(s.RepositoryLocalPath)
 		s.RepositoryHandler, err = git.PlainClone(s.RepositoryLocalPath, false, &git.CloneOptions{
 			URL: s.RepositoryName,
+			Auth: &http.BasicAuth{
+				Username: os.Getenv("GITHUB_USERNAME"),
+				Password: os.Getenv("GITHUB_TOKEN"),
+			},
 		})
 		if err != nil {
-			fmt.Println("Unable to reach repository", err.Error())
+			fmt.Println("Unable to reach repository", s.RepositoryName, "Error:", err.Error())
 			return err
 		}
 	} else {
+		s.RepositoryLocalPath = "./"
 		s.RepositoryHandler, err = git.PlainOpen(s.RepositoryLocalPath)
 		if err != nil {
-			fmt.Println("Unable to reach repository", err.Error())
+			fmt.Println("Unable to reach repository", s.RepositoryName, "Error:", err.Error())
 			return err
 		}
 	}
+	os.Chdir(s.RepositoryLocalPath)
 	return err
 }
 
