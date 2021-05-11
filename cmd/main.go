@@ -124,14 +124,7 @@ func (s *Setup) ListCommits() ([]CommitDetails, error) {
 	var ref *plumbing.Reference
 	var err error
 
-	// if zero.IsZero(s.Force.Commit) {
 	ref, err = s.RepositoryHandler.Head()
-	// } else {
-	// 	if varDebug {
-	// 		fmt.Println("DEBUG: Forced start from commit", s.Force.Commit)
-	// 	}
-	// 	ref = plumbing.NewHashReference("start_commit", plumbing.NewHash(s.Force.Commit))
-	// }
 	if err != nil {
 		return []CommitDetails{}, err
 	}
@@ -231,6 +224,7 @@ func (s *Setup) getSemver() string {
 
 func main() {
 	if varShowVersion {
+		checkLatestRelease()
 		fmt.Println("semver-gen", PKG_VERSION, "\tMore information: https://github.com/lukaszraczylo/semver-generator")
 		return
 	}

@@ -9,6 +9,7 @@ require (
 	github.com/go-git/go-git/v5 v5.3.0
 	github.com/kevinburke/ssh_config v1.1.0 // indirect
 	github.com/lithammer/fuzzysearch v1.1.2
+	github.com/lukaszraczylo/simple-gql-client v1.22.38 // indirect
 	github.com/lukaszraczylo/zero v0.0.0-20160322155811-4a4535dd56e7
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
