@@ -72,7 +72,7 @@ jobs:
           fetch-depth: '0'
       - name: Semver run
         id: semver
-        uses: lukaszraczylo/semver-generator@1.0.29
+        uses: lukaszraczylo/semver-generator@1.0.44
         with:
           config_file: config.yaml
           # either...
