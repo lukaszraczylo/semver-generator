@@ -195,7 +195,7 @@ jobs:
           draft: false
           prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
       - name: Create Release v1
-        id: create_release
+        id: create_release_v1
         uses: softprops/action-gh-release@v1
         if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
         env:
