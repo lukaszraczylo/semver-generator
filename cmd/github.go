@@ -9,7 +9,7 @@ import (
 )
 
 func checkLatestRelease() (string, bool) {
-	ghToken, ghTokenSet := os.LookupEnv("GHCR_TOKEN")
+	ghToken, ghTokenSet := os.LookupEnv("GITHUB_TOKEN")
 	if ghTokenSet {
 		gql.GraphQLUrl = "https://api.github.com/graphql"
 		headers := map[string]interface{}{
