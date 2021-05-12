@@ -92,6 +92,9 @@ jobs:
           repository_local: true
           # or...
           repository_url: https://github.com/lukaszraczylo/simple-gql-client
+          # when using remote repository, especially with private one:
+          github_username: lukaszraczylo
+          github_token: MySupeRSecr3tPa$$w0rd
       - name: Semver check
         run: |
           echo "Semantic version detected: ${{ steps.semver.outputs.semantic_version }}"
