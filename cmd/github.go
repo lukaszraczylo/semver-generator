@@ -5,6 +5,7 @@ import (
 	"os"
 
 	gql "github.com/lukaszraczylo/simple-gql-client"
+	"github.com/tidwall/gjson"
 )
 
 func checkLatestRelease() (string, bool) {
@@ -15,13 +16,23 @@ func checkLatestRelease() (string, bool) {
 			"Authorization": fmt.Sprintf("bearer %s", ghToken),
 		}
 		variables := map[string]interface{}{}
-		var query = `query { viewer { login }}`
+		var query = `query {
+			repository(name: "semver-generator", owner: "lukaszraczylo") {
+				releases(last: 1) {
+					nodes {
+						tag {
+							name
+						}
+					}
+				}
+			}
+		}`
 		result, err := gql.Query(query, variables, headers)
 		if err != nil {
 			fmt.Println("Query error", err)
 			return "", false
 		}
-		fmt.Println(result)
+		result = gjson.Get(result, "repository.releases.nodes.0.tag.name").String()
 		return result, true
 	} else {
 		return "[no GITHUB_TOKEN set]", false
