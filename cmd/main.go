@@ -234,8 +234,12 @@ func (s *Setup) getSemver() string {
 
 func main() {
 	if varShowVersion {
-		checkLatestRelease()
-		fmt.Println("semver-gen", PKG_VERSION, "\tMore information: https://github.com/lukaszraczylo/semver-generator")
+		var outdatedMsg string
+		latestRelease, latestRelaseOk := checkLatestRelease()
+		if PKG_VERSION != latestRelease && latestRelaseOk {
+			outdatedMsg = fmt.Sprintf("(Latest available: %s)", latestRelease)
+		}
+		fmt.Println("semver-gen", PKG_VERSION, "", outdatedMsg, "\tMore information: https://github.com/lukaszraczylo/semver-generator")
 		return
 	}
 	if repo.Generate {
