@@ -26,6 +26,14 @@ if [[ "${FLAGS}" == "" && "$*" == "" ]]; then
   exit 1
 fi
 
+if [[ ! -z "$INPUT_GITHUB_TOKEN" ]]; then
+  export GITHUB_TOKEN=$INPUT_GITHUB_TOKEN
+fi
+
+if [[ ! -z "$INPUT_GITHUB_USERNAME" ]]; then
+  export GITHUB_USERNAME=$INPUT_GITHUB_USERNAME
+fi
+
 cd /github/workspace
 OUT_SEMVER_GEN=$(/go/src/app/semver-gen generate $FLAGS $*)
 [ $? -eq 0 ] || exit 1

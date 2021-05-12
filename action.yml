@@ -16,6 +16,12 @@ inputs:
   repository_local:
     description: 'Use already cloned repository in current directory'
     required: false
+  github_token:
+    description: 'GitHub Personal Access Token OR password'
+    required: false
+  github_username:
+    description: 'GitHub or other git hosting provider username'
+    required: false
 outputs:
   semantic_version:
     description: 'Calculated semantic version'
