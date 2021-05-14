@@ -75,6 +75,11 @@ jobs:
       - name: Run unit tests
         run: |
           make test CI_RUN=${CI}
+      - name: Upload codecov result
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          files: coverage.out
       # - name: Codeclimate
       #   uses: paambaati/codeclimate-action@v2.7.5
       #   with:
