@@ -1,6 +1,6 @@
 ## Semantic version generator
 
-[![Docker image build.](https://github.com/lukaszraczylo/semver-generator/actions/workflows/release.yaml/badge.svg)](https://github.com/lukaszraczylo/semver-generator/actions/workflows/release.yaml) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/lukaszraczylo/semver-generator?style=plastic) [![Maintainability](https://api.codeclimate.com/v1/badges/0953eb7b7717af41911b/maintainability)](https://codeclimate.com/github/lukaszraczylo/semver-generator/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/0953eb7b7717af41911b/test_coverage)](https://codeclimate.com/github/lukaszraczylo/semver-generator/test_coverage)
+[![Docker image build.](https://github.com/lukaszraczylo/semver-generator/actions/workflows/release.yaml/badge.svg)](https://github.com/lukaszraczylo/semver-generator/actions/workflows/release.yaml) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/lukaszraczylo/semver-generator) [![codecov](https://codecov.io/gh/lukaszraczylo/semver-generator/branch/main/graph/badge.svg?token=FY9BKETB59)](https://codecov.io/gh/lukaszraczylo/semver-generator)
 
 Project created overnight, to prove that management of semantic versioning is NOT painful and do not require arguments and debates within the team. Simple, clean and only thing the project team should need to agree to are the keywords.
 

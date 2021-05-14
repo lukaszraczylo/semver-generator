@@ -9,7 +9,7 @@ run: build
 	@./semver-gen
 
 test:
-	@go test ./... -v -race -cover
+	@go test ./... -v -race -cover -coverprofile=coverage.out
 
 update:
 	@go get -u ./...
