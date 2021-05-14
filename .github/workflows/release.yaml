@@ -73,6 +73,8 @@ jobs:
           golangci-lint run --exclude-use-default ./...
           /action/lib/linter.sh
       - name: Run unit tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GHCR_TOKEN }}
         run: |
           make test CI_RUN=${CI}
       - name: Upload codecov result
