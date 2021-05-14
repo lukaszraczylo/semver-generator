@@ -38,6 +38,7 @@ var (
 func (suite *Tests) SetupTest() {
 	os.Chdir(testCurrentPath)
 	assert = assertions.New(suite.T())
+	varDebug = true
 }
 
 func TestSuite(t *testing.T) {
