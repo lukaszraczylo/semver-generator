@@ -11,7 +11,8 @@ Project created overnight, to prove that management of semantic versioning is NO
     - [As a binary](#as-a-binary)
     - [As a github action](#as-a-github-action)
     - [As a docker container](#as-a-docker-container)
-    - [Calculations example](#calculations-example)
+    - [Calculations example [standard]](#calculations-example-standard)
+    - [Calculations example [strict matching]](#calculations-example-strict-matching)
     - [Example configuration](#example-configuration)
   - [Good to know](#good-to-know)
 
@@ -64,6 +65,7 @@ Flags:
   -h, --help                help for semver-gen
   -l, --local               Use local repository
   -r, --repository string   Remote repository URL. (default "https://github.com/lukaszraczylo/simple-gql-client")
+  -s, --strict              Strict matching
   -u, --update              Update binary with latest
   -v, --version             Display version
 ```
@@ -110,7 +112,7 @@ docker pull ghcr.io/lukaszraczylo/semver-generator:latest
 **Docker supported architectures:**
 Linux/arm64, Linux/amd64
 
-#### Calculations example
+#### Calculations example [standard]
 
 * 0.0.1 - PATCH - starting commit
 * 0.0.2 - PATCH - another commit
@@ -119,6 +121,16 @@ Linux/arm64, Linux/amd64
 * 0.1.1 - PATCH - additional commit
 * 1.0.1 - MAJOR - commit with word 'BREAKING' = > INCREMENT MAJOR, reset MINOR
 * 1.0.2 - PATCH - another commit
+
+#### Calculations example [strict matching]
+
+* 0.0.1 - PATCH - starting commit
+* 0.0.1 - PATCH - another commit
+* 0.0.1 - PATCH - another commit with word 'Update' => DOUBLE increment PATCH
+* 0.1.0 - MINOR - after commit with word 'Change' => increment MINOR, reset PATCH
+* 0.1.0 - PATCH - additional commit
+* 1.0.0 - MAJOR - commit with word 'BREAKING' = > INCREMENT MAJOR, reset MINOR
+* 1.0.0 - PATCH - another commit
 
 #### Example configuration
 
