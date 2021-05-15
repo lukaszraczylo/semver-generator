@@ -64,6 +64,7 @@ Flags:
   -h, --help                help for semver-gen
   -l, --local               Use local repository
   -r, --repository string   Remote repository URL. (default "https://github.com/lukaszraczylo/simple-gql-client")
+  -u, --update              Update binary with latest
   -v, --version             Display version
 ```
 

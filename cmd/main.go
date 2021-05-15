@@ -242,6 +242,9 @@ func main() {
 		fmt.Println("semver-gen", PKG_VERSION, "", outdatedMsg, "\tMore information: https://github.com/lukaszraczylo/semver-generator")
 		return
 	}
+	if varUpdate {
+		updatePackage()
+	}
 	if repo.Generate {
 		err := repo.ReadConfig(repo.LocalConfigFile)
 		if err != nil {
