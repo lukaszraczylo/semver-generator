@@ -60,6 +60,7 @@ var (
 	varShowVersion           bool
 	varDebug                 bool
 	varUpdate                bool
+	varStrict                bool
 )
 
 func init() {
@@ -72,5 +73,6 @@ func init() {
 		rootCmd.PersistentFlags().BoolVarP(&varShowVersion, "version", "v", false, "Display version")
 		rootCmd.PersistentFlags().BoolVarP(&varDebug, "debug", "d", false, "Enable debug mode")
 		rootCmd.PersistentFlags().BoolVarP(&varUpdate, "update", "u", false, "Update binary with latest")
+		rootCmd.PersistentFlags().BoolVarP(&varStrict, "strict", "s", false, "Strict matching")
 	}
 }

@@ -332,9 +332,10 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 		Patch int
 	}
 	tests := []struct {
-		name       string
-		fields     fields
-		wantSemver wantSemver
+		name           string
+		fields         fields
+		wantSemver     wantSemver
+		strictMatching bool
 	}{
 		{
 			name: "Test on existing repository",
@@ -349,6 +350,22 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 				Major: 0,
 				Minor: 0,
 				Patch: 7,
+			},
+		},
+		{
+			name: "Test on existing repository with strict matching",
+			fields: fields{
+				RepositoryName:  "https://github.com/lukaszraczylo/semver-generator-test-repo",
+				LocalConfigFile: "meta.yaml",
+				Force: Force{
+					Commit: "",
+				},
+			},
+			strictMatching: true,
+			wantSemver: wantSemver{
+				Major: 2,
+				Minor: 4,
+				Patch: 1,
 			},
 		},
 		{
@@ -387,10 +404,33 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 			s.ForcedVersioning()
 			s.Force = tt.fields.Force
 			s.ListCommits()
+			varStrict = tt.strictMatching
 			semver := s.CalculateSemver()
 			assert.Equal(tt.wantSemver.Major, semver.Major, "Unexpected MAJOR semver result in "+tt.name)
 			assert.Equal(tt.wantSemver.Minor, semver.Minor, "Unexpected MINOR semver result in "+tt.name)
 			assert.Equal(tt.wantSemver.Patch, semver.Patch, "Unexpected PATCH semver result in "+tt.name)
+		})
+	}
+}
+
+func (suite *Tests) Test_debugPrint() {
+	type args struct {
+		content string
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "Test debug print",
+			args: args{
+				content: "Test debug",
+			},
+		},
+	}
+	for _, tt := range tests {
+		suite.T().Run(tt.name, func(t *testing.T) {
+			debugPrint(tt.args.content)
 		})
 	}
 }

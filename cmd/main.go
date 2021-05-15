@@ -89,11 +89,17 @@ func checkMatches(content []string, targets []string) bool {
 	return false
 }
 
+func debugPrint(content string) {
+	if varDebug {
+		fmt.Println("DEBUG:", content)
+	}
+}
+
 func (s *Setup) CalculateSemver() SemVer {
 	for _, commit := range s.Commits {
-		s.Semver.Patch++
-		if varDebug {
-			fmt.Println("DEBUG: Incrementing patch (DEFAULT) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver())
+		if !varStrict {
+			s.Semver.Patch++
+			debugPrint(fmt.Sprintln("Incrementing patch (DEFAULT) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
 		}
 		commitSlice := strings.Fields(commit.Message)
 		matchPatch := checkMatches(commitSlice, s.Wording.Patch)
@@ -101,24 +107,18 @@ func (s *Setup) CalculateSemver() SemVer {
 		matchMajor := checkMatches(commitSlice, s.Wording.Major)
 		if matchPatch {
 			s.Semver.Patch++
-			if varDebug {
-				fmt.Println("DEBUG: Incrementing patch (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver())
-			}
+			debugPrint(fmt.Sprintln("Incrementing patch (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
 		}
 		if matchMinor {
 			s.Semver.Minor++
 			s.Semver.Patch = 1
-			if varDebug {
-				fmt.Println("DEBUG: Incrementing minor (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver())
-			}
+			debugPrint(fmt.Sprintln("Incrementing minor (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
 		}
 		if matchMajor {
 			s.Semver.Major++
 			s.Semver.Minor = 0
 			s.Semver.Patch = 1
-			if varDebug {
-				fmt.Println("DEBUG: Incrementing major (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver())
-			}
+			debugPrint(fmt.Sprintln("Incrementing major (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
 		}
 	}
 	return s.Semver
@@ -144,9 +144,7 @@ func (s *Setup) ListCommits() ([]CommitDetails, error) {
 		return nil
 	})
 
-	if varDebug {
-		fmt.Println("\n---COMMITS BEFORE CUT---\n", tmpResults)
-	}
+	debugPrint(fmt.Sprintln("\n---COMMITS BEFORE CUT---\n", s.Commits))
 
 	for commitId, cmt := range tmpResults {
 		if s.Force.Commit != "" && cmt.Hash == s.Force.Commit {
@@ -156,9 +154,7 @@ func (s *Setup) ListCommits() ([]CommitDetails, error) {
 		}
 	}
 
-	if varDebug {
-		fmt.Println("\n---COMMITS AFTER CUT---\n", s.Commits)
-	}
+	debugPrint(fmt.Sprintln("\n---COMMITS AFTER CUT---\n", s.Commits))
 
 	return s.Commits, err
 }
@@ -197,21 +193,15 @@ func (s *Setup) Prepare() error {
 
 func (s *Setup) ForcedVersioning() {
 	if !zero.IsZero(s.Force.Major) {
-		if varDebug {
-			fmt.Println("DEBUG: Forced versioning (MAJOR)", s.Force.Major)
-		}
+		debugPrint(fmt.Sprintln("Forced versioning (MAJOR)", s.Force.Major))
 		s.Semver.Major = s.Force.Major
 	}
 	if !zero.IsZero(s.Force.Minor) {
-		if varDebug {
-			fmt.Println("DEBUG: Forced versioning (MINOR)", s.Force.Minor)
-		}
+		debugPrint(fmt.Sprintln("Forced versioning (MINOR)", s.Force.Minor))
 		s.Semver.Minor = s.Force.Minor
 	}
 	if !zero.IsZero(s.Force.Patch) {
-		if varDebug {
-			fmt.Println("DEBUG: Forced versioning (PATCH)", s.Force.Patch)
-		}
+		debugPrint(fmt.Sprintln("Forced versioning (PATCH)", s.Force.Patch))
 		s.Semver.Patch = s.Force.Patch
 	}
 }
@@ -240,6 +230,9 @@ func main() {
 			outdatedMsg = fmt.Sprintf("(Latest available: %s)", latestRelease)
 		}
 		fmt.Println("semver-gen", PKG_VERSION, "", outdatedMsg, "\tMore information: https://github.com/lukaszraczylo/semver-generator")
+		if outdatedMsg != "" {
+			fmt.Println("You can update automatically with: semver-gen -u")
+		}
 		return
 	}
 	if varUpdate {
