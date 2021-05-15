@@ -47,7 +47,7 @@ func updatePackage() bool {
 			fmt.Println("Unable to obtain download url for the binary", binaryName)
 			return false
 		}
-		if flag.Lookup("test.v") == nil {
+		if flag.Lookup("test.v") == nil && os.Getenv("CI") == "" {
 			downloadedBinaryPath := fmt.Sprintf("/tmp/%s", binaryName)
 			g := got.New()
 			err = g.Download(result, downloadedBinaryPath)
