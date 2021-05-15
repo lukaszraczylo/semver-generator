@@ -126,7 +126,7 @@ Linux/arm64, Linux/amd64
 
 * 0.0.1 - PATCH - starting commit
 * 0.0.1 - PATCH - another commit
-* 0.0.1 - PATCH - another commit with word 'Update' => DOUBLE increment PATCH
+* 0.0.1 - PATCH - another commit with word 'Update' => SINGLE increment PATCH
 * 0.1.0 - MINOR - after commit with word 'Change' => increment MINOR, reset PATCH
 * 0.1.0 - PATCH - additional commit
 * 1.0.0 - MAJOR - commit with word 'BREAKING' = > INCREMENT MAJOR, reset MINOR
