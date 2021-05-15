@@ -17,6 +17,7 @@ limitations under the License.
 package cmd
 
 import (
+	"flag"
 	"fmt"
 	"net/url"
 	"os"
@@ -90,14 +91,14 @@ func checkMatches(content []string, targets []string) bool {
 }
 
 func debugPrint(content string) {
-	if varDebug {
+	if params.varDebug && flag.Lookup("test.v") == nil {
 		fmt.Println("DEBUG:", content)
 	}
 }
 
 func (s *Setup) CalculateSemver() SemVer {
 	for _, commit := range s.Commits {
-		if !varStrict {
+		if !params.varStrict {
 			s.Semver.Patch++
 			debugPrint(fmt.Sprintln("Incrementing patch (DEFAULT) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
 		}
@@ -223,7 +224,7 @@ func (s *Setup) getSemver() string {
 }
 
 func main() {
-	if varShowVersion {
+	if params.varShowVersion {
 		var outdatedMsg string
 		latestRelease, latestRelaseOk := checkLatestRelease()
 		if PKG_VERSION != latestRelease && latestRelaseOk {
@@ -235,17 +236,20 @@ func main() {
 		}
 		return
 	}
-	if varUpdate {
+	if params.varUpdate {
 		updatePackage()
+		return
 	}
-	if repo.Generate {
+	if repo.Generate || params.varGenerateInTest {
 		err := repo.ReadConfig(repo.LocalConfigFile)
 		if err != nil {
-			panic(err)
+			fmt.Println("Unable to find config file", repo.LocalConfigFile)
+			os.Exit(1)
 		}
 		err = repo.Prepare()
 		if err != nil {
-			panic(err)
+			fmt.Println("Unable to prepare repository")
+			os.Exit(1)
 		}
 		repo.ListCommits()
 		repo.ForcedVersioning()

@@ -38,7 +38,7 @@ var (
 func (suite *Tests) SetupTest() {
 	os.Chdir(testCurrentPath)
 	assert = assertions.New(suite.T())
-	varDebug = true
+	params.varDebug = true
 }
 
 func TestSuite(t *testing.T) {
@@ -404,7 +404,7 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 			s.ForcedVersioning()
 			s.Force = tt.fields.Force
 			s.ListCommits()
-			varStrict = tt.strictMatching
+			params.varStrict = tt.strictMatching
 			semver := s.CalculateSemver()
 			assert.Equal(tt.wantSemver.Major, semver.Major, "Unexpected MAJOR semver result in "+tt.name)
 			assert.Equal(tt.wantSemver.Minor, semver.Minor, "Unexpected MINOR semver result in "+tt.name)
@@ -431,6 +431,51 @@ func (suite *Tests) Test_debugPrint() {
 	for _, tt := range tests {
 		suite.T().Run(tt.name, func(t *testing.T) {
 			debugPrint(tt.args.content)
+		})
+	}
+}
+
+func (suite *Tests) Test_main() {
+	type vars struct {
+		varRepoName       string
+		varLocalCfg       string
+		varUseLocal       bool
+		varShowVersion    bool
+		varDebug          bool
+		varUpdate         bool
+		varStrict         bool
+		varGenerateInTest bool
+	}
+	tests := []struct {
+		name string
+		vars vars
+	}{
+		{
+			name: "Test printing version",
+			vars: vars{
+				varShowVersion: true,
+			},
+		},
+		{
+			name: "Test update switch",
+			vars: vars{
+				varUpdate: true,
+			},
+		},
+		{
+			name: "Test main",
+			vars: vars{
+				varGenerateInTest: false,
+			},
+		},
+	}
+	for _, tt := range tests {
+		suite.T().Run(tt.name, func(t *testing.T) {
+			params = myParams(tt.vars)
+			repo = &Setup{}
+			repo.LocalConfigFile = "../config.yaml"
+			repo.UseLocal = true
+			main()
 		})
 	}
 }
