@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"runtime"
@@ -46,27 +47,29 @@ func updatePackage() bool {
 			fmt.Println("Unable to obtain download url for the binary", binaryName)
 			return false
 		}
-		downloadedBinaryPath := fmt.Sprintf("/tmp/%s", binaryName)
-		g := got.New()
-		err = g.Download(result, downloadedBinaryPath)
-		if err != nil {
-			fmt.Println("Unable to download binary", err.Error())
-			return false
-		}
-		currentBinary, err := os.Executable()
-		if err != nil {
-			fmt.Println("Unable to obtain current binary path", err.Error())
-			return false
-		}
-		err = os.Rename(downloadedBinaryPath, currentBinary)
-		if err != nil {
-			fmt.Println("Unable to overwrite current binary", err.Error())
-			return false
-		}
-		err = os.Chmod(currentBinary, 0777)
-		if err != nil {
-			fmt.Println("Unable to make binary executable", err.Error())
-			return false
+		if flag.Lookup("test.v") == nil {
+			downloadedBinaryPath := fmt.Sprintf("/tmp/%s", binaryName)
+			g := got.New()
+			err = g.Download(result, downloadedBinaryPath)
+			if err != nil {
+				fmt.Println("Unable to download binary", err.Error())
+				return false
+			}
+			currentBinary, err := os.Executable()
+			if err != nil {
+				fmt.Println("Unable to obtain current binary path", err.Error())
+				return false
+			}
+			err = os.Rename(downloadedBinaryPath, currentBinary)
+			if err != nil {
+				fmt.Println("Unable to overwrite current binary", err.Error())
+				return false
+			}
+			err = os.Chmod(currentBinary, 0777)
+			if err != nil {
+				fmt.Println("Unable to make binary executable", err.Error())
+				return false
+			}
 		}
 	}
 	return true

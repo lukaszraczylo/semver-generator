@@ -16,9 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"os"
-	"strings"
-
 	"github.com/spf13/cobra"
 )
 
@@ -48,31 +45,33 @@ func (r *Setup) setupCobra() {
 	if err != nil {
 		panic(err)
 	}
-	r.UseLocal = varUseLocal
+	r.UseLocal = params.varUseLocal
 	if err != nil {
 		panic(err)
 	}
 }
 
-var (
-	varRepoName, varLocalCfg string
-	varUseLocal              bool
-	varShowVersion           bool
-	varDebug                 bool
-	varUpdate                bool
-	varStrict                bool
-)
+type myParams struct {
+	varRepoName       string
+	varLocalCfg       string
+	varUseLocal       bool
+	varShowVersion    bool
+	varDebug          bool
+	varUpdate         bool
+	varStrict         bool
+	varGenerateInTest bool
+}
+
+var params myParams
 
 func init() {
 	repo = &Setup{}
-	if !strings.HasSuffix(os.Args[0], ".test") {
-		cobra.OnInitialize(repo.setupCobra)
-		rootCmd.PersistentFlags().StringVarP(&varRepoName, "repository", "r", "https://github.com/lukaszraczylo/simple-gql-client", "Remote repository URL.")
-		rootCmd.PersistentFlags().StringVarP(&varLocalCfg, "config", "c", "semver.yaml", "Path to config file")
-		rootCmd.PersistentFlags().BoolVarP(&varUseLocal, "local", "l", false, "Use local repository")
-		rootCmd.PersistentFlags().BoolVarP(&varShowVersion, "version", "v", false, "Display version")
-		rootCmd.PersistentFlags().BoolVarP(&varDebug, "debug", "d", false, "Enable debug mode")
-		rootCmd.PersistentFlags().BoolVarP(&varUpdate, "update", "u", false, "Update binary with latest")
-		rootCmd.PersistentFlags().BoolVarP(&varStrict, "strict", "s", false, "Strict matching")
-	}
+	cobra.OnInitialize(repo.setupCobra)
+	rootCmd.PersistentFlags().StringVarP(&params.varRepoName, "repository", "r", "https://github.com/lukaszraczylo/simple-gql-client", "Remote repository URL.")
+	rootCmd.PersistentFlags().StringVarP(&params.varLocalCfg, "config", "c", "semver.yaml", "Path to config file")
+	rootCmd.PersistentFlags().BoolVarP(&params.varUseLocal, "local", "l", false, "Use local repository")
+	rootCmd.PersistentFlags().BoolVarP(&params.varShowVersion, "version", "v", false, "Display version")
+	rootCmd.PersistentFlags().BoolVarP(&params.varDebug, "debug", "d", false, "Enable debug mode")
+	rootCmd.PersistentFlags().BoolVarP(&params.varUpdate, "update", "u", false, "Update binary with latest")
+	rootCmd.PersistentFlags().BoolVarP(&params.varStrict, "strict", "s", false, "Strict matching")
 }
