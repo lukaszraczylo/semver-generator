@@ -66,6 +66,32 @@ func (suite *Tests) TestSetup_getSemver() {
 			},
 			want: "1.3.7",
 		},
+		{
+			name: "Return 1.3.7-rc.2",
+			fields: fields{
+				Semver: SemVer{
+					Major:                  1,
+					Minor:                  3,
+					Patch:                  7,
+					Release:                2,
+					EnableReleaseCandidate: true,
+				},
+			},
+			want: "1.3.7-rc.2",
+		},
+		{
+			name: "Return 1.3.9",
+			fields: fields{
+				Semver: SemVer{
+					Major:                  1,
+					Minor:                  3,
+					Patch:                  9,
+					Release:                2,
+					EnableReleaseCandidate: false,
+				},
+			},
+			want: "1.3.9",
+		},
 	}
 	for _, tt := range tests {
 		suite.T().Run(tt.name, func(t *testing.T) {

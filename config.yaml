@@ -7,8 +7,9 @@ wording:
     - initial
     - fix
   minor:
-    - add
     - change
     - improve
   major:
     - breaking
+  release:
+    - release-candidate
