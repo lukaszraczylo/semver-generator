@@ -41,9 +41,10 @@ var (
 )
 
 type Wording struct {
-	Patch []string
-	Minor []string
-	Major []string
+	Patch            []string
+	Minor            []string
+	Major            []string
+	ReleaseCandidate []string
 }
 
 type Force struct {
@@ -54,9 +55,11 @@ type Force struct {
 }
 
 type SemVer struct {
-	Patch int
-	Minor int
-	Major int
+	Patch                  int
+	Minor                  int
+	Major                  int
+	ReleaseCandidate       int
+	EnableReleaseCandidate bool
 }
 
 type Setup struct {
@@ -106,19 +109,29 @@ func (s *Setup) CalculateSemver() SemVer {
 		matchPatch := checkMatches(commitSlice, s.Wording.Patch)
 		matchMinor := checkMatches(commitSlice, s.Wording.Minor)
 		matchMajor := checkMatches(commitSlice, s.Wording.Major)
+		matchReleaseCandidate := checkMatches(commitSlice, s.Wording.ReleaseCandidate)
 		if matchPatch {
 			s.Semver.Patch++
 			debugPrint(fmt.Sprintln("Incrementing patch (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
 		}
+		if matchReleaseCandidate {
+			s.Semver.ReleaseCandidate++
+			s.Semver.EnableReleaseCandidate = true
+			debugPrint(fmt.Sprintln("Incrementing release candidate (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
+		}
 		if matchMinor {
 			s.Semver.Minor++
 			s.Semver.Patch = 1
+			s.Semver.EnableReleaseCandidate = false
+			s.Semver.ReleaseCandidate = 0
 			debugPrint(fmt.Sprintln("Incrementing minor (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
 		}
 		if matchMajor {
 			s.Semver.Major++
 			s.Semver.Minor = 0
 			s.Semver.Patch = 1
+			s.Semver.EnableReleaseCandidate = false
+			s.Semver.ReleaseCandidate = 0
 			debugPrint(fmt.Sprintln("Incrementing major (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
 		}
 	}
@@ -156,7 +169,6 @@ func (s *Setup) ListCommits() ([]CommitDetails, error) {
 	}
 
 	debugPrint(fmt.Sprintln("\n---COMMITS AFTER CUT---\n", s.Commits))
-
 	return s.Commits, err
 }
 
@@ -219,8 +231,12 @@ func (s *Setup) ReadConfig(file string) error {
 	return err
 }
 
-func (s *Setup) getSemver() string {
-	return fmt.Sprintf("%d.%d.%d", s.Semver.Major, s.Semver.Minor, s.Semver.Patch)
+func (s *Setup) getSemver() (semverReturned string) {
+	semverReturned = fmt.Sprintf("%d.%d.%d", s.Semver.Major, s.Semver.Minor, s.Semver.Patch)
+	if s.Semver.EnableReleaseCandidate {
+		semverReturned = fmt.Sprintf("%s-rc.%d", semverReturned, s.Semver.ReleaseCandidate)
+	}
+	return semverReturned
 }
 
 func main() {
