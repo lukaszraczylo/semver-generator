@@ -13,6 +13,7 @@ Project created overnight, to prove that management of semantic versioning is NO
     - [As a docker container](#as-a-docker-container)
     - [Calculations example [standard]](#calculations-example-standard)
     - [Calculations example [strict matching]](#calculations-example-strict-matching)
+    - [Release candidates](#release-candidates)
     - [Example configuration](#example-configuration)
   - [Good to know](#good-to-know)
 
@@ -134,6 +135,17 @@ Linux/arm64, Linux/amd64
 - 0.1.0 - PATCH - additional commit
 - 1.0.0 - MAJOR - commit with word 'BREAKING' = > INCREMENT MAJOR, reset MINOR
 - 1.0.0 - PATCH - another commit
+```
+
+#### Release candidates
+
+The `semver-gen` supports release candidates generation as well. Add following configuration ( and change the trigger keywords to anything what suits you )
+to generate the appropriate release in format `1.3.37-rc.1` and counting up until next `minor` trigger will be detected.
+
+```yaml
+  release:
+    - release-candidate
+    - add-rc
 ```
 
 #### Example configuration
