@@ -321,7 +321,7 @@ func (suite *Tests) TestSetup_ListCommits() {
 			fields: fields{
 				RepositoryName: "https://github.com/lukaszraczylo/simple-gql-client",
 				Force: Force{
-					Commit: "97d3682ed94168600926f9ff6da650403d1f3317",
+					Commit: "f6ee82113afb32ee95eac892d1155582a2f85166",
 				},
 			},
 			noCommits: false,
@@ -368,10 +368,8 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 			fields: fields{
 				RepositoryName:  "https://github.com/lukaszraczylo/semver-generator-test-repo",
 				LocalConfigFile: "meta.yaml",
-				Force: Force{
-					Commit: "",
-				},
 			},
+			strictMatching: false,
 			wantSemver: wantSemver{
 				Major: 0,
 				Minor: 0,
@@ -383,9 +381,6 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 			fields: fields{
 				RepositoryName:  "https://github.com/lukaszraczylo/semver-generator-test-repo",
 				LocalConfigFile: "meta.yaml",
-				Force: Force{
-					Commit: "",
-				},
 			},
 			strictMatching: true,
 			wantSemver: wantSemver{
@@ -400,11 +395,32 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 				RepositoryName:  "https://github.com/lukaszraczylo/semver-generator-test-repo",
 				LocalConfigFile: "meta.yaml",
 				Force: Force{
+					Major:  1,
+					Minor:  1,
 					Commit: "45f9a23cec39e94503841638aee3efecd45111cf",
 				},
 			},
+			strictMatching: false,
 			wantSemver: wantSemver{
-				Major: 2,
+				Major: 1,
+				Minor: 5,
+				Patch: 1,
+			},
+		},
+		{
+			name: "Test on existing repository, starting with different hash",
+			fields: fields{
+				RepositoryName:  "https://github.com/lukaszraczylo/semver-generator-test-repo",
+				LocalConfigFile: "meta.yaml",
+				Force: Force{
+					Major:  1,
+					Minor:  1,
+					Commit: "48564920d88a8a16df607736b438947309ffb8c6",
+				},
+			},
+			strictMatching: false,
+			wantSemver: wantSemver{
+				Major: 1,
 				Minor: 4,
 				Patch: 1,
 			},

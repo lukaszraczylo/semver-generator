@@ -163,7 +163,9 @@ func (s *Setup) ListCommits() ([]CommitDetails, error) {
 
 	for commitId, cmt := range tmpResults {
 		if s.Force.Commit != "" && cmt.Hash == s.Force.Commit {
+			debugPrint(fmt.Sprintln(">>>> FOUND MATCH", len(s.Commits), len(tmpResults[commitId:])))
 			s.Commits = tmpResults[commitId:]
+			break
 		} else {
 			s.Commits = tmpResults
 		}
