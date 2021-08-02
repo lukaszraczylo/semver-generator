@@ -188,8 +188,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: dist/semver-gen-*
-          tag_name: v1
-          name: v1
+          tag_name: ${{ needs.prepare.outputs.RELEASE_VERSION }}
+          name: ${{ needs.prepare.outputs.RELEASE_VERSION }}
           body_path: .release_notes
           draft: false
           prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
