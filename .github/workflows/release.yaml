@@ -182,34 +182,37 @@ jobs:
           echo "$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%h %s")" > .release_notes
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v0.1.5
+        uses: marvinpinto/action-automatic-releases@latest
         if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           files: dist/semver-gen-*
-          tag_name: ${{ needs.prepare.outputs.RELEASE_VERSION }}
-          name: ${{ needs.prepare.outputs.RELEASE_VERSION }}
-          body_path: .release_notes
-          draft: false
+          automatic_release_tag: ${{ needs.prepare.outputs.RELEASE_VERSION }}
+          title: version ${{ needs.prepare.outputs.RELEASE_VERSION }}
+          # tag: ${{ needs.prepare.outputs.RELEASE_VERSION }}
+          # name: ${{ needs.prepare.outputs.RELEASE_VERSION }}
+          # body_path: .release_notes
+          # draft: false
           prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
       - name: Delete previous v1 release asset
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
           fail-if-no-assets: false
+          fail-if-no-release: false
           tag: v1
           assets: 'semver-gen-*'
       - name: Create Release V1
         id: create_release_global
-        uses: softprops/action-gh-release@v0.1.5
+        uses: marvinpinto/action-automatic-releases@latest
         if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           files: dist/semver-gen-*
-          tag_name: v1
-          name: v1
-          body_path: .release_notes
-          draft: false
+          automatic_release_tag: v1
+          title: version v1:${{ needs.prepare.outputs.RELEASE_VERSION }}
           prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
