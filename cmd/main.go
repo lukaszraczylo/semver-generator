@@ -135,6 +135,7 @@ func (s *Setup) CalculateSemver() SemVer {
 				if commit.Hash == tagHash.Hash {
 					debugPrint(fmt.Sprintln("Found existing tag:", tagHash.Name, "related to", commit.Message))
 					s.Semver = parseExistingSemver(tagHash.Name)
+					continue
 				}
 			}
 		}
