@@ -6,6 +6,8 @@ Project created overnight, to prove that management of semantic versioning is NO
 
 - [Semantic version generator](#semantic-version-generator)
   - [How does it work](#how-does-it-work)
+  - [Additional features](#additional-features)
+  - [Important changes](#important-changes)
   - [Usage](#usage)
     - [Authentication](#authentication)
     - [As a binary](#as-a-binary)
@@ -22,6 +24,15 @@ Project created overnight, to prove that management of semantic versioning is NO
 * Binary clones the github repository
 * Iterates through the list of commits looking for the keywords specified in config file for additional bumps of versions
 * Returns the semantic version which can be included in the release
+
+### Additional features
+
+* With flag `-e` or config `force.existing: true` the existing tags in versioning will be respected, helping you to avoid the version conflicts.
+* With config `force.commit: deadbeef` where `deadbeef` is the commit hash - calculations will start from the specified commit.
+
+### Important changes
+
+* From version `1.4.2+` as pointed out in [issue #12](https://github.com/lukaszraczylo/semver-generator/issues/12) commits from merge will not be included in the calculations and commits themselves will bump the version on first match ( starting checks from `patch` upwards ).
 
 ### Usage
 
@@ -63,6 +74,7 @@ Available Commands:
 Flags:
   -c, --config string       Path to config file (default "semver.yaml")
   -d, --debug               Enable debug mode
+  -e, --existing            Respect existing tags
   -h, --help                help for semver-gen
   -l, --local               Use local repository
   -r, --repository string   Remote repository URL. (default "https://github.com/lukaszraczylo/simple-gql-client")

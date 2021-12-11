@@ -60,6 +60,7 @@ type myParams struct {
 	varUpdate         bool
 	varStrict         bool
 	varGenerateInTest bool
+	varExisting       bool
 }
 
 var params myParams
@@ -74,4 +75,5 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&params.varDebug, "debug", "d", false, "Enable debug mode")
 	rootCmd.PersistentFlags().BoolVarP(&params.varUpdate, "update", "u", false, "Update binary with latest")
 	rootCmd.PersistentFlags().BoolVarP(&params.varStrict, "strict", "s", false, "Strict matching")
+	rootCmd.PersistentFlags().BoolVarP(&params.varExisting, "existing", "e", false, "Respect existing tags")
 }

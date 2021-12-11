@@ -487,6 +487,7 @@ func (suite *Tests) Test_main() {
 		varUpdate         bool
 		varStrict         bool
 		varGenerateInTest bool
+		varExisting       bool
 	}
 	tests := []struct {
 		name string

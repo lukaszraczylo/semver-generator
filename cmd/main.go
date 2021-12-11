@@ -22,6 +22,7 @@ import (
 	"net/url"
 	"os"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -48,10 +49,11 @@ type Wording struct {
 }
 
 type Force struct {
-	Patch  int
-	Minor  int
-	Major  int
-	Commit string
+	Patch    int
+	Minor    int
+	Major    int
+	Commit   string
+	Existing bool
 }
 
 type SemVer struct {
@@ -67,6 +69,7 @@ type Setup struct {
 	RepositoryLocalPath string
 	RepositoryHandler   *git.Repository
 	Commits             []CommitDetails
+	Tags                []TagDetails
 	Semver              SemVer
 	Wording             Wording
 	Force               Force
@@ -82,7 +85,16 @@ type CommitDetails struct {
 	Timestamp time.Time
 }
 
+type TagDetails struct {
+	Name string
+	Hash string
+}
+
 func checkMatches(content []string, targets []string) bool {
+	if fuzzy.MatchNormalizedFold(strings.Join(content, " "), "Merge branch") {
+		debugPrint(fmt.Sprintln("Merge detected, ignoring commits within:", content))
+		return false
+	}
 	var r []string
 	for _, tgt := range targets {
 		r = fuzzy.FindNormalizedFold(tgt, content)
@@ -100,8 +112,30 @@ func debugPrint(content string) {
 	}
 }
 
+func parseExistingSemver(tagName string) (semanticVersion SemVer) {
+	var tagNameParts []string
+	tagNameParts = strings.Split(tagName, ".")
+	semanticVersion.Major, _ = strconv.Atoi(tagNameParts[0])
+	semanticVersion.Minor, _ = strconv.Atoi(tagNameParts[1])
+	semanticVersion.Patch, _ = strconv.Atoi(tagNameParts[2])
+	tagReleaseParts := strings.Split(tagNameParts[2], "-rc.")
+	if len(tagReleaseParts) > 1 {
+		semanticVersion.Release, _ = strconv.Atoi(tagNameParts[3])
+	}
+	return
+}
+
 func (s *Setup) CalculateSemver() SemVer {
 	for _, commit := range s.Commits {
+		if params.varExisting || s.Force.Existing {
+			for _, tagHash := range s.Tags {
+				if commit.Hash == tagHash.Hash {
+					debugPrint(fmt.Sprintln("Found existing tag:", tagHash.Name, "related to", commit.Message))
+					s.Semver = parseExistingSemver(tagHash.Name)
+				}
+			}
+		}
+
 		if !params.varStrict {
 			s.Semver.Patch++
 			debugPrint(fmt.Sprintln("Incrementing patch (DEFAULT) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
@@ -142,6 +176,21 @@ func (s *Setup) CalculateSemver() SemVer {
 		}
 	}
 	return s.Semver
+}
+
+func (s *Setup) ListExistingTags() {
+	debugPrint(fmt.Sprintln("Listing existing tags"))
+	refs, err := s.RepositoryHandler.Tags()
+	if err != nil {
+		panic(err)
+	}
+	if err := refs.ForEach(func(ref *plumbing.Reference) error {
+		s.Tags = append(s.Tags, TagDetails{Name: ref.Name().Short(), Hash: ref.Hash().String()})
+		debugPrint(fmt.Sprintln("Found tag:", ref.Name().Short(), ref.Hash().String()))
+		return nil
+	}); err != nil {
+		panic(err)
+	}
 }
 
 func (s *Setup) ListCommits() ([]CommitDetails, error) {
@@ -195,6 +244,7 @@ func (s *Setup) Prepare() error {
 				Username: os.Getenv("GITHUB_USERNAME"),
 				Password: os.Getenv("GITHUB_TOKEN"),
 			},
+			Tags: git.AllTags,
 		})
 		if err != nil {
 			fmt.Println("Unable to reach repository", s.RepositoryName, "Error:", err.Error())
@@ -276,6 +326,9 @@ func main() {
 			os.Exit(1)
 		}
 		repo.ListCommits()
+		if params.varExisting {
+			repo.ListExistingTags()
+		}
 		repo.ForcedVersioning()
 		repo.CalculateSemver()
 		fmt.Println("SEMVER", repo.getSemver())
