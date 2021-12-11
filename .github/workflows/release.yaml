@@ -5,7 +5,7 @@ on:
   push:
     paths-ignore:
     - '**.md'
-    - 'action.yml'
+    - '**/release.yaml'
     branches:
       - "master"
       - "main"
@@ -79,6 +79,7 @@ jobs:
           make test CI_RUN=${CI}
       - name: Upload codecov result
         uses: codecov/codecov-action@v1
+        continue-on-error: true
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
           files: coverage.out
