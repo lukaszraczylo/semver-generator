@@ -522,3 +522,58 @@ func (suite *Tests) Test_main() {
 		})
 	}
 }
+
+func (suite *Tests) Test_parseExistingSemver() {
+	type args struct {
+		tagName string
+	}
+	tests := []struct {
+		name                string
+		args                args
+		wantSemanticVersion SemVer
+	}{
+		{
+			name: "Test parsing existing semver",
+			args: args{
+				tagName: "1.2.3",
+			},
+			wantSemanticVersion: SemVer{
+				Major: 1,
+				Minor: 2,
+				Patch: 3,
+			},
+		},
+		{
+			name: "Test parsing existing semver with v",
+			args: args{
+				tagName: "v1.2.3",
+			},
+			wantSemanticVersion: SemVer{
+				Major: 1,
+				Minor: 2,
+				Patch: 3,
+			},
+		},
+		{
+			name: "Test parsing existing semver with rc",
+			args: args{
+				tagName: "1.2.5-rc.7",
+			},
+			wantSemanticVersion: SemVer{
+				Major:   1,
+				Minor:   2,
+				Patch:   5,
+				Release: 7,
+			},
+		},
+	}
+	for _, tt := range tests {
+		suite.T().Run(tt.name, func(t *testing.T) {
+			got := parseExistingSemver(tt.args.tagName)
+			assert.Equal(tt.wantSemanticVersion.Major, got.Major, "Unexpected MAJOR semver result in "+tt.name)
+			assert.Equal(tt.wantSemanticVersion.Minor, got.Minor, "Unexpected MINOR semver result in "+tt.name)
+			assert.Equal(tt.wantSemanticVersion.Patch, got.Patch, "Unexpected PATCH semver result in "+tt.name)
+			assert.Equal(tt.wantSemanticVersion.Release, got.Release, "Unexpected RELEASE semver result in "+tt.name)
+		})
+	}
+}

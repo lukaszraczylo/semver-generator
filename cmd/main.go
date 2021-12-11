@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -112,15 +113,17 @@ func debugPrint(content string) {
 	}
 }
 
+var extractNumber = regexp.MustCompile("[0-9]+")
+
 func parseExistingSemver(tagName string) (semanticVersion SemVer) {
 	var tagNameParts []string
 	tagNameParts = strings.Split(tagName, ".")
-	semanticVersion.Major, _ = strconv.Atoi(tagNameParts[0])
-	semanticVersion.Minor, _ = strconv.Atoi(tagNameParts[1])
-	semanticVersion.Patch, _ = strconv.Atoi(tagNameParts[2])
-	tagReleaseParts := strings.Split(tagNameParts[2], "-rc.")
-	if len(tagReleaseParts) > 1 {
-		semanticVersion.Release, _ = strconv.Atoi(tagNameParts[3])
+	semanticVersion.Major, _ = strconv.Atoi(extractNumber.FindAllString(tagNameParts[0], -1)[0])
+	semanticVersion.Minor, _ = strconv.Atoi(extractNumber.FindAllString(tagNameParts[1], -1)[0])
+	semanticVersion.Patch, _ = strconv.Atoi(extractNumber.FindAllString(tagNameParts[2], -1)[0])
+	if len(tagNameParts) > 3 {
+		semanticVersion.Release, _ = strconv.Atoi(extractNumber.FindAllString(tagNameParts[3], -1)[0])
+		semanticVersion.EnableReleaseCandidate = true
 	}
 	return
 }
