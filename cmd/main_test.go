@@ -21,7 +21,7 @@ import (
 	"testing"
 
 	git "github.com/go-git/go-git/v5"
-	"github.com/lukaszraczylo/zero"
+	"github.com/lukaszraczylo/pandati"
 	assertions "github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
@@ -242,7 +242,7 @@ func (suite *Tests) TestSetup_ReadConfig() {
 			} else {
 				assert.Error(err, "Error should be present in "+tt.name)
 			}
-			assert.Equal(tt.wordingEmpty, zero.IsZero(s.Wording), "Unexpected wording count "+tt.name+":", s.Wording)
+			assert.Equal(tt.wordingEmpty, pandati.IsZero(s.Wording), "Unexpected wording count "+tt.name+":", s.Wording)
 		})
 	}
 }
@@ -341,7 +341,7 @@ func (suite *Tests) TestSetup_ListCommits() {
 			} else {
 				assert.Error(err, "Error should be present in "+tt.name)
 			}
-			assert.Equal(tt.noCommits, zero.IsZero(listOfCommits), "Unexpected commits count"+tt.name)
+			assert.Equal(tt.noCommits, pandati.IsZero(listOfCommits), "Unexpected commits count"+tt.name)
 		})
 	}
 }

@@ -30,7 +30,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/lithammer/fuzzysearch/fuzzy"
-	"github.com/lukaszraczylo/zero"
+	"github.com/lukaszraczylo/pandati"
 	"github.com/spf13/viper"
 )
 
@@ -85,8 +85,9 @@ type CommitDetails struct {
 func checkMatches(content []string, targets []string) bool {
 	var r []string
 	for _, tgt := range targets {
-		r = fuzzy.FindFold(tgt, content)
+		r = fuzzy.FindNormalizedFold(tgt, content)
 		if len(r) > 0 {
+			debugPrint(fmt.Sprintln("Found match for ", tgt, "|", strings.Join(r, ",")))
 			return true
 		}
 	}
@@ -113,12 +114,14 @@ func (s *Setup) CalculateSemver() SemVer {
 		if matchPatch {
 			s.Semver.Patch++
 			debugPrint(fmt.Sprintln("Incrementing patch (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
+			continue
 		}
 		if matchReleaseCandidate {
 			s.Semver.Release++
 			s.Semver.Patch = 1
 			s.Semver.EnableReleaseCandidate = true
 			debugPrint(fmt.Sprintln("Incrementing release candidate (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
+			continue
 		}
 		if matchMinor {
 			s.Semver.Minor++
@@ -126,6 +129,7 @@ func (s *Setup) CalculateSemver() SemVer {
 			s.Semver.EnableReleaseCandidate = false
 			s.Semver.Release = 0
 			debugPrint(fmt.Sprintln("Incrementing minor (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
+			continue
 		}
 		if matchMajor {
 			s.Semver.Major++
@@ -134,6 +138,7 @@ func (s *Setup) CalculateSemver() SemVer {
 			s.Semver.EnableReleaseCandidate = false
 			s.Semver.Release = 0
 			debugPrint(fmt.Sprintln("Incrementing major (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
+			continue
 		}
 	}
 	return s.Semver
@@ -208,15 +213,15 @@ func (s *Setup) Prepare() error {
 }
 
 func (s *Setup) ForcedVersioning() {
-	if !zero.IsZero(s.Force.Major) {
+	if !pandati.IsZero(s.Force.Major) {
 		debugPrint(fmt.Sprintln("Forced versioning (MAJOR)", s.Force.Major))
 		s.Semver.Major = s.Force.Major
 	}
-	if !zero.IsZero(s.Force.Minor) {
+	if !pandati.IsZero(s.Force.Minor) {
 		debugPrint(fmt.Sprintln("Forced versioning (MINOR)", s.Force.Minor))
 		s.Semver.Minor = s.Force.Minor
 	}
-	if !zero.IsZero(s.Force.Patch) {
+	if !pandati.IsZero(s.Force.Patch) {
 		debugPrint(fmt.Sprintln("Forced versioning (PATCH)", s.Force.Patch))
 		s.Semver.Patch = s.Force.Patch
 	}

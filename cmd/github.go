@@ -6,7 +6,7 @@ import (
 	"os"
 	"runtime"
 
-	gql "github.com/lukaszraczylo/simple-gql-client"
+	graphql "github.com/lukaszraczylo/go-simple-graphql"
 	"github.com/melbahja/got"
 	"github.com/tidwall/gjson"
 )
@@ -16,9 +16,10 @@ func updatePackage() bool {
 	if ghTokenSet {
 		binaryName := fmt.Sprintf("semver-gen-%s-%s", runtime.GOOS, runtime.GOARCH)
 		fmt.Println("Downloading", binaryName)
-		gql.GraphQLUrl = "https://api.github.com/graphql"
+		gql := graphql.NewConnection()
+		gql.Endpoint = "https://api.github.com/graphql"
 		headers := map[string]interface{}{
-			"Authorization": fmt.Sprintf("bearer %s", ghToken),
+			"Authorization": fmt.Sprintf("Bearer %s", ghToken),
 		}
 		variables := map[string]interface{}{
 			"binaryName": binaryName,
@@ -78,14 +79,15 @@ func updatePackage() bool {
 func checkLatestRelease() (string, bool) {
 	ghToken, ghTokenSet := os.LookupEnv("GITHUB_TOKEN")
 	if ghTokenSet {
-		gql.GraphQLUrl = "https://api.github.com/graphql"
+		gql := graphql.NewConnection()
+		gql.Endpoint = "https://api.github.com/graphql"
 		headers := map[string]interface{}{
 			"Authorization": fmt.Sprintf("bearer %s", ghToken),
 		}
 		variables := map[string]interface{}{}
 		var query = `query {
-			repository(name: "semver-generator", owner: "lukaszraczylo") {
-				releases(last: 1) {
+			repository(name: "semver-generator", owner: "lukaszraczylo", followRenames: true) {
+				releases(last: 2) {
 					nodes {
 						tag {
 							name
@@ -96,7 +98,7 @@ func checkLatestRelease() (string, bool) {
 		}`
 		result, err := gql.Query(query, variables, headers)
 		if err != nil {
-			fmt.Println("Query error", err)
+			fmt.Println("Query error >>", err)
 			return "", false
 		}
 		result = gjson.Get(result, "repository.releases.nodes.0.tag.name").String()
