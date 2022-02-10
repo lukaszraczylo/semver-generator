@@ -3,6 +3,7 @@ force:
   major: 1
   minor: 4
   existing: true
+  strict: false
   commit: 960207e4677476ad31a9f389f74eaf9f33d49613
 wording:
   patch:

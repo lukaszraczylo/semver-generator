@@ -146,7 +146,7 @@ func (s *Setup) CalculateSemver() SemVer {
 			}
 		}
 
-		if !params.varStrict {
+		if !params.varStrict && !s.Force.Strict {
 			s.Semver.Patch++
 			debugPrint(fmt.Sprintln("Incrementing patch (DEFAULT) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
 		}
