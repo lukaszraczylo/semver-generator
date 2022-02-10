@@ -43,6 +43,7 @@ jobs:
           TMP_GITHUB_COMMITS_COUNT=$(git rev-list --count HEAD)
           TMP_GITHUB_COUNT_NUMBER=$(echo ${GITHUB_RUN_NUMBER})
           TMP_RELEASE_VERSION=$(./semver-gen generate -l -c config-release.yaml | sed -e 's|SEMVER ||g')
+          TMP_RELEASE_VERSION=1.4.3
           echo "::set-output name=SANITISED_REPOSITORY_NAME::$TMP_SANITISED_REPOSITORY_NAME"
           echo "::set-output name=DOCKER_IMAGE::ghcr.io/${{ github.repository_owner }}/$TMP_SANITISED_REPOSITORY_NAME"
           echo "::set-output name=GITHUB_COMMIT_NUMBER::$TMP_GITHUB_COMMITS_COUNT"
@@ -126,7 +127,11 @@ jobs:
       - name: Prepare for push
         id: prep
         run: |
-          TAGS="${{ needs.prepare.outputs.DOCKER_IMAGE  }}:${{ needs.prepare.outputs.GITHUB_SHA }},${{ needs.prepare.outputs.DOCKER_IMAGE  }}:${{ needs.prepare.outputs.RELEASE_VERSION }},${{ needs.prepare.outputs.DOCKER_IMAGE  }}:latest"
+          if [ -z "${{ needs.prepare.outputs.RELEASE_VERSION }}" ]; then
+            TAGS="${{ needs.prepare.outputs.DOCKER_IMAGE  }}:${{ needs.prepare.outputs.GITHUB_SHA }},${{ needs.prepare.outputs.DOCKER_IMAGE  }}:latest"
+          else
+            TAGS="${{ needs.prepare.outputs.DOCKER_IMAGE  }}:${{ needs.prepare.outputs.GITHUB_SHA }},${{ needs.prepare.outputs.DOCKER_IMAGE  }}:${{ needs.prepare.outputs.RELEASE_VERSION }},${{ needs.prepare.outputs.DOCKER_IMAGE  }}:latest"
+          fi
           echo ::set-output name=tags::${TAGS}
           BRANCH=$(echo ${GITHUB_REF##*/} | tr '[A-Z]' '[a-z]')
           LABELS="org.opencontainers.image.revision=${{ needs.prepare.outputs.GITHUB_SHA }}"

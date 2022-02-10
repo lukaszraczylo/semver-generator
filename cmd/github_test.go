@@ -26,6 +26,9 @@ func Test_checkLatestRelease(t *testing.T) {
 }
 
 func Test_updatePackage(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping test in short / CI mode")
+	}
 	tests := []struct {
 		name string
 		want bool

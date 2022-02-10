@@ -1,4 +1,10 @@
 LOCAL_VERSION?=$(shell semver-gen generate -l -c config-release.yaml | sed -e 's|SEMVER ||g')
+CI_RUN?=false
+ADDITIONAL_BUILD_FLAGS=""
+
+ifeq ($(CI_RUN), true)
+	ADDITIONAL_BUILD_FLAGS="-test.short"
+endif
 
 all: build
 
@@ -9,7 +15,7 @@ run: build
 	@./semver-gen
 
 test:
-	@go test ./... -v -race -cover -coverprofile=coverage.out
+	@go test ./... $(ADDITIONAL_BUILD_FLAGS) -v -race -cover -coverprofile=coverage.out
 
 update:
 	@go get -u ./...
