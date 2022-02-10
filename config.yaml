@@ -1,7 +1,8 @@
 version: 1
 force:
   major: 1
-  existing: true
+  existing: false
+  strict: false
 wording:
   patch:
     - update

@@ -55,6 +55,7 @@ type Force struct {
 	Major    int
 	Commit   string
 	Existing bool
+	Strict   bool
 }
 
 type SemVer struct {
@@ -115,9 +116,14 @@ func debugPrint(content string) {
 
 var extractNumber = regexp.MustCompile("[0-9]+")
 
-func parseExistingSemver(tagName string) (semanticVersion SemVer) {
+func parseExistingSemver(tagName string, currentSemver SemVer) (semanticVersion SemVer) {
+	debugPrint(fmt.Sprintln("Parsing existing semver:", tagName))
 	var tagNameParts []string
 	tagNameParts = strings.Split(tagName, ".")
+	if len(tagNameParts) < 3 {
+		debugPrint("Unable to parse incompatible semver ( non x.y.z )")
+		return currentSemver
+	}
 	semanticVersion.Major, _ = strconv.Atoi(extractNumber.FindAllString(tagNameParts[0], -1)[0])
 	semanticVersion.Minor, _ = strconv.Atoi(extractNumber.FindAllString(tagNameParts[1], -1)[0])
 	semanticVersion.Patch, _ = strconv.Atoi(extractNumber.FindAllString(tagNameParts[2], -1)[0])
@@ -134,7 +140,7 @@ func (s *Setup) CalculateSemver() SemVer {
 			for _, tagHash := range s.Tags {
 				if commit.Hash == tagHash.Hash {
 					debugPrint(fmt.Sprintln("Found existing tag:", tagHash.Name, "related to", commit.Message))
-					s.Semver = parseExistingSemver(tagHash.Name)
+					s.Semver = parseExistingSemver(tagHash.Name, s.Semver)
 					continue
 				}
 			}
@@ -330,7 +336,7 @@ func main() {
 			os.Exit(1)
 		}
 		repo.ListCommits()
-		if params.varExisting {
+		if params.varExisting || repo.Force.Existing {
 			repo.ListExistingTags()
 		}
 		repo.ForcedVersioning()

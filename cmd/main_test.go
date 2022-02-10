@@ -569,7 +569,11 @@ func (suite *Tests) Test_parseExistingSemver() {
 	}
 	for _, tt := range tests {
 		suite.T().Run(tt.name, func(t *testing.T) {
-			got := parseExistingSemver(tt.args.tagName)
+			got := parseExistingSemver(tt.args.tagName, SemVer{
+				Major: 1,
+				Minor: 1,
+				Patch: 1,
+			})
 			assert.Equal(tt.wantSemanticVersion.Major, got.Major, "Unexpected MAJOR semver result in "+tt.name)
 			assert.Equal(tt.wantSemanticVersion.Minor, got.Minor, "Unexpected MINOR semver result in "+tt.name)
 			assert.Equal(tt.wantSemanticVersion.Patch, got.Patch, "Unexpected PATCH semver result in "+tt.name)
