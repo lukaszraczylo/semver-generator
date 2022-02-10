@@ -43,7 +43,6 @@ jobs:
           TMP_GITHUB_COMMITS_COUNT=$(git rev-list --count HEAD)
           TMP_GITHUB_COUNT_NUMBER=$(echo ${GITHUB_RUN_NUMBER})
           TMP_RELEASE_VERSION=$(./semver-gen generate -l -c config-release.yaml | sed -e 's|SEMVER ||g')
-          TMP_RELEASE_VERSION=1.4.3
           echo "::set-output name=SANITISED_REPOSITORY_NAME::$TMP_SANITISED_REPOSITORY_NAME"
           echo "::set-output name=DOCKER_IMAGE::ghcr.io/${{ github.repository_owner }}/$TMP_SANITISED_REPOSITORY_NAME"
           echo "::set-output name=GITHUB_COMMIT_NUMBER::$TMP_GITHUB_COMMITS_COUNT"

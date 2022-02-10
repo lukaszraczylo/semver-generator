@@ -102,7 +102,6 @@ func checkLatestRelease() (string, bool) {
 			fmt.Println("Query error >>", err)
 			return "", false
 		}
-		fmt.Println(result)
 		result = gjson.Get(result, "repository.releases.nodes.0.tag.name").String()
 		if result == "v1" {
 			result = gjson.Get(result, "repository.releases.nodes.1.tag.name").String()
