@@ -43,6 +43,7 @@ func updatePackage() bool {
 			fmt.Println("Query error", err)
 			return false
 		}
+
 		result = gjson.Get(result, "repository.latestRelease.releaseAssets.edges.0.node.downloadUrl").String()
 		if result == "" {
 			fmt.Println("Unable to obtain download url for the binary", binaryName)
@@ -101,7 +102,11 @@ func checkLatestRelease() (string, bool) {
 			fmt.Println("Query error >>", err)
 			return "", false
 		}
+		fmt.Println(result)
 		result = gjson.Get(result, "repository.releases.nodes.0.tag.name").String()
+		if result == "v1" {
+			result = gjson.Get(result, "repository.releases.nodes.1.tag.name").String()
+		}
 		return result, true
 	} else {
 		return "[no GITHUB_TOKEN set]", false
