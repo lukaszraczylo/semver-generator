@@ -6,7 +6,7 @@ RUN apk add make
 WORKDIR /go/src/app
 ENV GO111MODULE=on CGO_ENABLED=1 GOOS=linux
 COPY . /go/src/app/
-RUN make
+RUN make build
 
 FROM alpine:latest
 RUN apk add --no-cache ca-certificates
