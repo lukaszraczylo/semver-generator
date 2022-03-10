@@ -327,8 +327,7 @@ func main() {
 	if repo.Generate || params.varGenerateInTest {
 		err := repo.ReadConfig(repo.LocalConfigFile)
 		if err != nil {
-			fmt.Println("Unable to find config file", repo.LocalConfigFile)
-			os.Exit(1)
+			fmt.Println("Unable to find config file semver.yaml. Using defaults and flags.", repo.LocalConfigFile)
 		}
 		err = repo.Prepare()
 		if err != nil {
