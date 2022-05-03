@@ -4,8 +4,8 @@ go 1.17
 
 require (
 	github.com/go-git/go-git/v5 v5.4.2
-	github.com/lithammer/fuzzysearch v1.1.4
-	github.com/lukaszraczylo/go-simple-graphql v1.0.50
+	github.com/lithammer/fuzzysearch v1.1.5
+	github.com/lukaszraczylo/go-simple-graphql v1.0.51
 	github.com/lukaszraczylo/pandati v0.0.12
 	github.com/melbahja/got v0.6.1
 	github.com/spf13/cobra v1.4.0
@@ -50,7 +50,7 @@ require (
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
 	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f // indirect
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
-	golang.org/x/sys v0.0.0-20220422013727-9388b58f7150 // indirect
+	golang.org/x/sys v0.0.0-20220502124256-b6088ccd6cba // indirect
 	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
