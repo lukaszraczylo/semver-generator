@@ -157,12 +157,12 @@ jobs:
             ${{ steps.prep.outputs.args }}
           labels: ${{ steps.prep.outputs.labels }}
           no-cache: false
-      - name: Scan image
-        uses: anchore/scan-action@v2
-        if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
-        with:
-          image: "${{ needs.prepare.outputs.DOCKER_IMAGE }}:${{ needs.prepare.outputs.GITHUB_SHA }}"
-          fail-build: false
+      # - name: Scan image
+      #   uses: anchore/scan-action@v2
+      #   if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
+      #   with:
+      #     image: "${{ needs.prepare.outputs.DOCKER_IMAGE }}:${{ needs.prepare.outputs.GITHUB_SHA }}"
+      #     fail-build: false
 
   build-binary:
     needs: [ prepare, test, code_scans ]
