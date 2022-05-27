@@ -174,7 +174,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Compile binary
-        uses: thatisuday/go-cross-build@v1.0.2
+        uses: thatisuday/go-cross-build@v1.1.0
         with:
           platforms: linux/amd64,darwin/amd64,windows/amd64,linux/arm64,darwin/amd64,darwin/arm64
           name: semver-gen
