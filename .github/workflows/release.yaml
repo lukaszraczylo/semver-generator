@@ -162,7 +162,7 @@ jobs:
         if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
         with:
           image: "${{ needs.prepare.outputs.DOCKER_IMAGE }}:${{ needs.prepare.outputs.GITHUB_SHA }}"
-          fail-build: true
+          fail-build: false
 
   build-binary:
     needs: [ prepare, test, code_scans ]
