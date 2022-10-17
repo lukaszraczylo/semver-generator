@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -578,6 +578,55 @@ func (suite *Tests) Test_parseExistingSemver() {
 			assert.Equal(tt.wantSemanticVersion.Minor, got.Minor, "Unexpected MINOR semver result in "+tt.name)
 			assert.Equal(tt.wantSemanticVersion.Patch, got.Patch, "Unexpected PATCH semver result in "+tt.name)
 			assert.Equal(tt.wantSemanticVersion.Release, got.Release, "Unexpected RELEASE semver result in "+tt.name)
+		})
+	}
+}
+
+func (suite *Tests) TestSetup_ListExistingTags() {
+	type fields struct {
+		RepositoryName      string
+		RepositoryLocalPath string
+		RepositoryHandler   *git.Repository
+		LocalConfigFile     string
+		Commits             []CommitDetails
+		Semver              SemVer
+		Wording             Wording
+		Force               Force
+	}
+
+	tests := []struct {
+		name   string
+		fields fields
+		noTags bool
+	}{
+		{
+			name: "List tags from existing repository",
+			fields: fields{
+				RepositoryName: "https://github.com/lukaszraczylo/simple-gql-client",
+			},
+			noTags: false,
+		},
+		{
+			name: "List tags from non-existing repository",
+			fields: fields{
+				RepositoryName: "https://github.com/lukaszraczylo/simple-gql-client-dead",
+			},
+			noTags: true,
+		},
+	}
+	for _, tt := range tests {
+		suite.T().Run(tt.name, func(t *testing.T) {
+			s := &Setup{}
+			s.ReadConfig(tt.fields.LocalConfigFile)
+			s.RepositoryName = tt.fields.RepositoryName
+			s.Force = tt.fields.Force
+			s.Prepare()
+			s.ListExistingTags()
+			if tt.noTags {
+				assert.Equal(len(s.Tags), 0, "Unexpected number of tags in "+tt.name)
+			} else {
+				assert.GreaterOrEqual(len(s.Tags), 1, "Unexpected number of tags in "+tt.name)
+			}
 		})
 	}
 }
