@@ -28,7 +28,7 @@ jobs:
       RELEASE_VERSION: ${{ steps.get_env.outputs.RELEASE_VERSION }}
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: '0'
       - name: Setting environment variables
@@ -59,7 +59,7 @@ jobs:
       CI: true
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Lint Code Base
         if: env.ENABLE_CODE_LINT == true
         env:
@@ -90,7 +90,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Configure git for private modules
         run: |
           make update
@@ -111,7 +111,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Get list of the commits since last release
         run: |
           echo "$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%h %s")" > .release_notes
@@ -131,7 +131,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -201,7 +201,7 @@ jobs:
         continue-on-error: [true]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Compile binary
