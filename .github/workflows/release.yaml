@@ -37,6 +37,7 @@ jobs:
           DOWNLOAD_URL=$(curl -s https://api.github.com/repos/lukaszraczylo/semver-generator/releases/latest \
             | grep browser_download_url \
             | grep semver-gen-linux-amd64 \
+            | grep -v '.md5' \
             | cut -d '"' -f 4)
           curl -s -L -o semver-gen "$DOWNLOAD_URL" && chmod +x semver-gen
           TMP_SANITISED_REPOSITORY_NAME=$(echo ${{ github.event.repository.name }} | sed -e 's|\.|-|g')
