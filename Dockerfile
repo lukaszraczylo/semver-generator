@@ -2,7 +2,7 @@
 
 FROM golang:1-alpine as baseimg
 
-RUN apk add make ca-certificates
+RUN apk add --no-cache make ca-certificates
 WORKDIR /go/src/app
 ENV GO111MODULE=on CGO_ENABLED=1 GOOS=linux
 COPY . /go/src/app/

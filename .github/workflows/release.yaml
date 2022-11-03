@@ -232,7 +232,7 @@ jobs:
           project_path: .
           binary_name: semver-gen
           asset_name: semver-gen-${{ matrix.goos }}-${{ matrix.goarch }}
-          release_name: version v1:${{ needs.prepare.outputs.RELEASE_VERSION }}
+          release_name: version v1
           release_tag: v1
           compress_assets: false
           retry: 10
