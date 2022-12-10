@@ -32,5 +32,9 @@ test: ## Run whole test suite
 	@go test ./... $(ADDITIONAL_BUILD_FLAGS) -v -race -cover -coverprofile=coverage.out
 
 .PHONY: update
-update: ## Update all dependencies and sub-packages
+update: ## Update dependencies
+	@go get ./...
+
+.PHONY: update-all
+update-all: ## Update all dependencies and sub-packages
 	@go get -u ./...
