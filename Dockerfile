@@ -7,7 +7,6 @@ RUN make build
 
 FROM ubuntu:jammy
 WORKDIR /go/src/app
-# COPY --from=alpine /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=baseimg /go/src/app/semver-gen .
 COPY --from=baseimg /go/src/app/config-release.yaml config.yaml
 COPY --from=baseimg /go/src/app/entrypoint.sh /entrypoint.sh
