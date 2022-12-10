@@ -1,7 +1,7 @@
 FROM golang:1-bullseye as baseimg
 WORKDIR /go/src/app
 COPY . /go/src/app/
-RUN make build
+RUN CGO_ENABLED=1 make build
 
 FROM ubuntu:jammy
 WORKDIR /go/src/app
