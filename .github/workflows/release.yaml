@@ -35,7 +35,7 @@ jobs:
       - name: Setting environment variables
         id: get_env
         run: |
-          DOWNLOAD_URL=$(curl -s https://api.github.com/repos/lukaszraczylo/semver-generator/releases/latest | grep -E ".*browser_download_url.*linux-" | grep -vE "(arm64|md5)"
+          DOWNLOAD_URL=$(curl -s https://api.github.com/repos/lukaszraczylo/semver-generator/releases/latest | grep -E ".*browser_download_url.*linux-" | grep -vE "(arm64|md5)" \
             | cut -d '"' -f 4)
           # DOWNLOAD_URL=$(curl -s https://api.github.com/repos/lukaszraczylo/semver-generator/releases/latest \
           #   | grep browser_download_url \
