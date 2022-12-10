@@ -221,7 +221,7 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
       - name: Compile and release semver
-        uses: wangyoucao577/go-release-action@v1.32
+        uses: wangyoucao577/go-release-action@v1.33
         with:
           github_token: ${{ secrets.GHCR_TOKEN }}
           goos: ${{ matrix.goos }}
@@ -238,7 +238,7 @@ jobs:
           pre_command: export GODEBUG=http2client=0
 
       - name: Compile and release v1
-        uses: wangyoucao577/go-release-action@v1.32
+        uses: wangyoucao577/go-release-action@v1.33
         with:
           github_token: ${{ secrets.GHCR_TOKEN }}
           goos: ${{ matrix.goos }}
