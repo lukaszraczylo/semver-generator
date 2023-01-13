@@ -47,12 +47,14 @@ jobs:
           TMP_GITHUB_COMMITS_COUNT=$(git rev-list --count HEAD)
           TMP_GITHUB_COUNT_NUMBER=$(echo ${GITHUB_RUN_NUMBER})
           TMP_RELEASE_VERSION=$(./semver-gen generate -l -c config-release.yaml | sed -e 's|SEMVER ||g')
-          echo "::set-output name=SANITISED_REPOSITORY_NAME::$TMP_SANITISED_REPOSITORY_NAME"
-          echo "::set-output name=DOCKER_IMAGE::ghcr.io/${{ github.repository_owner }}/$TMP_SANITISED_REPOSITORY_NAME"
-          echo "::set-output name=GITHUB_COMMIT_NUMBER::$TMP_GITHUB_COMMITS_COUNT"
-          echo "::set-output name=GITHUB_SHA::$(echo ${GITHUB_SHA::8})"
-          echo "::set-output name=GITHUB_RUN_ID::$TMP_GITHUB_COUNT_NUMBER"
-          echo "::set-output name=RELEASE_VERSION::$TMP_RELEASE_VERSION"
+
+          # Setting outputs
+          echo "SANITISED_REPOSITORY_NAME=$TMP_SANITISED_REPOSITORY_NAME" > $GITHUB_OUTPUT
+          echo "DOCKER_IMAGE=ghcr.io/${{ github.repository_owner }}/$TMP_SANITISED_REPOSITORY_NAME" >> $GITHUB_OUTPUT
+          echo "GITHUB_COMMIT_NUMBER=$TMP_GITHUB_COMMITS_COUNT" >> $GITHUB_OUTPUT
+          echo "GITHUB_SHA=$(echo ${GITHUB_SHA::8})" >> $GITHUB_OUTPUT
+          echo "GITHUB_RUN_ID=$TMP_GITHUB_COUNT_NUMBER" >> $GITHUB_OUTPUT
+          echo "RELEASE_VERSION=$TMP_RELEASE_VERSION" >> $GITHUB_OUTPUT"
 
   test:
     needs: [ prepare ]
@@ -163,16 +165,16 @@ jobs:
           else
             TAGS="${{ needs.prepare.outputs.DOCKER_IMAGE  }}:${{ needs.prepare.outputs.GITHUB_SHA }},${{ needs.prepare.outputs.DOCKER_IMAGE  }}:${{ needs.prepare.outputs.RELEASE_VERSION }},${{ needs.prepare.outputs.DOCKER_IMAGE  }}:latest"
           fi
-          echo ::set-output name=tags::${TAGS}
+          echo "TAGS=$TAGS" >> $GITHUB_OUTPUT
           BRANCH=$(echo ${GITHUB_REF##*/} | tr '[A-Z]' '[a-z]')
           LABELS="org.opencontainers.image.revision=${{ needs.prepare.outputs.GITHUB_SHA }}"
           LABELS="$LABELS,org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
           LABELS="$LABELS,org.opencontainers.image.version=$VERSION"
           LABELS="$LABELS,com.github.repo.branch=$BRANCH"
           LABELS="$LABELS,com.github.repo.dockerfile=Dockerfile"
-          echo ::set-output name=labels::${LABELS}
+          echo "LABELS=$LABELS" >> $GITHUB_OUTPUT
           BUILD_ARGS="BRANCH=$BRANCH"
-          echo ::set-output name=args::${BUILD_ARGS}
+          echo "args=$BUILD_ARGS" >> $GITHUB_OUTPUT
       - name: Build image
         id: docker_build
         uses: docker/build-push-action@v2
@@ -253,41 +255,3 @@ jobs:
           retry: 10
           overwrite: true
           pre_command: export GODEBUG=http2client=0
-
-      # - name: Create Release
-      #   id: create_release
-      #   uses: marvinpinto/action-automatic-releases@latest
-      #   if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-      #     files: dist/semver-gen-*
-      #     automatic_release_tag: ${{ needs.prepare.outputs.RELEASE_VERSION }}
-      #     title: version ${{ needs.prepare.outputs.RELEASE_VERSION }}
-      #     # tag: ${{ needs.prepare.outputs.RELEASE_VERSION }}
-      #     # name: ${{ needs.prepare.outputs.RELEASE_VERSION }}
-      #     # body_path: .release_notes
-      #     # draft: false
-      #     prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
-      # - name: Delete previous v1 release asset
-      #   uses: mknejp/delete-release-assets@v1
-      #   if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
-      #   with:
-      #     token: ${{ github.token }}
-      #     fail-if-no-assets: false
-      #     fail-if-no-release: false
-      #     tag: v1
-      #     assets: 'semver-gen-*'
-      # - name: Create Release V1
-      #   id: create_release_global
-      #   uses: marvinpinto/action-automatic-releases@latest
-      #   if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-      #     files: dist/semver-gen-*
-      #     automatic_release_tag: v1
-      #     title: version v1:${{ needs.prepare.outputs.RELEASE_VERSION }}
-      #     prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
