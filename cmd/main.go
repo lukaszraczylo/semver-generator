@@ -1,7 +1,3 @@
-// go:build (darwin && cgo) || linux
-//go:build (darwin && cgo) || linux
-// +build darwin,cgo linux
-
 // Project: semver-generator
 /*
 Copyright © 2021 LUKASZ RACZYLO <lukasz$raczylo,com>

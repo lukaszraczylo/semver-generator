@@ -114,29 +114,9 @@ jobs:
         with:
           args: ./...
 
-  # create-dummy-release:
-  #   needs: [ prepare, test, code_scans ]
-  #   name: Create empty release
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout repo
-  #       uses: actions/checkout@v3
-  #     - name: Get list of the commits since last release
-  #       run: |
-  #         echo "$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%h %s")" > .release_notes
-  #     - name: Create empty release
-  #       uses: ncipollo/release-action@v1
-  #       with:
-  #         bodyFile: ./.release_notes
-  #         name: version ${{ needs.prepare.outputs.RELEASE_VERSION }}
-  #         token: ${{ secrets.GHCR_TOKEN }}
-  #         tag: ${{ needs.prepare.outputs.RELEASE_VERSION }}
-  #         prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
-  #         allowUpdates: true
-
-  build:
+  build-docker:
     needs: [ prepare, test, code_scans ]
-    name: Docker image build (regular:multiarch)
+    name: Docker image build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -211,20 +191,40 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       - name: Install Go
         uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
-
-      - name: Compile and release semver
-        uses: goreleaser/goreleaser-action@v4
+      - name: Build binaries
+        run: |
+          LOCAL_VERSION=${{ needs.prepare.outputs.RELEASE_VERSION }} make dist-release
+      - name: Upload binaries
+        uses: actions/upload-artifact@v2
         with:
-          version: latest
-          args: release --rm-dist --skip-validate --skip-publish --skip-sign
-        env:
-          GITHUB_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          name: binaries
+          path: dist/
+
+  create-release:
+    needs: [ build-binary, build-docker ]
+    name: Create empty release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Get list of the commits since last release
+        run: |
+          echo "$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%h %s")" > .release_notes
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          bodyFile: ./.release_notes
+          name: version ${{ needs.prepare.outputs.RELEASE_VERSION }}
+          token: ${{ secrets.GHCR_TOKEN }}
+          tag: ${{ needs.prepare.outputs.RELEASE_VERSION }}
+          prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
+          artifacts: "dist/*"
+          allowUpdates: true
+
       # - name: Compile and release semver
       #   uses: wangyoucao577/go-release-action@v1.34
       #   with:

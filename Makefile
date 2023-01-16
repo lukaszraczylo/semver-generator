@@ -1,6 +1,7 @@
 LOCAL_VERSION?=""
 CI_RUN?=false
 ADDITIONAL_BUILD_FLAGS=""
+LDFLAGS=-s -w -X main.PKG_VERSION=${LOCAL_VERSION}
 
 ifeq ($(CI_RUN), true)
 	ADDITIONAL_BUILD_FLAGS="-test.short"
@@ -38,3 +39,12 @@ update: ## Update dependencies
 .PHONY: update-all
 update-all: ## Update all dependencies and sub-packages
 	@go get -u ./...
+
+dist-release: ## Build all binaries
+	rm -fr dist/ || true
+	mkdir -p dist/
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags $(LDFLAGS) -a -installsuffix cgo -o dist/semver-gen-linux-amd64
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags $(LDFLAGS) -a -installsuffix cgo -o dist/semver-gen-linux-arm64
+	CGO_ENABLED=0 GOOS=darwin go build -ldflags $(LDFLAGS) -a -installsuffix cgo -o dist/semver-gen-darwin-amd64
+	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags $(LDFLAGS) -a -installsuffix cgo -o dist/semver-gen-darwin-arm64
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags $(LDFLAGS) -a -installsuffix cgo -o dist/semver-gen-windows-amd64.exe
