@@ -3,7 +3,7 @@ builds:
     ldflags:
       - -s -w -X main.PKG_VERSION={{.Version}}
     env:
-      - CGO_ENABLED=1
+      - CGO_ENABLED=0
       - GO111MODULE=on
       # - >-
       #   {{- if eq .Os "darwin" }}

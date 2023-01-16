@@ -114,25 +114,25 @@ jobs:
         with:
           args: ./...
 
-  create-dummy-release:
-    needs: [ prepare, test, code_scans ]
-    name: Create empty release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-      - name: Get list of the commits since last release
-        run: |
-          echo "$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%h %s")" > .release_notes
-      - name: Create empty release
-        uses: ncipollo/release-action@v1
-        with:
-          bodyFile: ./.release_notes
-          name: version ${{ needs.prepare.outputs.RELEASE_VERSION }}
-          token: ${{ secrets.GHCR_TOKEN }}
-          tag: ${{ needs.prepare.outputs.RELEASE_VERSION }}
-          prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
-          allowUpdates: true
+  # create-dummy-release:
+  #   needs: [ prepare, test, code_scans ]
+  #   name: Create empty release
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout repo
+  #       uses: actions/checkout@v3
+  #     - name: Get list of the commits since last release
+  #       run: |
+  #         echo "$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%h %s")" > .release_notes
+  #     - name: Create empty release
+  #       uses: ncipollo/release-action@v1
+  #       with:
+  #         bodyFile: ./.release_notes
+  #         name: version ${{ needs.prepare.outputs.RELEASE_VERSION }}
+  #         token: ${{ secrets.GHCR_TOKEN }}
+  #         tag: ${{ needs.prepare.outputs.RELEASE_VERSION }}
+  #         prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
+  #         allowUpdates: true
 
   build:
     needs: [ prepare, test, code_scans ]
@@ -197,17 +197,17 @@ jobs:
     needs: [ prepare, test, code_scans, create-dummy-release ]
     name: Binary compilation and release
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        # build and publish in parallel: linux/386, linux/amd64, linux/arm64, windows/386, windows/amd64, darwin/amd64, darwin/arm64
-        goos: [linux, windows, darwin]
-        goarch: ["386", amd64, arm64]
-        exclude:
-          - goarch: "386"
-            goos: darwin
-          - goarch: arm64
-            goos: windows
-        continue-on-error: [true]
+    # strategy:
+    #   matrix:
+    #     # build and publish in parallel: linux/386, linux/amd64, linux/arm64, windows/386, windows/amd64, darwin/amd64, darwin/arm64
+    #     goos: [linux, windows, darwin]
+    #     goarch: ["386", amd64, arm64]
+    #     exclude:
+    #       - goarch: "386"
+    #         goos: darwin
+    #       - goarch: arm64
+    #         goos: windows
+    #     continue-on-error: [true]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
