@@ -194,7 +194,7 @@ jobs:
       #     fail-build: false
 
   build-binary:
-    needs: [ prepare, test, code_scans, create-dummy-release ]
+    needs: [ prepare, test, code_scans ]
     name: Binary compilation and release
     runs-on: ubuntu-latest
     # strategy:
