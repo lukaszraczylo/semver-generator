@@ -49,7 +49,7 @@ jobs:
           echo "GITHUB_COMMIT_NUMBER=$TMP_GITHUB_COMMITS_COUNT" >> $GITHUB_OUTPUT
           echo "GITHUB_SHA=$(echo ${GITHUB_SHA::8})" >> $GITHUB_OUTPUT
           echo "GITHUB_RUN_ID=$TMP_GITHUB_COUNT_NUMBER" >> $GITHUB_OUTPUT
-          echo "RELEASE_VERSION=$TMP_RELEASE_VERSION" >> $GITHUB_OUTPUT"
+          echo "RELEASE_VERSION=$TMP_RELEASE_VERSION" >> $GITHUB_OUTPUT
 
   test:
     needs: [ prepare ]
