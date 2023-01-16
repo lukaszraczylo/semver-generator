@@ -232,7 +232,7 @@ jobs:
           compress_assets: false
           retry: 10
           overwrite: true
-          pre_command: export GODEBUG=http2client=0 && make update
+          pre_command: export GODEBUG=http2client=0 && export CGO_ENABLED=1 && make update
 
       - name: Compile and release v1
         uses: wangyoucao577/go-release-action@v1.33
@@ -249,4 +249,4 @@ jobs:
           compress_assets: false
           retry: 10
           overwrite: true
-          pre_command: export GODEBUG=http2client=0 && make update
+          pre_command: export GODEBUG=http2client=0 && export CGO_ENABLED=1 && make update
