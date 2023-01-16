@@ -33,7 +33,7 @@ test: ## Run whole test suite
 
 .PHONY: update
 update: ## Update dependencies
-	@go get ./...
+	@go mod download
 
 .PHONY: update-all
 update-all: ## Update all dependencies and sub-packages
