@@ -5,6 +5,10 @@ builds:
     env:
       - CGO_ENABLED=0
       - GO111MODULE=on
+      - >-
+         {{- if eq .Os "darwin" }}
+            GOOS=darwin
+            GOARCH={{ .Arch }}
       # - >-
       #   {{- if eq .Os "darwin" }}
       #     {{- if eq .Arch "amd64"}}CC=o64-clang{{- end }}
