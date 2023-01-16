@@ -217,36 +217,44 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
-      - name: Compile and release semver
-        uses: wangyoucao577/go-release-action@v1.34
-        with:
-          github_token: ${{ secrets.GHCR_TOKEN }}
-          goos: ${{ matrix.goos }}
-          goarch: ${{ matrix.goarch }}
-          ldflags: -s -w -X main.PKG_VERSION=${{ needs.prepare.outputs.RELEASE_VERSION }}
-          project_path: .
-          binary_name: semver-gen
-          asset_name: semver-gen-${{ matrix.goos }}-${{ matrix.goarch }}
-          release_name: version ${{ needs.prepare.outputs.RELEASE_VERSION }}
-          release_tag: ${{ needs.prepare.outputs.RELEASE_VERSION }}
-          compress_assets: false
-          retry: 10
-          overwrite: true
-          pre_command: export GODEBUG=http2client=0 && export CGO_ENABLED=1 && make update
 
-      - name: Compile and release v1
-        uses: wangyoucao577/go-release-action@v1.33
+      - name: Compile and release semver
+        uses: goreleaser/goreleaser-action@v4
         with:
-          github_token: ${{ secrets.GHCR_TOKEN }}
-          goos: ${{ matrix.goos }}
-          goarch: ${{ matrix.goarch }}
-          ldflags: -s -w -X main.PKG_VERSION=${{ needs.prepare.outputs.RELEASE_VERSION }}
-          project_path: .
-          binary_name: semver-gen
-          asset_name: semver-gen-${{ matrix.goos }}-${{ matrix.goarch }}
-          release_name: version v1
-          release_tag: v1
-          compress_assets: false
-          retry: 10
-          overwrite: true
-          pre_command: export GODEBUG=http2client=0 && export CGO_ENABLED=1 && make update
+          version: latest
+          args: release --rm-dist --skip-validate --skip-publish --skip-sign
+        env:
+          GITHUB_TOKEN: ${{ secrets.GHCR_TOKEN }}
+      # - name: Compile and release semver
+      #   uses: wangyoucao577/go-release-action@v1.34
+      #   with:
+      #     github_token: ${{ secrets.GHCR_TOKEN }}
+      #     goos: ${{ matrix.goos }}
+      #     goarch: ${{ matrix.goarch }}
+      #     ldflags: -s -w -X main.PKG_VERSION=${{ needs.prepare.outputs.RELEASE_VERSION }}
+      #     project_path: .
+      #     binary_name: semver-gen
+      #     asset_name: semver-gen-${{ matrix.goos }}-${{ matrix.goarch }}
+      #     release_name: version ${{ needs.prepare.outputs.RELEASE_VERSION }}
+      #     release_tag: ${{ needs.prepare.outputs.RELEASE_VERSION }}
+      #     compress_assets: false
+      #     retry: 10
+      #     overwrite: true
+      #     pre_command: export GODEBUG=http2client=0 && export CGO_ENABLED=1 && make update
+
+      # - name: Compile and release v1
+      #   uses: wangyoucao577/go-release-action@v1.33
+      #   with:
+      #     github_token: ${{ secrets.GHCR_TOKEN }}
+      #     goos: ${{ matrix.goos }}
+      #     goarch: ${{ matrix.goarch }}
+      #     ldflags: -s -w -X main.PKG_VERSION=${{ needs.prepare.outputs.RELEASE_VERSION }}
+      #     project_path: .
+      #     binary_name: semver-gen
+      #     asset_name: semver-gen-${{ matrix.goos }}-${{ matrix.goarch }}
+      #     release_name: version v1
+      #     release_tag: v1
+      #     compress_assets: false
+      #     retry: 10
+      #     overwrite: true
+      #     pre_command: export GODEBUG=http2client=0 && export CGO_ENABLED=1 && make update
