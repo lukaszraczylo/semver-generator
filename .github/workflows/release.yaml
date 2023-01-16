@@ -43,6 +43,8 @@ jobs:
           TMP_GITHUB_COUNT_NUMBER=$(echo ${GITHUB_RUN_NUMBER})
           TMP_RELEASE_VERSION=$(./semver-gen generate -l -c config-release.yaml | sed -e 's|SEMVER ||g')
 
+          echo ">> Release version: $TMP_RELEASE_VERSION <<"
+
           # Setting outputs
           echo "SANITISED_REPOSITORY_NAME=$TMP_SANITISED_REPOSITORY_NAME" > $GITHUB_OUTPUT
           echo "DOCKER_IMAGE=ghcr.io/${{ github.repository_owner }}/$TMP_SANITISED_REPOSITORY_NAME" >> $GITHUB_OUTPUT
@@ -152,7 +154,7 @@ jobs:
           echo "args=$BUILD_ARGS" >> $GITHUB_OUTPUT
       - name: Build image
         id: docker_build
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           builder: ${{ steps.buildx.outputs.name }}
           platforms: linux/arm64,linux/amd64
@@ -198,29 +200,29 @@ jobs:
       - name: Build binaries
         run: |
           LOCAL_VERSION=${{ needs.prepare.outputs.RELEASE_VERSION }} make dist-release
-      - name: Upload binaries
-        uses: actions/upload-artifact@v2
-        with:
-          name: binaries
-          path: dist/
 
-  create-release:
-    needs: [ build-binary, build-docker ]
-    name: Create empty release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
       - name: Get list of the commits since last release
         run: |
           echo "$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%h %s")" > .release_notes
-      - name: Create release
+
+      - name: Create release [semver]
         uses: ncipollo/release-action@v1
         with:
           bodyFile: ./.release_notes
           name: version ${{ needs.prepare.outputs.RELEASE_VERSION }}
           token: ${{ secrets.GHCR_TOKEN }}
           tag: ${{ needs.prepare.outputs.RELEASE_VERSION }}
+          prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
+          artifacts: "dist/*"
+          allowUpdates: true
+
+      - name: Create release [v1]
+        uses: ncipollo/release-action@v1
+        with:
+          bodyFile: ./.release_notes
+          name: version ${{ needs.prepare.outputs.RELEASE_VERSION }}
+          token: ${{ secrets.GHCR_TOKEN }}
+          tag: v1
           prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
           artifacts: "dist/*"
           allowUpdates: true
