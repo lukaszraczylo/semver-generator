@@ -117,8 +117,58 @@ jobs:
         with:
           args: ./...
 
-  build-docker:
+
+  build-binary:
     needs: [ prepare, test, code_scans ]
+    name: Binary compilation and release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Build binaries
+        run: |
+          LOCAL_VERSION=${{ needs.prepare.outputs.RELEASE_VERSION }} make dist-release
+
+      - name: Get list of the commits since last release
+        run: |
+          echo "$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%h %s")" > .release_notes
+
+      - name: Create release [semver]
+        uses: ncipollo/release-action@v1
+        with:
+          bodyFile: ./.release_notes
+          name: version ${{ needs.prepare.outputs.RELEASE_VERSION }}
+          token: ${{ secrets.GHCR_TOKEN }}
+          tag: ${{ needs.prepare.outputs.RELEASE_VERSION }}
+          prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
+          artifacts: "dist/*"
+          allowUpdates: true
+
+      - name: Delete existing v1 tag and release
+        run: |
+          gh release delete v1 --cleanup-tag -y
+        env:
+          GH_TOKEN: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Create release [v1]
+        uses: ncipollo/release-action@v1
+        with:
+          bodyFile: ./.release_notes
+          name: v1 - ${{ needs.prepare.outputs.RELEASE_VERSION }}
+          token: ${{ secrets.GHCR_TOKEN }}
+          tag: v1
+          prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
+          artifacts: "dist/*"
+          allowUpdates: true
+          makeLatest: false
+
+  build-docker:
+    needs: [ prepare, test, code_scans, build-binary ]
     name: Docker image build
     runs-on: ubuntu-latest
     steps:
@@ -169,52 +219,3 @@ jobs:
             ${{ steps.prep.outputs.args }}
           labels: ${{ steps.prep.outputs.labels }}
           no-cache: false
-
-  build-binary:
-    needs: [ prepare, test, code_scans ]
-    name: Binary compilation and release
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Install Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: ${{ env.GO_VERSION }}
-      - name: Build binaries
-        run: |
-          LOCAL_VERSION=${{ needs.prepare.outputs.RELEASE_VERSION }} make dist-release
-
-      - name: Get list of the commits since last release
-        run: |
-          echo "$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%h %s")" > .release_notes
-
-      - name: Create release [semver]
-        uses: ncipollo/release-action@v1
-        with:
-          bodyFile: ./.release_notes
-          name: version ${{ needs.prepare.outputs.RELEASE_VERSION }}
-          token: ${{ secrets.GHCR_TOKEN }}
-          tag: ${{ needs.prepare.outputs.RELEASE_VERSION }}
-          prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
-          artifacts: "dist/*"
-          allowUpdates: true
-
-      - name: Delete existing v1 tag and release
-        run: |
-          gh release delete v1 --cleanup-tag -y
-        env:
-          GH_TOKEN: ${{ secrets.GHCR_TOKEN }}
-
-      - name: Create release [v1]
-        uses: ncipollo/release-action@v1
-        with:
-          bodyFile: ./.release_notes
-          name: v1 - ${{ needs.prepare.outputs.RELEASE_VERSION }}
-          token: ${{ secrets.GHCR_TOKEN }}
-          tag: v1
-          prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
-          artifacts: "dist/*"
-          allowUpdates: true
-          makeLatest: false
