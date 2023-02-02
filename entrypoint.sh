@@ -1,5 +1,4 @@
 #!/bin/sh -l
-set -o pipefail
 
 FLAGS=""
 
