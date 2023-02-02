@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 FLAGS=""
@@ -37,5 +37,5 @@ fi
 cd /github/workspace
 OUT_SEMVER_GEN=$(/go/src/app/semver-gen generate $FLAGS $*)
 [ $? -eq 0 ] || exit 1
-echo "::set-output name=semantic_version::$(echo $OUT_SEMVER_GEN | sed -e 's|SEMVER ||g')"
+echo "semantic_version=$(echo $OUT_SEMVER_GEN | sed -e 's|SEMVER ||g') >> $GITHUB_OUTPUT"
 echo $OUT_SEMVER_GEN
