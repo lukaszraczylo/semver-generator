@@ -37,5 +37,6 @@ fi
 cd /github/workspace
 OUT_SEMVER_GEN=$(/go/src/app/semver-gen generate $FLAGS $*)
 [ $? -eq 0 ] || exit 1
-echo "semantic_version=$(echo $OUT_SEMVER_GEN | sed -e 's|SEMVER ||g') >> $GITHUB_OUTPUT"
+CLEAN_SEMVER=$(echo $OUT_SEMVER_GEN | sed -e 's|SEMVER ||g')
+echo "semantic_version=$CLEAN_SEMVER" >> $GITHUB_OUTPUT
 echo $OUT_SEMVER_GEN
