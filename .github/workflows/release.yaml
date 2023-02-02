@@ -169,28 +169,12 @@ jobs:
             ${{ steps.prep.outputs.args }}
           labels: ${{ steps.prep.outputs.labels }}
           no-cache: false
-      # - name: Scan image
-      #   uses: anchore/scan-action@v2
-      #   if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
-      #   with:
-      #     image: "${{ needs.prepare.outputs.DOCKER_IMAGE }}:${{ needs.prepare.outputs.GITHUB_SHA }}"
-      #     fail-build: false
 
   build-binary:
     needs: [ prepare, test, code_scans ]
     name: Binary compilation and release
     runs-on: ubuntu-latest
-    # strategy:
-    #   matrix:
-    #     # build and publish in parallel: linux/386, linux/amd64, linux/arm64, windows/386, windows/amd64, darwin/amd64, darwin/arm64
-    #     goos: [linux, windows, darwin]
-    #     goarch: ["386", amd64, arm64]
-    #     exclude:
-    #       - goarch: "386"
-    #         goos: darwin
-    #       - goarch: arm64
-    #         goos: windows
-    #     continue-on-error: [true]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -217,47 +201,18 @@ jobs:
           artifacts: "dist/*"
           allowUpdates: true
 
+      - name: Delete existing v1 tag and release
+        run: |
+          gh release delete v1 --cleanup-tag -y
+
       - name: Create release [v1]
         uses: ncipollo/release-action@v1
         with:
           bodyFile: ./.release_notes
-          name: version ${{ needs.prepare.outputs.RELEASE_VERSION }}
+          name: v1 - ${{ needs.prepare.outputs.RELEASE_VERSION }}
           token: ${{ secrets.GHCR_TOKEN }}
           tag: v1
           prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
           artifacts: "dist/*"
           allowUpdates: true
-
-      # - name: Compile and release semver
-      #   uses: wangyoucao577/go-release-action@v1.34
-      #   with:
-      #     github_token: ${{ secrets.GHCR_TOKEN }}
-      #     goos: ${{ matrix.goos }}
-      #     goarch: ${{ matrix.goarch }}
-      #     ldflags: -s -w -X main.PKG_VERSION=${{ needs.prepare.outputs.RELEASE_VERSION }}
-      #     project_path: .
-      #     binary_name: semver-gen
-      #     asset_name: semver-gen-${{ matrix.goos }}-${{ matrix.goarch }}
-      #     release_name: version ${{ needs.prepare.outputs.RELEASE_VERSION }}
-      #     release_tag: ${{ needs.prepare.outputs.RELEASE_VERSION }}
-      #     compress_assets: false
-      #     retry: 10
-      #     overwrite: true
-      #     pre_command: export GODEBUG=http2client=0 && export CGO_ENABLED=1 && make update
-
-      # - name: Compile and release v1
-      #   uses: wangyoucao577/go-release-action@v1.33
-      #   with:
-      #     github_token: ${{ secrets.GHCR_TOKEN }}
-      #     goos: ${{ matrix.goos }}
-      #     goarch: ${{ matrix.goarch }}
-      #     ldflags: -s -w -X main.PKG_VERSION=${{ needs.prepare.outputs.RELEASE_VERSION }}
-      #     project_path: .
-      #     binary_name: semver-gen
-      #     asset_name: semver-gen-${{ matrix.goos }}-${{ matrix.goarch }}
-      #     release_name: version v1
-      #     release_tag: v1
-      #     compress_assets: false
-      #     retry: 10
-      #     overwrite: true
-      #     pre_command: export GODEBUG=http2client=0 && export CGO_ENABLED=1 && make update
+          makeLatest: false
