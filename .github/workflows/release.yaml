@@ -204,6 +204,8 @@ jobs:
       - name: Delete existing v1 tag and release
         run: |
           gh release delete v1 --cleanup-tag -y
+        env:
+          GH_TOKEN: ${{ secrets.GHCR_TOKEN }}
 
       - name: Create release [v1]
         uses: ncipollo/release-action@v1
