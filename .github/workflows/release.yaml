@@ -139,9 +139,9 @@ jobs:
         id: prep
         run: |
           if [ -z "${{ needs.prepare.outputs.RELEASE_VERSION }}" ]; then
-            TAGS="${{ needs.prepare.outputs.DOCKER_IMAGE  }}:${{ needs.prepare.outputs.GITHUB_SHA }},${{ needs.prepare.outputs.DOCKER_IMAGE  }}:latest"
+            TAGS="${{ needs.prepare.outputs.DOCKER_IMAGE  }}:${{ needs.prepare.outputs.GITHUB_SHA }},${{ needs.prepare.outputs.DOCKER_IMAGE  }}:latest,${{ needs.prepare.outputs.DOCKER_IMAGE  }}:v1"
           else
-            TAGS="${{ needs.prepare.outputs.DOCKER_IMAGE  }}:${{ needs.prepare.outputs.GITHUB_SHA }},${{ needs.prepare.outputs.DOCKER_IMAGE  }}:${{ needs.prepare.outputs.RELEASE_VERSION }},${{ needs.prepare.outputs.DOCKER_IMAGE  }}:latest"
+            TAGS="${{ needs.prepare.outputs.DOCKER_IMAGE  }}:${{ needs.prepare.outputs.GITHUB_SHA }},${{ needs.prepare.outputs.DOCKER_IMAGE  }}:${{ needs.prepare.outputs.RELEASE_VERSION }},${{ needs.prepare.outputs.DOCKER_IMAGE  }}:latest,${{ needs.prepare.outputs.DOCKER_IMAGE  }}:v1"
           fi
           echo "TAGS=$TAGS" >> $GITHUB_OUTPUT
           BRANCH=$(echo ${GITHUB_REF##*/} | tr '[A-Z]' '[a-z]')

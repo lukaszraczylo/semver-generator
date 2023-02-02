@@ -1,4 +1,5 @@
-#!/bin/sh -l
+#!/bin/sh
+set -e
 
 FLAGS=""
 
