@@ -22,6 +22,12 @@ inputs:
   github_username:
     description: 'GitHub or other git hosting provider username'
     required: false
+  strict:
+    description: 'Strict mode'
+    required: false
+  existing:
+    description: 'Respect existing tags'
+    required: false
 outputs:
   semantic_version:
     description: 'Calculated semantic version'

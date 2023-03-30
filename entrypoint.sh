@@ -22,6 +22,14 @@ if [[ ! -z "$INPUT_REPOSITORY_LOCAL" ]]; then
   FLAGS="${FLAGS} -l"
 fi
 
+if [[ ! -z "$INPUT_STRICT" ]]; then
+  FLAGS="${FLAGS} -s"
+fi
+
+if [[ ! -z "$INPUT_EXISTING" ]]; then
+  FLAGS="${FLAGS} -e"
+fi
+
 if [[ "${FLAGS}" == "" && "$*" == "" ]]; then
   exit 1
 fi

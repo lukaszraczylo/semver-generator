@@ -13,8 +13,8 @@ Project created overnight, to prove that management of semantic versioning is NO
     - [As a binary](#as-a-binary)
     - [As a github action](#as-a-github-action)
     - [As a docker container](#as-a-docker-container)
-    - [Calculations example [standard]](#calculations-example-standard)
-    - [Calculations example [strict matching]](#calculations-example-strict-matching)
+    - [Calculations example \[standard\]](#calculations-example-standard)
+    - [Calculations example \[strict matching\]](#calculations-example-strict-matching)
     - [Release candidates](#release-candidates)
     - [Example configuration](#example-configuration)
   - [Good to know](#good-to-know)
@@ -111,6 +111,8 @@ jobs:
           # when using remote repository, especially with private one:
           github_username: lukaszraczylo
           github_token: MySupeRSecr3tPa$$w0rd
+          strict: true
+          existing: false
       - name: Semver check
         run: |
           echo "Semantic version detected: ${{ steps.semver.outputs.semantic_version }}"
