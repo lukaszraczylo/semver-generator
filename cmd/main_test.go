@@ -52,8 +52,8 @@ func (suite *Tests) TestSetup_getSemver() {
 	}
 	tests := []struct {
 		name   string
-		fields fields
 		want   string
+		fields fields
 	}{
 		{
 			name: "Return 1.3.7",
@@ -106,13 +106,13 @@ func (suite *Tests) TestSetup_getSemver() {
 
 func (suite *Tests) TestSetup_ForcedVersioning() {
 	type fields struct {
-		Semver SemVer
 		Force  Force
+		Semver SemVer
 	}
 	tests := []struct {
 		name   string
-		fields fields
 		want   string
+		fields fields
 	}{
 		{
 			name: "No versioning",
@@ -211,8 +211,8 @@ func (suite *Tests) TestSetup_ReadConfig() {
 	}
 	tests := []struct {
 		name         string
-		fields       fields
 		args         args
+		fields       fields
 		wordingEmpty bool
 		wantErr      bool
 	}{
@@ -284,14 +284,14 @@ func (suite *Tests) Test_checkMatches() {
 
 func (suite *Tests) TestSetup_ListCommits() {
 	type fields struct {
+		RepositoryHandler   *git.Repository
 		RepositoryName      string
 		RepositoryLocalPath string
-		RepositoryHandler   *git.Repository
 		LocalConfigFile     string
-		Commits             []CommitDetails
-		Semver              SemVer
 		Wording             Wording
 		Force               Force
+		Commits             []CommitDetails
+		Semver              SemVer
 	}
 
 	tests := []struct {
@@ -349,8 +349,8 @@ func (suite *Tests) TestSetup_ListCommits() {
 func (suite *Tests) TestSetup_CalculateSemver() {
 	type fields struct {
 		RepositoryName  string
-		Force           Force
 		LocalConfigFile string
+		Force           Force
 	}
 	type wantSemver struct {
 		Major int
@@ -584,14 +584,14 @@ func (suite *Tests) Test_parseExistingSemver() {
 
 func (suite *Tests) TestSetup_ListExistingTags() {
 	type fields struct {
+		RepositoryHandler   *git.Repository
 		RepositoryName      string
 		RepositoryLocalPath string
-		RepositoryHandler   *git.Repository
 		LocalConfigFile     string
-		Commits             []CommitDetails
-		Semver              SemVer
 		Wording             Wording
 		Force               Force
+		Commits             []CommitDetails
+		Semver              SemVer
 	}
 
 	tests := []struct {

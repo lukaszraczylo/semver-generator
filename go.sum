@@ -47,6 +47,8 @@ github.com/ProtonMail/go-crypto v0.0.0-20230113180642-068501e20d67/go.mod h1:UBY
 github.com/ProtonMail/go-crypto v0.0.0-20230217124315-7d5c6f04bbb8/go.mod h1:I0gYDMZ6Z5GRU7l58bNFSkPTFN6Yl12dsUlAZ8xy98g=
 github.com/ProtonMail/go-crypto v0.0.0-20230321155629-9a39f2531310 h1:dGAdTcqheKrQ/TW76sAcmO2IorwXplUw2inPkOzykbw=
 github.com/ProtonMail/go-crypto v0.0.0-20230321155629-9a39f2531310/go.mod h1:8TI4H3IbrackdNgv+92dI+rhpCaLqM0IfpgCgenFvRE=
+github.com/ProtonMail/go-crypto v0.0.0-20230331115716-d34776aa93ec h1:eQusauqzE1cAFR5hGnwkuSmFxKoy3+j9/cVaDeYfjjs=
+github.com/ProtonMail/go-crypto v0.0.0-20230331115716-d34776aa93ec/go.mod h1:8TI4H3IbrackdNgv+92dI+rhpCaLqM0IfpgCgenFvRE=
 github.com/acomagu/bufpipe v1.0.3 h1:fxAGrHZTgQ9w5QqVItgzwj235/uYZYgbXitB+dLupOk=
 github.com/acomagu/bufpipe v1.0.3/go.mod h1:mxdxdup/WdsKVreO5GpW4+M/1CE2sMG4jeGJ2sYmHc4=
 github.com/acomagu/bufpipe v1.0.4 h1:e3H4WUzM3npvo5uv95QuJM3cQspFNtFBzvJ2oNjKIDQ=
@@ -208,6 +210,8 @@ github.com/lukaszraczylo/pandati v0.0.17 h1:p5317W4mXmyLPHvpebRvIGzwoQpt5jBWpkkt
 github.com/lukaszraczylo/pandati v0.0.17/go.mod h1:2/+hBv1EighvY4J1J1lo4IrC+OZ8GmQ5eDwJygLT0Do=
 github.com/lukaszraczylo/pandati v0.0.18 h1:6khtDY6QXkiyh4a3dzHtIzx/9UqUGfHjzKBCA0SIurI=
 github.com/lukaszraczylo/pandati v0.0.18/go.mod h1:Aqlc0KH+ssvrscYYbEKMv7n5cFwe+0MjsJbikNz1h60=
+github.com/lukaszraczylo/pandati v0.0.20 h1:LqF7CS3z9Zi04KwEY8wd/YUpfWKSwi0nc7pagKQLXHc=
+github.com/lukaszraczylo/pandati v0.0.20/go.mod h1:ZegK9ll9UebKV1uNMF73qdLb43G/O4CSOdPglu6NniQ=
 github.com/magiconair/properties v1.8.7 h1:IeQXZAiQcpL9mgcAe1Nu6cX9LLw6ExEHKjN0VQdvPDY=
 github.com/magiconair/properties v1.8.7/go.mod h1:Dhd985XPs7jluiymwWYZ0G4Z61jb3vdS329zhj2hYo0=
 github.com/matryer/is v1.2.0 h1:92UTHpy8CDwaJ08GqLDzhhuixiBUUD1p3AU6PHddz4A=

@@ -6,7 +6,7 @@ require (
 	github.com/go-git/go-git/v5 v5.6.1
 	github.com/lithammer/fuzzysearch v1.1.5
 	github.com/lukaszraczylo/go-simple-graphql v1.0.74
-	github.com/lukaszraczylo/pandati v0.0.18
+	github.com/lukaszraczylo/pandati v0.0.20
 	github.com/melbahja/got v0.7.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.15.0
@@ -16,7 +16,7 @@ require (
 
 require (
 	github.com/Microsoft/go-winio v0.6.0 // indirect
-	github.com/ProtonMail/go-crypto v0.0.0-20230321155629-9a39f2531310 // indirect
+	github.com/ProtonMail/go-crypto v0.0.0-20230331115716-d34776aa93ec // indirect
 	github.com/acomagu/bufpipe v1.0.4 // indirect
 	github.com/allegro/bigcache/v3 v3.1.0 // indirect
 	github.com/avast/retry-go v3.0.0+incompatible // indirect

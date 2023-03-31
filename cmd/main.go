@@ -51,10 +51,10 @@ type Wording struct {
 }
 
 type Force struct {
+	Commit   string
 	Patch    int
 	Minor    int
 	Major    int
-	Commit   string
 	Existing bool
 	Strict   bool
 }
@@ -68,24 +68,24 @@ type SemVer struct {
 }
 
 type Setup struct {
+	RepositoryHandler   *git.Repository
 	RepositoryName      string
 	RepositoryLocalPath string
-	RepositoryHandler   *git.Repository
+	LocalConfigFile     string
+	Wording             Wording
+	Force               Force
 	Commits             []CommitDetails
 	Tags                []TagDetails
 	Semver              SemVer
-	Wording             Wording
-	Force               Force
 	Generate            bool
-	LocalConfigFile     string
 	UseLocal            bool
 }
 
 type CommitDetails struct {
+	Timestamp time.Time
 	Hash      string
 	Author    string
 	Message   string
-	Timestamp time.Time
 }
 
 type TagDetails struct {
