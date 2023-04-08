@@ -46,6 +46,8 @@ github.com/ProtonMail/go-crypto v0.0.0-20230331115716-d34776aa93ec h1:eQusauqzE1
 github.com/ProtonMail/go-crypto v0.0.0-20230331115716-d34776aa93ec/go.mod h1:8TI4H3IbrackdNgv+92dI+rhpCaLqM0IfpgCgenFvRE=
 github.com/acomagu/bufpipe v1.0.4 h1:e3H4WUzM3npvo5uv95QuJM3cQspFNtFBzvJ2oNjKIDQ=
 github.com/acomagu/bufpipe v1.0.4/go.mod h1:mxdxdup/WdsKVreO5GpW4+M/1CE2sMG4jeGJ2sYmHc4=
+github.com/akyoto/cache v1.0.6 h1:5XGVVYoi2i+DZLLPuVIXtsNIJ/qaAM16XT0LaBaXd2k=
+github.com/akyoto/cache v1.0.6/go.mod h1:WfxTRqKhfgAG71Xh6E3WLpjhBtZI37O53G4h5s+3iM4=
 github.com/allegro/bigcache v1.2.1 h1:hg1sY1raCwic3Vnsvje6TT7/pnZba83LeFck5NrFKSc=
 github.com/allegro/bigcache v1.2.1/go.mod h1:Cb/ax3seSYIx7SuZdm2G2xzfwmv3TPSk2ucNfQESPXM=
 github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be h1:9AeTilPcZAjCFIImctFaOjnTIavg87rW78vTPkQqLI8=
@@ -195,6 +197,8 @@ github.com/lukaszraczylo/ask v0.0.0-20230407165749-41ac0d88c13d h1:ydn3p85tHJP+8
 github.com/lukaszraczylo/ask v0.0.0-20230407165749-41ac0d88c13d/go.mod h1:M+UVdyqZs++xtEPrascaVmZdOMhCnxjZ2SgH+xHpR0c=
 github.com/lukaszraczylo/go-simple-graphql v1.1.11 h1:2Y2hE2fD9WN8thQrtWv/PEw1tLTJ7kUhrcG3msPW5fc=
 github.com/lukaszraczylo/go-simple-graphql v1.1.11/go.mod h1:isKTPbnk5Wp302lErjGEwdQbGPA+/4nIuBdeUMMmyjA=
+github.com/lukaszraczylo/go-simple-graphql v1.1.28 h1:J4+KsxK1GynGg+ikAXdQnMQTsHaPKJ4QiIvt2fwHZz0=
+github.com/lukaszraczylo/go-simple-graphql v1.1.28/go.mod h1:W/5VDE8PFajDWmWyF4mfbGQIkvWKnbCVLa+9Y3ID6Vs=
 github.com/lukaszraczylo/pandati v0.0.20 h1:LqF7CS3z9Zi04KwEY8wd/YUpfWKSwi0nc7pagKQLXHc=
 github.com/lukaszraczylo/pandati v0.0.20/go.mod h1:ZegK9ll9UebKV1uNMF73qdLb43G/O4CSOdPglu6NniQ=
 github.com/magiconair/properties v1.8.7 h1:IeQXZAiQcpL9mgcAe1Nu6cX9LLw6ExEHKjN0VQdvPDY=
