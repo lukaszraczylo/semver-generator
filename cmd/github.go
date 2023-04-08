@@ -6,9 +6,9 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/lukaszraczylo/ask"
 	graphql "github.com/lukaszraczylo/go-simple-graphql"
 	"github.com/melbahja/got"
-	"github.com/tidwall/gjson"
 )
 
 func updatePackage() bool {
@@ -17,7 +17,10 @@ func updatePackage() bool {
 		binaryName := fmt.Sprintf("semver-gen-%s-%s", runtime.GOOS, runtime.GOARCH)
 		fmt.Println("Downloading", binaryName)
 		gql := graphql.NewConnection()
-		gql.Endpoint = "https://api.github.com/graphql"
+
+		gql.SetEndpoint("https://api.github.com/graphql")
+		gql.SetOutput("mapstring")
+
 		headers := map[string]interface{}{
 			"Authorization": fmt.Sprintf("Bearer %s", ghToken),
 		}
@@ -44,15 +47,15 @@ func updatePackage() bool {
 			return false
 		}
 
-		result = gjson.Get(result, "repository.latestRelease.releaseAssets.edges.0.node.downloadUrl").String()
-		if result == "" {
-			fmt.Println("Unable to obtain download url for the binary", binaryName)
+		output, ok := ask.For(result, "repository.latestRelease.releaseAssets.edges[0].node.downloadUrl").String("")
+		if !ok {
+			fmt.Println("Unable to obtain download url for the binary", binaryName, output)
 			return false
 		}
 		if flag.Lookup("test.v") == nil && os.Getenv("CI") == "" {
 			downloadedBinaryPath := fmt.Sprintf("/tmp/%s", binaryName)
 			g := got.New()
-			err = g.Download(result, downloadedBinaryPath)
+			err = g.Download(output, downloadedBinaryPath)
 			if err != nil {
 				fmt.Println("Unable to download binary", err.Error())
 				return false
@@ -81,7 +84,7 @@ func checkLatestRelease() (string, bool) {
 	ghToken, ghTokenSet := os.LookupEnv("GITHUB_TOKEN")
 	if ghTokenSet {
 		gql := graphql.NewConnection()
-		gql.Endpoint = "https://api.github.com/graphql"
+		gql.SetEndpoint("https://api.github.com/graphql")
 		headers := map[string]interface{}{
 			"Authorization": fmt.Sprintf("bearer %s", ghToken),
 		}
@@ -102,11 +105,11 @@ func checkLatestRelease() (string, bool) {
 			fmt.Println("Query error >>", err)
 			return "", false
 		}
-		result = gjson.Get(result, "repository.releases.nodes.0.tag.name").String()
-		if result == "v1" {
-			result = gjson.Get(result, "repository.releases.nodes.1.tag.name").String()
+		output, _ := ask.For(result, "repository.releases.nodes[0].tag.name").String("")
+		if output == "v1" {
+			output, _ = ask.For(result, "repository.releases.nodes[1].tag.name").String("")
 		}
-		return result, true
+		return output, true
 	} else {
 		return "[no GITHUB_TOKEN set]", false
 	}
