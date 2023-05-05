@@ -70,6 +70,7 @@ type SemVer struct {
 type Setup struct {
 	RepositoryHandler   *git.Repository
 	RepositoryName      string
+	RepositoryBranch    string
 	RepositoryLocalPath string
 	LocalConfigFile     string
 	Wording             Wording
@@ -247,10 +248,12 @@ func (s *Setup) Prepare() error {
 			fmt.Println("Unable to parse repository URL", s.RepositoryName, "Error:", err.Error())
 			return err
 		}
-		s.RepositoryLocalPath = fmt.Sprintf("/tmp/semver/%s", u.Path)
+		s.RepositoryLocalPath = fmt.Sprintf("/tmp/semver/%s/%s", u.Path, s.RepositoryBranch)
 		os.RemoveAll(s.RepositoryLocalPath)
 		s.RepositoryHandler, err = git.PlainClone(s.RepositoryLocalPath, false, &git.CloneOptions{
-			URL: s.RepositoryName,
+			URL:           s.RepositoryName,
+			ReferenceName: plumbing.NewBranchReferenceName(s.RepositoryBranch),
+			SingleBranch:  true,
 			Auth: &http.BasicAuth{
 				Username: os.Getenv("GITHUB_USERNAME"),
 				Password: os.Getenv("GITHUB_TOKEN"),
