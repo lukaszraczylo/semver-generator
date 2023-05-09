@@ -39,6 +39,7 @@ func (suite *Tests) SetupTest() {
 	os.Chdir(testCurrentPath)
 	assert = assertions.New(suite.T())
 	params.varDebug = true
+	params.varRepoBranch = "main"
 }
 
 func TestSuite(t *testing.T) {
@@ -286,6 +287,7 @@ func (suite *Tests) TestSetup_ListCommits() {
 	type fields struct {
 		RepositoryHandler   *git.Repository
 		RepositoryName      string
+		RepositoryBranch    string
 		RepositoryLocalPath string
 		LocalConfigFile     string
 		Wording             Wording
@@ -303,7 +305,8 @@ func (suite *Tests) TestSetup_ListCommits() {
 		{
 			name: "List commits from existing repository",
 			fields: fields{
-				RepositoryName: "https://github.com/lukaszraczylo/simple-gql-client",
+				RepositoryName:   "https://github.com/lukaszraczylo/simple-gql-client",
+				RepositoryBranch: "master",
 			},
 			noCommits: false,
 			wantErr:   false,
@@ -311,7 +314,8 @@ func (suite *Tests) TestSetup_ListCommits() {
 		{
 			name: "List commits from non-existing repository",
 			fields: fields{
-				RepositoryName: "https://github.com/lukaszraczylo/simple-gql-client-dead",
+				RepositoryName:   "https://github.com/lukaszraczylo/simple-gql-client-dead",
+				RepositoryBranch: "main",
 			},
 			noCommits: true,
 			wantErr:   true,
@@ -319,7 +323,8 @@ func (suite *Tests) TestSetup_ListCommits() {
 		{
 			name: "List commits starting with certain hash",
 			fields: fields{
-				RepositoryName: "https://github.com/lukaszraczylo/simple-gql-client",
+				RepositoryName:   "https://github.com/lukaszraczylo/simple-gql-client",
+				RepositoryBranch: "master",
 				Force: Force{
 					Commit: "f6ee82113afb32ee95eac892d1155582a2f85166",
 				},
@@ -333,6 +338,7 @@ func (suite *Tests) TestSetup_ListCommits() {
 			s := &Setup{}
 			s.ReadConfig(tt.fields.LocalConfigFile)
 			s.RepositoryName = tt.fields.RepositoryName
+			s.RepositoryBranch = tt.fields.RepositoryBranch
 			s.Force = tt.fields.Force
 			s.Prepare()
 			listOfCommits, err := s.ListCommits()
@@ -349,6 +355,7 @@ func (suite *Tests) TestSetup_ListCommits() {
 func (suite *Tests) TestSetup_CalculateSemver() {
 	type fields struct {
 		RepositoryName  string
+		BranchName      string
 		LocalConfigFile string
 		Force           Force
 	}
@@ -368,6 +375,7 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 			fields: fields{
 				RepositoryName:  "https://github.com/lukaszraczylo/semver-generator-test-repo",
 				LocalConfigFile: "meta.yaml",
+				BranchName:      "main",
 			},
 			strictMatching: false,
 			wantSemver: wantSemver{
@@ -381,6 +389,7 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 			fields: fields{
 				RepositoryName:  "https://github.com/lukaszraczylo/semver-generator-test-repo",
 				LocalConfigFile: "meta.yaml",
+				BranchName:      "main",
 			},
 			strictMatching: true,
 			wantSemver: wantSemver{
@@ -394,6 +403,7 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 			fields: fields{
 				RepositoryName:  "https://github.com/lukaszraczylo/semver-generator-test-repo",
 				LocalConfigFile: "meta.yaml",
+				BranchName:      "main",
 				Force: Force{
 					Major:  1,
 					Minor:  1,
@@ -412,6 +422,7 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 			fields: fields{
 				RepositoryName:  "https://github.com/lukaszraczylo/semver-generator-test-repo",
 				LocalConfigFile: "meta.yaml",
+				BranchName:      "main",
 				Force: Force{
 					Major:  1,
 					Minor:  1,
@@ -442,6 +453,7 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 			s := &Setup{}
 			s.ReadConfig(tt.fields.LocalConfigFile)
 			s.RepositoryName = tt.fields.RepositoryName
+			s.RepositoryBranch = tt.fields.BranchName
 			s.Prepare()
 			s.ForcedVersioning()
 			s.Force = tt.fields.Force
@@ -480,6 +492,7 @@ func (suite *Tests) Test_debugPrint() {
 func (suite *Tests) Test_main() {
 	type vars struct {
 		varRepoName       string
+		varRepoBranch     string
 		varLocalCfg       string
 		varUseLocal       bool
 		varShowVersion    bool
@@ -586,6 +599,7 @@ func (suite *Tests) TestSetup_ListExistingTags() {
 	type fields struct {
 		RepositoryHandler   *git.Repository
 		RepositoryName      string
+		RepositoryBranch    string
 		RepositoryLocalPath string
 		LocalConfigFile     string
 		Wording             Wording
@@ -602,14 +616,16 @@ func (suite *Tests) TestSetup_ListExistingTags() {
 		{
 			name: "List tags from existing repository",
 			fields: fields{
-				RepositoryName: "https://github.com/lukaszraczylo/simple-gql-client",
+				RepositoryName:   "https://github.com/lukaszraczylo/simple-gql-client",
+				RepositoryBranch: "master",
 			},
 			noTags: false,
 		},
 		{
 			name: "List tags from non-existing repository",
 			fields: fields{
-				RepositoryName: "https://github.com/lukaszraczylo/simple-gql-client-dead",
+				RepositoryName:   "https://github.com/lukaszraczylo/simple-gql-client-dead",
+				RepositoryBranch: "master",
 			},
 			noTags: true,
 		},
@@ -619,6 +635,7 @@ func (suite *Tests) TestSetup_ListExistingTags() {
 			s := &Setup{}
 			s.ReadConfig(tt.fields.LocalConfigFile)
 			s.RepositoryName = tt.fields.RepositoryName
+			s.RepositoryBranch = tt.fields.RepositoryBranch
 			s.Force = tt.fields.Force
 			s.Prepare()
 			s.ListExistingTags()
