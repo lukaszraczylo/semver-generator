@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,6 +41,10 @@ func (r *Setup) setupCobra() {
 	if err != nil {
 		panic(err)
 	}
+	r.RepositoryBranch, err = rootCmd.Flags().GetString("branch")
+	if err != nil {
+		panic(err)
+	}
 	r.LocalConfigFile, err = rootCmd.Flags().GetString("config")
 	if err != nil {
 		panic(err)
@@ -53,6 +57,7 @@ func (r *Setup) setupCobra() {
 
 type myParams struct {
 	varRepoName       string
+	varRepoBranch     string
 	varLocalCfg       string
 	varUseLocal       bool
 	varShowVersion    bool
@@ -69,6 +74,7 @@ func init() {
 	repo = &Setup{}
 	cobra.OnInitialize(repo.setupCobra)
 	rootCmd.PersistentFlags().StringVarP(&params.varRepoName, "repository", "r", "https://github.com/lukaszraczylo/simple-gql-client", "Remote repository URL.")
+	rootCmd.PersistentFlags().StringVarP(&params.varRepoBranch, "branch", "b", "main", "Remote repository URL Branch.")
 	rootCmd.PersistentFlags().StringVarP(&params.varLocalCfg, "config", "c", "semver.yaml", "Path to config file")
 	rootCmd.PersistentFlags().BoolVarP(&params.varUseLocal, "local", "l", false, "Use local repository")
 	rootCmd.PersistentFlags().BoolVarP(&params.varShowVersion, "version", "v", false, "Display version")

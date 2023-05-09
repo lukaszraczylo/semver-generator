@@ -18,6 +18,10 @@ if [[ ! -z "$INPUT_REPOSITORY_URL" ]]; then
   FLAGS="${FLAGS} -r $INPUT_REPOSITORY_URL"
 fi
 
+if [[ ! -z "$INPUT_REPOSITORY_BRANCH" ]]; then
+  FLAGS="${FLAGS} -b $INPUT_REPOSITORY_BRANCH"
+fi
+
 if [[ ! -z "$INPUT_REPOSITORY_LOCAL" ]]; then
   FLAGS="${FLAGS} -l"
 fi
