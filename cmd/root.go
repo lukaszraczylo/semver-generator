@@ -16,6 +16,8 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -42,6 +44,7 @@ func (r *Setup) setupCobra() {
 		panic(err)
 	}
 	r.RepositoryBranch, err = rootCmd.Flags().GetString("branch")
+	fmt.Println(">>> branch", r.RepositoryBranch)
 	if err != nil {
 		panic(err)
 	}
