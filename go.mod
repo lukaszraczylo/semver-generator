@@ -20,7 +20,7 @@ require (
 	github.com/acomagu/bufpipe v1.0.4 // indirect
 	github.com/akyoto/cache v1.0.6 // indirect
 	github.com/avast/retry-go/v4 v4.3.3 // indirect
-	github.com/cloudflare/circl v1.3.2 // indirect
+	github.com/cloudflare/circl v1.3.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
