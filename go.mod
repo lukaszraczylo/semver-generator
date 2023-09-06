@@ -1,6 +1,6 @@
 module github.com/lukaszraczylo/semver-generator
 
-go 1.21.0
+go 1.21
 
 require (
 	github.com/go-git/go-git/v5 v5.8.1
