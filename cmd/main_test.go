@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	git "github.com/go-git/go-git/v5"
+	libpack_logging "github.com/lukaszraczylo/graphql-monitoring-proxy/logging"
 	"github.com/lukaszraczylo/pandati"
 	assertions "github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -36,13 +37,17 @@ var (
 )
 
 func (suite *Tests) SetupTest() {
-	os.Chdir(testCurrentPath)
+	err := os.Chdir(testCurrentPath)
+	if err != nil {
+		logger.Critical("main", map[string]interface{}{"error": err.Error(), "message": "Unable to change directory to test directory"})
+	}
 	assert = assertions.New(suite.T())
 	params.varDebug = true
 	params.varRepoBranch = "main"
 }
 
 func TestSuite(t *testing.T) {
+	logger = libpack_logging.NewLogger()
 	testCurrentPath, _ = os.Getwd()
 	suite.Run(t, new(Tests))
 }
@@ -463,28 +468,6 @@ func (suite *Tests) TestSetup_CalculateSemver() {
 			assert.Equal(tt.wantSemver.Major, semver.Major, "Unexpected MAJOR semver result in "+tt.name)
 			assert.Equal(tt.wantSemver.Minor, semver.Minor, "Unexpected MINOR semver result in "+tt.name)
 			assert.Equal(tt.wantSemver.Patch, semver.Patch, "Unexpected PATCH semver result in "+tt.name)
-		})
-	}
-}
-
-func (suite *Tests) Test_debugPrint() {
-	type args struct {
-		content string
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		{
-			name: "Test debug print",
-			args: args{
-				content: "Test debug",
-			},
-		},
-	}
-	for _, tt := range tests {
-		suite.T().Run(tt.name, func(t *testing.T) {
-			debugPrint(tt.args.content)
 		})
 	}
 }

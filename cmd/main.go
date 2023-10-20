@@ -18,7 +18,6 @@ limitations under the License.
 package cmd
 
 import (
-	"flag"
 	"fmt"
 	"net/url"
 	"os"
@@ -33,6 +32,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/lithammer/fuzzysearch/fuzzy"
+	libpack_logger "github.com/lukaszraczylo/graphql-monitoring-proxy/logging"
 	"github.com/lukaszraczylo/pandati"
 	"github.com/spf13/viper"
 )
@@ -41,6 +41,7 @@ var (
 	err         error
 	repo        *Setup
 	PKG_VERSION string
+	logger      *libpack_logger.LogConfig
 )
 
 type Wording struct {
@@ -96,34 +97,28 @@ type TagDetails struct {
 
 func checkMatches(content []string, targets []string) bool {
 	if fuzzy.MatchNormalizedFold(strings.Join(content, " "), "Merge branch") {
-		debugPrint(fmt.Sprintln("Merge detected, ignoring commits within:", content))
+		logger.Debug("semver-gen", map[string]interface{}{"message": "Merge detected, ignoring commits within", "content": strings.Join(content, " ")})
 		return false
 	}
 	var r []string
 	for _, tgt := range targets {
 		r = fuzzy.FindNormalizedFold(tgt, content)
 		if len(r) > 0 {
-			debugPrint(fmt.Sprintln("Found match for ", tgt, "|", strings.Join(r, ",")))
+			logger.Debug("semver-gen", map[string]interface{}{"message": "Found match", "target": tgt, "match": strings.Join(r, ","), "content": strings.Join(content, " ")})
 			return true
 		}
 	}
 	return false
 }
 
-func debugPrint(content string) {
-	if params.varDebug && flag.Lookup("test.v") == nil {
-		fmt.Println("DEBUG:", content)
-	}
-}
-
 var extractNumber = regexp.MustCompile("[0-9]+")
 
 func parseExistingSemver(tagName string, currentSemver SemVer) (semanticVersion SemVer) {
-	debugPrint(fmt.Sprintln("Parsing existing semver:", tagName))
+	logger.Debug("semver-gen", map[string]interface{}{"message": "Parsing existing semver", "tag": tagName})
 	var tagNameParts []string
 	tagNameParts = strings.Split(tagName, ".")
 	if len(tagNameParts) < 3 {
-		debugPrint("Unable to parse incompatible semver ( non x.y.z )")
+		logger.Debug("semver-gen", map[string]interface{}{"message": "Unable to parse incompatible semver ( non x.y.z )"})
 		return currentSemver
 	}
 	semanticVersion.Major, _ = strconv.Atoi(extractNumber.FindAllString(tagNameParts[0], -1)[0])
@@ -141,7 +136,7 @@ func (s *Setup) CalculateSemver() SemVer {
 		if params.varExisting || s.Force.Existing {
 			for _, tagHash := range s.Tags {
 				if commit.Hash == tagHash.Hash {
-					debugPrint(fmt.Sprintln("Found existing tag:", tagHash.Name, "related to", commit.Message))
+					logger.Debug("semver-gen", map[string]interface{}{"message": "Found existing tag", "tag": tagHash.Name, "commit": strings.TrimSuffix(commit.Message, "\n")})
 					s.Semver = parseExistingSemver(tagHash.Name, s.Semver)
 					continue
 				}
@@ -150,7 +145,7 @@ func (s *Setup) CalculateSemver() SemVer {
 
 		if !params.varStrict && !s.Force.Strict {
 			s.Semver.Patch++
-			debugPrint(fmt.Sprintln("Incrementing patch (DEFAULT) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
+			logger.Debug("semver-gen", map[string]interface{}{"message": "Incrementing patch (DEFAULT)", "commit": strings.TrimSuffix(commit.Message, "\n"), "semver": s.getSemver()})
 		}
 		commitSlice := strings.Fields(commit.Message)
 		matchPatch := checkMatches(commitSlice, s.Wording.Patch)
@@ -159,14 +154,14 @@ func (s *Setup) CalculateSemver() SemVer {
 		matchReleaseCandidate := checkMatches(commitSlice, s.Wording.Release)
 		if matchPatch {
 			s.Semver.Patch++
-			debugPrint(fmt.Sprintln("Incrementing patch (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
+			logger.Debug("semver-gen", map[string]interface{}{"message": "Incrementing patch (WORDING)", "commit": strings.TrimSuffix(commit.Message, "\n"), "semver": s.getSemver()})
 			continue
 		}
 		if matchReleaseCandidate {
 			s.Semver.Release++
 			s.Semver.Patch = 1
 			s.Semver.EnableReleaseCandidate = true
-			debugPrint(fmt.Sprintln("Incrementing release candidate (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
+			logger.Debug("semver-gen", map[string]interface{}{"message": "Incrementing release candidate (WORDING)", "commit": strings.TrimSuffix(commit.Message, "\n"), "semver": s.getSemver()})
 			continue
 		}
 		if matchMinor {
@@ -174,7 +169,7 @@ func (s *Setup) CalculateSemver() SemVer {
 			s.Semver.Patch = 1
 			s.Semver.EnableReleaseCandidate = false
 			s.Semver.Release = 0
-			debugPrint(fmt.Sprintln("Incrementing minor (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
+			logger.Debug("semver-gen", map[string]interface{}{"message": "Incrementing minor (WORDING)", "commit": strings.TrimSuffix(commit.Message, "\n"), "semver": s.getSemver()})
 			continue
 		}
 		if matchMajor {
@@ -183,7 +178,7 @@ func (s *Setup) CalculateSemver() SemVer {
 			s.Semver.Patch = 1
 			s.Semver.EnableReleaseCandidate = false
 			s.Semver.Release = 0
-			debugPrint(fmt.Sprintln("Incrementing major (WORDING) on ", strings.TrimSuffix(commit.Message, "\n"), "| Semver:", s.getSemver()))
+			logger.Debug("semver-gen", map[string]interface{}{"message": "Incrementing major (WORDING)", "commit": strings.TrimSuffix(commit.Message, "\n"), "semver": s.getSemver()})
 			continue
 		}
 	}
@@ -191,14 +186,14 @@ func (s *Setup) CalculateSemver() SemVer {
 }
 
 func (s *Setup) ListExistingTags() {
-	debugPrint(fmt.Sprintln("Listing existing tags"))
+	logger.Debug("semver-gen", map[string]interface{}{"message": "Listing existing tags"})
 	refs, err := s.RepositoryHandler.Tags()
 	if err != nil {
 		panic(err)
 	}
 	if err := refs.ForEach(func(ref *plumbing.Reference) error {
 		s.Tags = append(s.Tags, TagDetails{Name: ref.Name().Short(), Hash: ref.Hash().String()})
-		debugPrint(fmt.Sprintln("Found tag:", ref.Name().Short(), ref.Hash().String()))
+		logger.Debug("semver-gen", map[string]interface{}{"message": "Found tag", "tag": ref.Name().Short(), "hash": ref.Hash().String()})
 		return nil
 	}); err != nil {
 		panic(err)
@@ -225,11 +220,10 @@ func (s *Setup) ListCommits() ([]CommitDetails, error) {
 		return nil
 	})
 
-	debugPrint(fmt.Sprintln("\n---COMMITS BEFORE CUT---\n", s.Commits))
-
+	logger.Debug("semver-gen", map[string]interface{}{"message": "Commits before cut", "commits": tmpResults})
 	for commitId, cmt := range tmpResults {
 		if s.Force.Commit != "" && cmt.Hash == s.Force.Commit {
-			debugPrint(fmt.Sprintln(">>>> FOUND MATCH", len(s.Commits), len(tmpResults[commitId:])))
+			logger.Debug("semver-gen", map[string]interface{}{"message": "Found commit match", "commit": cmt.Hash, "index": commitId})
 			s.Commits = tmpResults[commitId:]
 			break
 		} else {
@@ -237,7 +231,7 @@ func (s *Setup) ListCommits() ([]CommitDetails, error) {
 		}
 	}
 
-	debugPrint(fmt.Sprintln("\n---COMMITS AFTER CUT---\n", s.Commits))
+	logger.Debug("semver-gen", map[string]interface{}{"message": "Commits after cut", "commits": s.Commits})
 	return s.Commits, err
 }
 
@@ -245,7 +239,7 @@ func (s *Setup) Prepare() error {
 	if !repo.UseLocal {
 		u, err := url.Parse(s.RepositoryName)
 		if err != nil {
-			fmt.Println("Unable to parse repository URL", s.RepositoryName, "Error:", err.Error())
+			logger.Error("semver-gen", map[string]interface{}{"message": "Unable to parse repository URL", "error": err.Error(), "url": s.RepositoryName})
 			return err
 		}
 		s.RepositoryLocalPath = fmt.Sprintf("/tmp/semver/%s/%s", u.Path, s.RepositoryBranch)
@@ -261,14 +255,14 @@ func (s *Setup) Prepare() error {
 			Tags: git.AllTags,
 		})
 		if err != nil {
-			fmt.Println("Unable to reach repository", s.RepositoryName, "Error:", err.Error())
+			logger.Error("semver-gen", map[string]interface{}{"message": "Unable to clone repository", "error": err.Error(), "url": s.RepositoryName})
 			return err
 		}
 	} else {
 		s.RepositoryLocalPath = "./"
 		s.RepositoryHandler, err = git.PlainOpen(s.RepositoryLocalPath)
 		if err != nil {
-			fmt.Println("Unable to reach repository", s.RepositoryName, "Error:", err.Error())
+			logger.Error("semver-gen", map[string]interface{}{"message": "Unable to open local repository", "error": err.Error(), "path": s.RepositoryLocalPath})
 			return err
 		}
 	}
@@ -278,15 +272,15 @@ func (s *Setup) Prepare() error {
 
 func (s *Setup) ForcedVersioning() {
 	if !pandati.IsZero(s.Force.Major) {
-		debugPrint(fmt.Sprintln("Forced versioning (MAJOR)", s.Force.Major))
+		logger.Debug("semver-gen", map[string]interface{}{"message": "Forced versioning (MAJOR)", "major": s.Force.Major})
 		s.Semver.Major = s.Force.Major
 	}
 	if !pandati.IsZero(s.Force.Minor) {
-		debugPrint(fmt.Sprintln("Forced versioning (MINOR)", s.Force.Minor))
+		logger.Debug("semver-gen", map[string]interface{}{"message": "Forced versioning (MINOR)", "minor": s.Force.Minor})
 		s.Semver.Minor = s.Force.Minor
 	}
 	if !pandati.IsZero(s.Force.Patch) {
-		debugPrint(fmt.Sprintln("Forced versioning (PATCH)", s.Force.Patch))
+		logger.Debug("semver-gen", map[string]interface{}{"message": "Forced versioning (PATCH)", "patch": s.Force.Patch})
 		s.Semver.Patch = s.Force.Patch
 	}
 }
@@ -312,15 +306,16 @@ func (s *Setup) getSemver() (semverReturned string) {
 }
 
 func main() {
+	logger = libpack_logger.NewLogger()
 	if params.varShowVersion {
 		var outdatedMsg string
 		latestRelease, latestRelaseOk := checkLatestRelease()
 		if PKG_VERSION != latestRelease && latestRelaseOk {
 			outdatedMsg = fmt.Sprintf("(Latest available: %s)", latestRelease)
 		}
-		fmt.Println("semver-gen", PKG_VERSION, "", outdatedMsg, "\tMore information: https://github.com/lukaszraczylo/semver-generator")
+		logger.Info("semver-gen", map[string]interface{}{"version": PKG_VERSION, "outdated": outdatedMsg})
 		if outdatedMsg != "" {
-			fmt.Println("You can update automatically with: semver-gen -u")
+			logger.Info("semver-gen", map[string]interface{}{"message": "You can update automatically with: semver-gen -u"})
 		}
 		return
 	}
@@ -331,12 +326,11 @@ func main() {
 	if repo.Generate || params.varGenerateInTest {
 		err := repo.ReadConfig(repo.LocalConfigFile)
 		if err != nil {
-			fmt.Println("Unable to find config file semver.yaml. Using defaults and flags.", repo.LocalConfigFile)
+			logger.Error("semver-gen", map[string]interface{}{"message": "Unable to find config file semver.yaml. Using defaults and flags.", "file": repo.LocalConfigFile})
 		}
 		err = repo.Prepare()
 		if err != nil {
-			fmt.Println("Unable to prepare repository")
-			os.Exit(1)
+			logger.Critical("semver-gen", map[string]interface{}{"message": "Unable to prepare repository", "error": err.Error()})
 		}
 		repo.ListCommits()
 		if params.varExisting || repo.Force.Existing {

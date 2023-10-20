@@ -2,9 +2,12 @@ package cmd
 
 import (
 	"testing"
+
+	libpack_logging "github.com/lukaszraczylo/graphql-monitoring-proxy/logging"
 )
 
 func Test_checkLatestRelease(t *testing.T) {
+	logger = libpack_logging.NewLogger()
 	tests := []struct {
 		name  string
 		want  string
@@ -26,6 +29,7 @@ func Test_checkLatestRelease(t *testing.T) {
 }
 
 func Test_updatePackage(t *testing.T) {
+	logger = libpack_logging.NewLogger()
 	if testing.Short() {
 		t.Skip("Skipping test in short / CI mode")
 	}

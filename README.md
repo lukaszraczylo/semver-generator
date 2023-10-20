@@ -196,3 +196,4 @@ wording:
 
 * Word matching uses fuzzy search AND is case INSENSITIVE
 * I do not recommend using common words ( like "the" from the example configuration )
+* You can specify env variable `LOG_LEVEL=debug` to see what exactly happens during the calculations
