@@ -6,6 +6,7 @@ on:
     paths-ignore:
     - '**.md'
     - '**/release.yaml'
+    - 'action.yml'
     branches:
       - "master"
       - "main"
