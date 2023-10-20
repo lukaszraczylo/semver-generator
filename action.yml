@@ -33,4 +33,4 @@ outputs:
     description: 'Calculated semantic version'
 runs:
   using: 'docker'
-  image: Dockerfile
+  image: 'docker://ghcr.io/lukaszraczylo/semver-generator:latest'

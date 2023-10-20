@@ -6,6 +6,7 @@ on:
     paths-ignore:
     - '**.md'
     - '**/release.yaml'
+    - 'action.yml'
     branches:
       - "master"
       - "main"
@@ -14,7 +15,7 @@ env:
   ENABLE_CODE_LINT: false
   ENABLE_CODE_SCANS: false
   DEPLOY: false
-  GO_VERSION: 1.20.2
+  GO_VERSION: 1.21
 
 jobs:
   prepare:
