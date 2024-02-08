@@ -3,7 +3,7 @@ WORKDIR /go/src/app
 COPY . /go/src/app/
 RUN CGO_ENABLED=1 make build
 
-FROM ubuntu:jammy
+FROM gcr.io/distroless/base-debian12:nonroot
 WORKDIR /go/src/app
 COPY --from=baseimg /go/src/app/semver-gen .
 COPY --from=baseimg /go/src/app/config-release.yaml config.yaml
