@@ -296,8 +296,8 @@ func (suite *Tests) TestSetup_ListCommits() {
 		RepositoryLocalPath string
 		LocalConfigFile     string
 		Wording             Wording
-		Force               Force
 		Commits             []CommitDetails
+		Force               Force
 		Semver              SemVer
 	}
 
@@ -586,8 +586,8 @@ func (suite *Tests) TestSetup_ListExistingTags() {
 		RepositoryLocalPath string
 		LocalConfigFile     string
 		Wording             Wording
-		Force               Force
 		Commits             []CommitDetails
+		Force               Force
 		Semver              SemVer
 	}
 

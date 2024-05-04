@@ -75,9 +75,9 @@ type Setup struct {
 	RepositoryLocalPath string
 	LocalConfigFile     string
 	Wording             Wording
-	Force               Force
 	Commits             []CommitDetails
 	Tags                []TagDetails
+	Force               Force
 	Semver              SemVer
 	Generate            bool
 	UseLocal            bool
