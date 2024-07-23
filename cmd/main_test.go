@@ -39,7 +39,7 @@ var (
 func (suite *Tests) SetupTest() {
 	err := os.Chdir(testCurrentPath)
 	if err != nil {
-		logger.Critical("main", map[string]interface{}{"error": err.Error(), "message": "Unable to change directory to test directory"})
+		logger.Critical(&libpack_logging.LogMessage{Message: "Unable to change directory to test directory", Pairs: map[string]any{"error": err}})
 	}
 	assert = assertions.New(suite.T())
 	params.varDebug = true
@@ -47,7 +47,7 @@ func (suite *Tests) SetupTest() {
 }
 
 func TestSuite(t *testing.T) {
-	logger = libpack_logging.NewLogger()
+	logger = libpack_logging.New()
 	testCurrentPath, _ = os.Getwd()
 	suite.Run(t, new(Tests))
 }

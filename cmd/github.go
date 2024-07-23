@@ -8,6 +8,7 @@ import (
 
 	"github.com/lukaszraczylo/ask"
 	graphql "github.com/lukaszraczylo/go-simple-graphql"
+	libpack_logger "github.com/lukaszraczylo/graphql-monitoring-proxy/logging"
 	"github.com/melbahja/got"
 )
 
@@ -15,7 +16,7 @@ func updatePackage() bool {
 	ghToken, ghTokenSet := os.LookupEnv("GITHUB_TOKEN")
 	if ghTokenSet {
 		binaryName := fmt.Sprintf("semver-gen-%s-%s", runtime.GOOS, runtime.GOARCH)
-		logger.Info("semver-gen", map[string]interface{}{"message": "Checking for updates"})
+		logger.Info(&libpack_logger.LogMessage{Message: "Checking for updates", Pairs: map[string]interface{}{"binaryName": binaryName}})
 		gql := graphql.NewConnection()
 
 		gql.SetEndpoint("https://api.github.com/graphql")
@@ -43,13 +44,13 @@ func updatePackage() bool {
 		}`
 		result, err := gql.Query(query, variables, headers)
 		if err != nil {
-			logger.Error("semver-gen", map[string]interface{}{"error": err.Error(), "message": "Unable to query GitHub API"})
+			logger.Error(&libpack_logger.LogMessage{Message: "Unable to query GitHub API", Pairs: map[string]interface{}{"error": err.Error()}})
 			return false
 		}
 
 		output, ok := ask.For(result, "repository.latestRelease.releaseAssets.edges[0].node.downloadUrl").String("")
 		if !ok {
-			logger.Error("semver-gen", map[string]interface{}{"error": "Unable to obtain download url for the binary", "binary": binaryName, "output": output})
+			logger.Error(&libpack_logger.LogMessage{Message: "Unable to obtain download url for the binary", Pairs: map[string]interface{}{"binary": binaryName, "output": output}})
 			return false
 		}
 		if flag.Lookup("test.v") == nil && os.Getenv("CI") == "" {
@@ -57,22 +58,22 @@ func updatePackage() bool {
 			g := got.New()
 			err = g.Download(output, downloadedBinaryPath)
 			if err != nil {
-				logger.Error("semver-gen", map[string]interface{}{"error": err.Error(), "message": "Unable to download binary", "binaryPath": downloadedBinaryPath})
+				logger.Error(&libpack_logger.LogMessage{Message: "Unable to download binary", Pairs: map[string]interface{}{"error": err.Error(), "binaryPath": downloadedBinaryPath}})
 				return false
 			}
 			currentBinary, err := os.Executable()
 			if err != nil {
-				logger.Error("semver-gen", map[string]interface{}{"error": err.Error(), "message": "Unable to obtain current binary path"})
+				logger.Error(&libpack_logger.LogMessage{Message: "Unable to obtain current binary path", Pairs: map[string]interface{}{"error": err.Error()}})
 				return false
 			}
 			err = os.Rename(downloadedBinaryPath, currentBinary)
 			if err != nil {
-				logger.Error("semver-gen", map[string]interface{}{"error": err.Error(), "message": "Unable to overwrite current binary"})
+				logger.Error(&libpack_logger.LogMessage{Message: "Unable to overwrite current binary", Pairs: map[string]interface{}{"error": err.Error()}})
 				return false
 			}
 			err = os.Chmod(currentBinary, 0777)
 			if err != nil {
-				logger.Error("semver-gen", map[string]interface{}{"error": err.Error(), "message": "Unable to make binary executable"})
+				logger.Error(&libpack_logger.LogMessage{Message: "Unable to make binary executable", Pairs: map[string]interface{}{"error": err.Error()}})
 				return false
 			}
 		}
@@ -102,7 +103,7 @@ func checkLatestRelease() (string, bool) {
 		}`
 		result, err := gql.Query(query, variables, headers)
 		if err != nil {
-			logger.Error("semver-gen", map[string]interface{}{"error": err.Error(), "message": "Unable to query GitHub API"})
+			logger.Error(&libpack_logger.LogMessage{Message: "Unable to query GitHub API", Pairs: map[string]interface{}{"error": err.Error()}})
 			return "", false
 		}
 		output, _ := ask.For(result, "repository.releases.nodes[0].tag.name").String("")
