@@ -64,7 +64,7 @@ jobs:
         run: |
           export GITHUB_TOKEN=${{ secrets.GHCR_TOKEN }}
           CI_RUN=${CI} make test
-          git config --global --add safe.directory /__w/graphql-monitoring-proxy/graphql-monitoring-proxy
+          git config --global --add safe.directory /__w/semver-generator/semver-generator
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
