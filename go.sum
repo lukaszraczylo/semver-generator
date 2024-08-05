@@ -75,8 +75,8 @@ github.com/lukaszraczylo/ask v0.0.0-20230927103145-2ff1123b4415 h1:lvI8Wlbg4PxkR
 github.com/lukaszraczylo/ask v0.0.0-20230927103145-2ff1123b4415/go.mod h1:M+UVdyqZs++xtEPrascaVmZdOMhCnxjZ2SgH+xHpR0c=
 github.com/lukaszraczylo/go-simple-graphql v1.2.18 h1:KqATPu1zPC01dmeVwDT/osB5+bzRT4kWBS5Kg8tIS6w=
 github.com/lukaszraczylo/go-simple-graphql v1.2.18/go.mod h1:wwY4xWUNJYhGXV1rElm2ILjwY5SeI9K8jrd/wOcf8Io=
-github.com/lukaszraczylo/graphql-monitoring-proxy v0.21.55 h1:cyjmG8QVzxqqR71U9vW1IcpkgkBlkUtEtqINNoHGl3U=
-github.com/lukaszraczylo/graphql-monitoring-proxy v0.21.55/go.mod h1:pInLLaNxFe17JCQyTekPRqtCIIDm1uLV6KbS24wEIas=
+github.com/lukaszraczylo/graphql-monitoring-proxy v0.21.59 h1:sGPF8LGf1DQtzo/4x4GQ+rGcPaP9UJI4ZtJ/kGBFZLw=
+github.com/lukaszraczylo/graphql-monitoring-proxy v0.21.59/go.mod h1:monlhtx8fyihAZopBsj3e5tDFMh5/JpJcWfBKPHO+LQ=
 github.com/lukaszraczylo/pandati v0.0.29 h1:WUEWm1+hWjE5KJbIL8OctG00x2dk4XKGJSlrjhxZ55k=
 github.com/lukaszraczylo/pandati v0.0.29/go.mod h1:+DyTWKFaXd+jIfe7GW5w2S5PyTko/RXxMyOa+Vl713A=
 github.com/magiconair/properties v1.8.7 h1:IeQXZAiQcpL9mgcAe1Nu6cX9LLw6ExEHKjN0VQdvPDY=
