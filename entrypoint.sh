@@ -46,7 +46,6 @@ if [[ ! -z "$INPUT_GITHUB_USERNAME" ]]; then
   export GITHUB_USERNAME=$INPUT_GITHUB_USERNAME
 fi
 
-cd /github/workspace
 OUT_SEMVER_GEN=$(/go/src/app/semver-gen generate $FLAGS $*)
 [ $? -eq 0 ] || exit 1
 CLEAN_SEMVER=$(echo $OUT_SEMVER_GEN | sed -e 's|SEMVER ||g')
