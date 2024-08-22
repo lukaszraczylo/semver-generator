@@ -35,7 +35,7 @@ if [[ ! -z "$INPUT_EXISTING" ]]; then
   FLAGS="${FLAGS} -e"
 fi
 
-if [[ ! =z "$INPUT_DEBUGMODE"]]; then
+if [[ ! -z "$INPUT_DEBUGMODE" ]]; then
   FLAGS="${FLAGS} --debug"
 fi
 
