@@ -5,6 +5,7 @@ FLAGS="$SEMVER_RAW_FLAGS"
 
 if [[ -z "$INPUT_CONFIG_FILE" ]]; then
   echo "Set the configuration file path."
+  exit 1
 else
   FLAGS="${FLAGS} -c $INPUT_CONFIG_FILE"
 fi
@@ -34,6 +35,10 @@ if [[ ! -z "$INPUT_EXISTING" ]]; then
   FLAGS="${FLAGS} -e"
 fi
 
+if [[ ! =z "$INPUT_DEBUGMODE"]]; then
+  FLAGS="${FLAGS} --debug"
+fi
+
 if [[ "${FLAGS}" == "" && "$*" == "" ]]; then
   exit 1
 fi
@@ -44,6 +49,19 @@ fi
 
 if [[ ! -z "$INPUT_GITHUB_USERNAME" ]]; then
   export GITHUB_USERNAME=$INPUT_GITHUB_USERNAME
+fi
+
+if [[ ! -z "$INPUT_DEBUGMODE" ]]; then
+  echo "DEBUG MODE ENABLED"
+  echo "----"
+  ls -lA
+  echo "----"
+  pwd
+  echo "----"
+  echo "FLAGS: $FLAGS"
+  echo "----"
+  /go/src/app/semver-gen generate $FLAGS $*
+  echo "----"
 fi
 
 OUT_SEMVER_GEN=$(/go/src/app/semver-gen generate $FLAGS $*)
