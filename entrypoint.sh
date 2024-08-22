@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-FLAGS=""
+FLAGS="$SEMVER_RAW_FLAGS"
 
 if [[ -z "$INPUT_CONFIG_FILE" ]]; then
   echo "Set the configuration file path."
