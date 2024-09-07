@@ -6,8 +6,8 @@ require (
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/lithammer/fuzzysearch v1.1.8
 	github.com/lukaszraczylo/ask v0.0.0-20230927103145-2ff1123b4415
-	github.com/lukaszraczylo/go-simple-graphql v1.2.22
-	github.com/lukaszraczylo/graphql-monitoring-proxy v0.23.26
+	github.com/lukaszraczylo/go-simple-graphql v1.2.23
+	github.com/lukaszraczylo/graphql-monitoring-proxy v0.23.30
 	github.com/lukaszraczylo/pandati v0.0.29
 	github.com/melbahja/got v0.7.0
 	github.com/spf13/cobra v1.8.1
