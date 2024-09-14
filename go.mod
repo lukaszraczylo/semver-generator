@@ -5,9 +5,9 @@ go 1.22.4
 require (
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/lithammer/fuzzysearch v1.1.8
-	github.com/lukaszraczylo/ask v0.0.0-20230927103145-2ff1123b4415
-	github.com/lukaszraczylo/go-simple-graphql v1.2.23
-	github.com/lukaszraczylo/graphql-monitoring-proxy v0.23.42
+	github.com/lukaszraczylo/ask v0.0.0-20240913191002-cd9856eb6d12
+	github.com/lukaszraczylo/go-simple-graphql v1.2.25
+	github.com/lukaszraczylo/graphql-monitoring-proxy v0.23.46
 	github.com/lukaszraczylo/pandati v0.0.29
 	github.com/melbahja/got v0.7.0
 	github.com/spf13/cobra v1.8.1
@@ -21,7 +21,7 @@ require (
 	github.com/ProtonMail/go-crypto v1.0.0 // indirect
 	github.com/avast/retry-go/v4 v4.6.0 // indirect
 	github.com/cloudflare/circl v1.4.0 // indirect
-	github.com/cyphar/filepath-securejoin v0.3.1 // indirect
+	github.com/cyphar/filepath-securejoin v0.3.2 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
