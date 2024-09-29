@@ -45,6 +45,8 @@ github.com/go-git/go-git/v5 v5.12.0 h1:7Md+ndsjrzZxbddRDZjF14qK+NN56sy6wkqaVrjZt
 github.com/go-git/go-git/v5 v5.12.0/go.mod h1:FTM9VKtnI2m65hNI/TenDDDnUf2Q9FHnXYjuz9i5OEY=
 github.com/goccy/go-json v0.10.3 h1:KZ5WoDbxAIgm2HNbYckL0se1fHD6rz5j4ywS6ebzDqA=
 github.com/goccy/go-json v0.10.3/go.mod h1:oq7eo15ShAhp70Anwd5lgX2pLfOS3QCiwU/PULtXL6M=
+github.com/goccy/go-reflect v1.2.0 h1:O0T8rZCuNmGXewnATuKYnkL0xm6o8UNOJZd/gOkb9ms=
+github.com/goccy/go-reflect v1.2.0/go.mod h1:n0oYZn8VcV2CkWTxi8B9QjkCoq6GTtCEdfmR66YhFtE=
 github.com/godbus/dbus/v5 v5.0.4/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=
 github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da h1:oI5xCqsCo564l8iNU+DwB5epxmsaqB+rhGL0m5jtYqE=
 github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da/go.mod h1:cIg4eruTrX1D+g88fzRXU5OdNfaM+9IcxsU14FzY7Hc=
@@ -73,8 +75,8 @@ github.com/lithammer/fuzzysearch v1.1.8 h1:/HIuJnjHuXS8bKaiTMeeDlW2/AyIWk2brx1V8
 github.com/lithammer/fuzzysearch v1.1.8/go.mod h1:IdqeyBClc3FFqSzYq/MXESsS4S0FsZ5ajtkr5xPLts4=
 github.com/lukaszraczylo/ask v0.0.0-20240916204100-6e9ef53a62d9 h1:pL8B9mjv6RPUfKYYGm/uJ7QL6Ndf+z+OEl0qJE6KmEc=
 github.com/lukaszraczylo/ask v0.0.0-20240916204100-6e9ef53a62d9/go.mod h1:M+UVdyqZs++xtEPrascaVmZdOMhCnxjZ2SgH+xHpR0c=
-github.com/lukaszraczylo/go-simple-graphql v1.2.25 h1:qufWMftg+DXlZcQZGHRKukLPxJWH3oNK+r2J9wNolFg=
-github.com/lukaszraczylo/go-simple-graphql v1.2.25/go.mod h1:coYAAtPYeMgIoNhDblnyVeZwCKBXw5BGMPexpJGE0mg=
+github.com/lukaszraczylo/go-simple-graphql v1.2.27 h1:bXcOppc2vN8xx6f574YvTEco3nq5ac0BUuRpFZYWFbM=
+github.com/lukaszraczylo/go-simple-graphql v1.2.27/go.mod h1:OHMzBtIb1Lv7q4x17dKpjOZlO67vtzJVYT1fpkTKGYw=
 github.com/lukaszraczylo/graphql-monitoring-proxy v0.23.58 h1:p8+dU9IEWSGPD3i5vYayak18HTVXVcJT8WpevVheS/o=
 github.com/lukaszraczylo/graphql-monitoring-proxy v0.23.58/go.mod h1:0bFMh/PG9Ipe5luOTIscKcH9jD0tGYolJSKWxraHDQ4=
 github.com/lukaszraczylo/pandati v0.0.29 h1:WUEWm1+hWjE5KJbIL8OctG00x2dk4XKGJSlrjhxZ55k=
