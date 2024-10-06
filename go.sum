@@ -75,10 +75,10 @@ github.com/lithammer/fuzzysearch v1.1.8 h1:/HIuJnjHuXS8bKaiTMeeDlW2/AyIWk2brx1V8
 github.com/lithammer/fuzzysearch v1.1.8/go.mod h1:IdqeyBClc3FFqSzYq/MXESsS4S0FsZ5ajtkr5xPLts4=
 github.com/lukaszraczylo/ask v0.0.0-20240916204100-6e9ef53a62d9 h1:pL8B9mjv6RPUfKYYGm/uJ7QL6Ndf+z+OEl0qJE6KmEc=
 github.com/lukaszraczylo/ask v0.0.0-20240916204100-6e9ef53a62d9/go.mod h1:M+UVdyqZs++xtEPrascaVmZdOMhCnxjZ2SgH+xHpR0c=
-github.com/lukaszraczylo/go-simple-graphql v1.2.28 h1:ymO4/H5lFDJk1BZ1aWfNiS6mzeAwQG8FawNC7D+SRew=
-github.com/lukaszraczylo/go-simple-graphql v1.2.28/go.mod h1:ljzIBBDrUOGuqx/2gUjkQ6XcMc6ZRx5Sb7lommvQfT4=
-github.com/lukaszraczylo/graphql-monitoring-proxy v0.23.70 h1:k5olobbKGNGWWNtG2dhCKWY5lwwvbl9dCG4t9RSDPp0=
-github.com/lukaszraczylo/graphql-monitoring-proxy v0.23.70/go.mod h1:MsLgb8XJNPx0XKPa1Xeg+9OEkUrkleO9gGF9ahiraLw=
+github.com/lukaszraczylo/go-simple-graphql v1.2.29 h1:Fo/3SN4vrST1pyX1UJ5Nd+pQCkurZNJSck4pyx5B/Fk=
+github.com/lukaszraczylo/go-simple-graphql v1.2.29/go.mod h1:kCvRu01tLxj0iKash5qwL7Em+SltQmZ82bs0yu2aOrk=
+github.com/lukaszraczylo/graphql-monitoring-proxy v0.23.74 h1:9ouyyxeLzb9b8lOrVeCF1HBlvuutMp9wDE4G42RKKb8=
+github.com/lukaszraczylo/graphql-monitoring-proxy v0.23.74/go.mod h1:XHy3yOlIuo6HtE/TwsBBkZs6+Sc5brUY9VP7vT6hDWI=
 github.com/lukaszraczylo/pandati v0.0.29 h1:WUEWm1+hWjE5KJbIL8OctG00x2dk4XKGJSlrjhxZ55k=
 github.com/lukaszraczylo/pandati v0.0.29/go.mod h1:+DyTWKFaXd+jIfe7GW5w2S5PyTko/RXxMyOa+Vl713A=
 github.com/magiconair/properties v1.8.7 h1:IeQXZAiQcpL9mgcAe1Nu6cX9LLw6ExEHKjN0VQdvPDY=
