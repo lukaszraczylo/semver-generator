@@ -30,7 +30,7 @@ require (
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/gookit/color v1.5.4 // indirect
-	github.com/gookit/goutil v0.6.17 // indirect
+	github.com/gookit/goutil v0.6.18 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
