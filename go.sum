@@ -73,10 +73,10 @@ github.com/lithammer/fuzzysearch v1.1.8 h1:/HIuJnjHuXS8bKaiTMeeDlW2/AyIWk2brx1V8
 github.com/lithammer/fuzzysearch v1.1.8/go.mod h1:IdqeyBClc3FFqSzYq/MXESsS4S0FsZ5ajtkr5xPLts4=
 github.com/lukaszraczylo/ask v0.0.0-20240916204100-6e9ef53a62d9 h1:pL8B9mjv6RPUfKYYGm/uJ7QL6Ndf+z+OEl0qJE6KmEc=
 github.com/lukaszraczylo/ask v0.0.0-20240916204100-6e9ef53a62d9/go.mod h1:M+UVdyqZs++xtEPrascaVmZdOMhCnxjZ2SgH+xHpR0c=
-github.com/lukaszraczylo/go-simple-graphql v1.2.32 h1:CKjXgNHUuwzeBVKIPLXoMw4wPQCqchIV0htFGk5+Hpg=
-github.com/lukaszraczylo/go-simple-graphql v1.2.32/go.mod h1:Y0fEHnPijfPyTF4fzSEpgmu5kaA4lENA0+gQdI1y1+0=
-github.com/lukaszraczylo/graphql-monitoring-proxy v0.25.12 h1:+JCZQHowl0wZGZAtZPk7WLYfZ+LdQccDcTo6K2dvb2I=
-github.com/lukaszraczylo/graphql-monitoring-proxy v0.25.12/go.mod h1:TVnuGqRMI9wTtZVfZNcWyBUXyWc2pwfxJXiKhEHxfFU=
+github.com/lukaszraczylo/go-simple-graphql v1.2.33 h1:77znJSjPCCbJg8qBjGrx+uRLn/JncBKDDPOwO3I64DM=
+github.com/lukaszraczylo/go-simple-graphql v1.2.33/go.mod h1:UOhnDW0SGIQglxwCbHLzpCQZ755JAUdQUa6v/c+V3dU=
+github.com/lukaszraczylo/graphql-monitoring-proxy v0.25.18 h1:G8E3Vg6g0neUK3b5V7xS7a320AWZxo/hb4FXHuAyO6k=
+github.com/lukaszraczylo/graphql-monitoring-proxy v0.25.18/go.mod h1:CZWyPpMAEgUl0zHH2BNBQoJCOrINNa7TrYAIqZ1N0qw=
 github.com/lukaszraczylo/pandati v0.0.29 h1:WUEWm1+hWjE5KJbIL8OctG00x2dk4XKGJSlrjhxZ55k=
 github.com/lukaszraczylo/pandati v0.0.29/go.mod h1:+DyTWKFaXd+jIfe7GW5w2S5PyTko/RXxMyOa+Vl713A=
 github.com/magiconair/properties v1.8.9 h1:nWcCbLq1N2v/cpNsy5WvQ37Fb+YElfq20WJ/a8RkpQM=
@@ -160,8 +160,8 @@ golang.org/x/crypto v0.0.0-20210921155107-089bfa567519/go.mod h1:GvvjBRRGRdwPK5y
 golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d/go.mod h1:IxCIyHEi3zRg3s0A5j5BB6A9Jmi73HwBIUl50j+osU4=
 golang.org/x/crypto v0.30.0 h1:RwoQn3GkWiMkzlX562cLB7OxWvjH1L8xutO2WoJcRoY=
 golang.org/x/crypto v0.30.0/go.mod h1:kDsLvtWBEx7MV9tJOj9bnXsPbxwJQ6csT/x4KIN4Ssk=
-golang.org/x/exp v0.0.0-20241204233417-43b7b7cde48d h1:0olWaB5pg3+oychR51GUVCEsGkeCU/2JxjBgIo4f3M0=
-golang.org/x/exp v0.0.0-20241204233417-43b7b7cde48d/go.mod h1:qj5a5QZpwLU2NLQudwIN5koi3beDhSAlJwa67PuM98c=
+golang.org/x/exp v0.0.0-20241210194714-1829a127f884 h1:Y/Mj/94zIQQGHVSv1tTtQBDaQaJe62U9bkDZKKyhPCU=
+golang.org/x/exp v0.0.0-20241210194714-1829a127f884/go.mod h1:qj5a5QZpwLU2NLQudwIN5koi3beDhSAlJwa67PuM98c=
 golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4/go.mod h1:jJ57K6gSWd91VN4djpZkiMVwK6gcyfeH4XE8wZrZaV4=
 golang.org/x/mod v0.8.0/go.mod h1:iBbtSCu2XBx23ZKBPSOrRkjjQPZFPuis4dIYUhu/chs=
 golang.org/x/net v0.0.0-20190620200207-3b0461eec859/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
