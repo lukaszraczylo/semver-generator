@@ -103,9 +103,8 @@ func checkMatches(content []string, targets []string) bool {
 		})
 		return false
 	}
-	var r []string
 	for _, tgt := range targets {
-		r = fuzzy.FindNormalizedFold(tgt, content)
+		r := fuzzy.FindNormalizedFold(tgt, content)
 		if len(r) > 0 {
 			logger.Debug(&libpack_logger.LogMessage{
 				Message: "Found match",
@@ -124,8 +123,7 @@ func parseExistingSemver(tagName string, currentSemver SemVer) (semanticVersion 
 		Message: "Parsing existing semver",
 		Pairs:   map[string]interface{}{"tag": tagName},
 	})
-	var tagNameParts []string
-	tagNameParts = strings.Split(tagName, ".")
+	tagNameParts := strings.Split(tagName, ".")
 	if len(tagNameParts) < 3 {
 		logger.Debug(&libpack_logger.LogMessage{
 			Message: "Unable to parse incompatible semver ( non x.y.z )",
@@ -351,7 +349,7 @@ func (s *Setup) ReadConfig(file string) error {
 	viper.SetConfigFile(file)
 	err := viper.ReadInConfig()
 	if err != nil {
-		err = fmt.Errorf("Fatal error config file: %s \n", err)
+		err = fmt.Errorf("fatal error config file: %s", err)
 		return err
 	}
 	viper.UnmarshalKey("wording", &s.Wording)
