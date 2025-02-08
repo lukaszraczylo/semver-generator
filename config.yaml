@@ -3,6 +3,11 @@ force:
   major: 1
   existing: true
   strict: false
+blacklist:
+  - "Merge branch"
+  - "Merge pull request"
+  - "feature/"
+  - "feature:"
 wording:
   patch:
     - update

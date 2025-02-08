@@ -81,6 +81,7 @@ type Setup struct {
 	Semver              SemVer
 	Generate            bool
 	UseLocal            bool
+	Blacklist           []string
 }
 
 type CommitDetails struct {
@@ -96,12 +97,17 @@ type TagDetails struct {
 }
 
 func checkMatches(content []string, targets []string) bool {
-	if fuzzy.MatchNormalizedFold(strings.Join(content, " "), "Merge branch") {
-		logger.Debug(&libpack_logger.LogMessage{
-			Message: "Merge detected, ignoring commits within",
-			Pairs:   map[string]interface{}{"content": strings.Join(content, " ")},
-		})
-		return false
+	contentStr := strings.Join(content, " ")
+	
+	// Check against blacklist terms first
+	for _, blacklistTerm := range repo.Blacklist {
+		if fuzzy.MatchNormalizedFold(contentStr, blacklistTerm) {
+			logger.Debug(&libpack_logger.LogMessage{
+				Message: "Blacklisted term detected, ignoring commit",
+				Pairs:   map[string]interface{}{"content": contentStr, "blacklist_term": blacklistTerm},
+			})
+			return false
+		}
 	}
 	for _, tgt := range targets {
 		r := fuzzy.FindNormalizedFold(tgt, content)
@@ -354,6 +360,7 @@ func (s *Setup) ReadConfig(file string) error {
 	}
 	viper.UnmarshalKey("wording", &s.Wording)
 	viper.UnmarshalKey("force", &s.Force)
+	viper.UnmarshalKey("blacklist", &s.Blacklist)
 	return err
 }
 
