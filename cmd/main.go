@@ -168,20 +168,14 @@ func (s *Setup) CalculateSemver() SemVer {
 		matchMinor := checkMatches(commitSlice, s.Wording.Minor)
 		matchMajor := checkMatches(commitSlice, s.Wording.Major)
 		matchReleaseCandidate := checkMatches(commitSlice, s.Wording.Release)
-		if matchPatch {
-			s.Semver.Patch++
-			logger.Debug(&libpack_logger.LogMessage{
-				Message: "Incrementing patch (WORDING)",
-				Pairs:   map[string]interface{}{"commit": strings.TrimSuffix(commit.Message, "\n"), "semver": s.getSemver()},
-			})
-			continue
-		}
-		if matchReleaseCandidate {
-			s.Semver.Release++
+		if matchMajor {
+			s.Semver.Major++
+			s.Semver.Minor = 0
 			s.Semver.Patch = 1
-			s.Semver.EnableReleaseCandidate = true
+			s.Semver.EnableReleaseCandidate = false
+			s.Semver.Release = 0
 			logger.Debug(&libpack_logger.LogMessage{
-				Message: "Incrementing release candidate (WORDING)",
+				Message: "Incrementing major (WORDING)",
 				Pairs:   map[string]interface{}{"commit": strings.TrimSuffix(commit.Message, "\n"), "semver": s.getSemver()},
 			})
 			continue
@@ -197,14 +191,20 @@ func (s *Setup) CalculateSemver() SemVer {
 			})
 			continue
 		}
-		if matchMajor {
-			s.Semver.Major++
-			s.Semver.Minor = 0
+		if matchReleaseCandidate {
+			s.Semver.Release++
 			s.Semver.Patch = 1
-			s.Semver.EnableReleaseCandidate = false
-			s.Semver.Release = 0
+			s.Semver.EnableReleaseCandidate = true
 			logger.Debug(&libpack_logger.LogMessage{
-				Message: "Incrementing major (WORDING)",
+				Message: "Incrementing release candidate (WORDING)",
+				Pairs:   map[string]interface{}{"commit": strings.TrimSuffix(commit.Message, "\n"), "semver": s.getSemver()},
+			})
+			continue
+		}
+		if matchPatch {
+			s.Semver.Patch++
+			logger.Debug(&libpack_logger.LogMessage{
+				Message: "Incrementing patch (WORDING)",
 				Pairs:   map[string]interface{}{"commit": strings.TrimSuffix(commit.Message, "\n"), "semver": s.getSemver()},
 			})
 			continue
