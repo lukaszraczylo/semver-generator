@@ -99,27 +99,34 @@ type TagDetails struct {
 func checkMatches(content []string, targets []string) bool {
 	contentStr := strings.Join(content, " ")
 	
-	// Check against blacklist terms first
-	for _, blacklistTerm := range repo.Blacklist {
-		if fuzzy.MatchNormalizedFold(contentStr, blacklistTerm) {
-			logger.Debug(&libpack_logger.LogMessage{
-				Message: "Blacklisted term detected, ignoring commit",
-				Pairs:   map[string]interface{}{"content": contentStr, "blacklist_term": blacklistTerm},
-			})
-			return false
-		}
-	}
+	// First check if any target matches
+	hasMatch := false
 	for _, tgt := range targets {
 		r := fuzzy.FindNormalizedFold(tgt, content)
 		if len(r) > 0 {
+			hasMatch = true
 			logger.Debug(&libpack_logger.LogMessage{
 				Message: "Found match",
-				Pairs:   map[string]interface{}{"target": tgt, "match": strings.Join(r, ","), "content": strings.Join(content, " ")},
+				Pairs:   map[string]interface{}{"target": tgt, "match": strings.Join(r, ","), "content": contentStr},
 			})
-			return true
+			break
 		}
 	}
-	return false
+
+	// If we have a match, check against blacklist
+	if hasMatch {
+		for _, blacklistTerm := range repo.Blacklist {
+			if strings.Contains(strings.ToLower(contentStr), strings.ToLower(blacklistTerm)) {
+				logger.Debug(&libpack_logger.LogMessage{
+					Message: "Blacklisted term detected, ignoring commit",
+					Pairs:   map[string]interface{}{"content": contentStr, "blacklist_term": blacklistTerm},
+				})
+				return false
+			}
+		}
+	}
+	
+	return hasMatch
 }
 
 var extractNumber = regexp.MustCompile("[0-9]+")
