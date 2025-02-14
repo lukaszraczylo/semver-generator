@@ -81,6 +81,7 @@ type Setup struct {
 	Semver              SemVer
 	Generate            bool
 	UseLocal            bool
+	Blacklist           []string
 }
 
 type CommitDetails struct {
@@ -96,24 +97,36 @@ type TagDetails struct {
 }
 
 func checkMatches(content []string, targets []string) bool {
-	if fuzzy.MatchNormalizedFold(strings.Join(content, " "), "Merge branch") {
-		logger.Debug(&libpack_logger.LogMessage{
-			Message: "Merge detected, ignoring commits within",
-			Pairs:   map[string]interface{}{"content": strings.Join(content, " ")},
-		})
-		return false
-	}
+	contentStr := strings.Join(content, " ")
+	
+	// First check if any target matches
+	hasMatch := false
 	for _, tgt := range targets {
 		r := fuzzy.FindNormalizedFold(tgt, content)
 		if len(r) > 0 {
+			hasMatch = true
 			logger.Debug(&libpack_logger.LogMessage{
 				Message: "Found match",
-				Pairs:   map[string]interface{}{"target": tgt, "match": strings.Join(r, ","), "content": strings.Join(content, " ")},
+				Pairs:   map[string]interface{}{"target": tgt, "match": strings.Join(r, ","), "content": contentStr},
 			})
-			return true
+			break
 		}
 	}
-	return false
+
+	// If we have a match, check against blacklist
+	if hasMatch {
+		for _, blacklistTerm := range repo.Blacklist {
+			if strings.Contains(strings.ToLower(contentStr), strings.ToLower(blacklistTerm)) {
+				logger.Debug(&libpack_logger.LogMessage{
+					Message: "Blacklisted term detected, ignoring commit",
+					Pairs:   map[string]interface{}{"content": contentStr, "blacklist_term": blacklistTerm},
+				})
+				return false
+			}
+		}
+	}
+	
+	return hasMatch
 }
 
 var extractNumber = regexp.MustCompile("[0-9]+")
@@ -168,20 +181,14 @@ func (s *Setup) CalculateSemver() SemVer {
 		matchMinor := checkMatches(commitSlice, s.Wording.Minor)
 		matchMajor := checkMatches(commitSlice, s.Wording.Major)
 		matchReleaseCandidate := checkMatches(commitSlice, s.Wording.Release)
-		if matchPatch {
-			s.Semver.Patch++
-			logger.Debug(&libpack_logger.LogMessage{
-				Message: "Incrementing patch (WORDING)",
-				Pairs:   map[string]interface{}{"commit": strings.TrimSuffix(commit.Message, "\n"), "semver": s.getSemver()},
-			})
-			continue
-		}
-		if matchReleaseCandidate {
-			s.Semver.Release++
+		if matchMajor {
+			s.Semver.Major++
+			s.Semver.Minor = 0
 			s.Semver.Patch = 1
-			s.Semver.EnableReleaseCandidate = true
+			s.Semver.EnableReleaseCandidate = false
+			s.Semver.Release = 0
 			logger.Debug(&libpack_logger.LogMessage{
-				Message: "Incrementing release candidate (WORDING)",
+				Message: "Incrementing major (WORDING)",
 				Pairs:   map[string]interface{}{"commit": strings.TrimSuffix(commit.Message, "\n"), "semver": s.getSemver()},
 			})
 			continue
@@ -197,14 +204,20 @@ func (s *Setup) CalculateSemver() SemVer {
 			})
 			continue
 		}
-		if matchMajor {
-			s.Semver.Major++
-			s.Semver.Minor = 0
+		if matchReleaseCandidate {
+			s.Semver.Release++
 			s.Semver.Patch = 1
-			s.Semver.EnableReleaseCandidate = false
-			s.Semver.Release = 0
+			s.Semver.EnableReleaseCandidate = true
 			logger.Debug(&libpack_logger.LogMessage{
-				Message: "Incrementing major (WORDING)",
+				Message: "Incrementing release candidate (WORDING)",
+				Pairs:   map[string]interface{}{"commit": strings.TrimSuffix(commit.Message, "\n"), "semver": s.getSemver()},
+			})
+			continue
+		}
+		if matchPatch {
+			s.Semver.Patch++
+			logger.Debug(&libpack_logger.LogMessage{
+				Message: "Incrementing patch (WORDING)",
 				Pairs:   map[string]interface{}{"commit": strings.TrimSuffix(commit.Message, "\n"), "semver": s.getSemver()},
 			})
 			continue
@@ -354,6 +367,7 @@ func (s *Setup) ReadConfig(file string) error {
 	}
 	viper.UnmarshalKey("wording", &s.Wording)
 	viper.UnmarshalKey("force", &s.Force)
+	viper.UnmarshalKey("blacklist", &s.Blacklist)
 	return err
 }
 

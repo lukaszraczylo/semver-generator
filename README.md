@@ -33,6 +33,7 @@ Project created overnight, to prove that management of semantic versioning is NO
 ### Important changes
 
 * From version `1.4.2+` as pointed out in [issue #12](https://github.com/lukaszraczylo/semver-generator/issues/12) commits from merge will not be included in the calculations and commits themselves will bump the version on first match ( starting checks from `patch` upwards ).
+* Added support for blacklisting terms to ignore specific commits, branch names, and merge messages from version calculations.
 
 ### Usage
 
@@ -172,6 +173,11 @@ force:
   minor: 0
   patch: 1
   commit: 69fbe2df696f40281b9104ff073d26186cde1024
+blacklist:
+  - "Merge branch"
+  - "Merge pull request"
+  - "feature/"
+  - "feature:"
 wording:
   patch:
     - update
@@ -190,6 +196,7 @@ wording:
 * `version`: is not respected at the moment, introduced for potential backwards compatibility in future
 * `force`: sets the "starting" version, you don't need to specify this section as the default is always `0`
 * `force.commit`: allows you to set commit hash from which the calculations should start
+* `blacklist`: terms to ignore when processing commits. Any commit containing these terms will be skipped in version calculations. Useful for ignoring merge commits, feature branch names, and other unwanted triggers.
 * `wording`: words the program should look for in the git commits to increment (patch|minor|major)
 
 ### Good to know
