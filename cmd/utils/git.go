@@ -95,6 +95,12 @@ func ListCommits(repo *GitRepository) ([]CommitDetails, error) {
 	var ref *plumbing.Reference
 	var err error
 
+	// Check if Handler is nil to avoid panic
+	if repo.Handler == nil {
+		Debug("Repository handler is nil, skipping commit listing", nil)
+		return repo.Commits, nil
+	}
+
 	ref, err = repo.Handler.Head()
 	if err != nil {
 		return []CommitDetails{}, err
@@ -113,8 +119,8 @@ func ListCommits(repo *GitRepository) ([]CommitDetails, error) {
 			Message:   c.Message,
 			Timestamp: c.Author.When,
 		})
-		sort.Slice(tmpResults, func(i, j int) bool { 
-			return tmpResults[i].Timestamp.Unix() < tmpResults[j].Timestamp.Unix() 
+		sort.Slice(tmpResults, func(i, j int) bool {
+			return tmpResults[i].Timestamp.Unix() < tmpResults[j].Timestamp.Unix()
 		})
 		return nil
 	})
@@ -126,7 +132,7 @@ func ListCommits(repo *GitRepository) ([]CommitDetails, error) {
 		for commitId, cmt := range tmpResults {
 			if cmt.Hash == repo.StartCommit {
 				Debug("Found commit match", map[string]interface{}{
-					"commit": cmt.Hash, 
+					"commit": cmt.Hash,
 					"index": commitId,
 				})
 				repo.Commits = tmpResults[commitId:]
@@ -145,6 +151,12 @@ func ListCommits(repo *GitRepository) ([]CommitDetails, error) {
 func ListExistingTags(repo *GitRepository) {
 	Debug("Listing existing tags", nil)
 	
+	// Check if Handler is nil to avoid panic
+	if repo.Handler == nil {
+		Debug("Repository handler is nil, skipping tag listing", nil)
+		return
+	}
+	
 	refs, err := repo.Handler.Tags()
 	if err != nil {
 		Error("Unable to list tags", map[string]interface{}{"error": err.Error()})
@@ -153,12 +165,12 @@ func ListExistingTags(repo *GitRepository) {
 	
 	if err := refs.ForEach(func(ref *plumbing.Reference) error {
 		repo.Tags = append(repo.Tags, TagDetails{
-			Name: ref.Name().Short(), 
+			Name: ref.Name().Short(),
 			Hash: ref.Hash().String(),
 		})
 		
 		Debug("Found tag", map[string]interface{}{
-			"tag": ref.Name().Short(), 
+			"tag": ref.Name().Short(),
 			"hash": ref.Hash().String(),
 		})
 		

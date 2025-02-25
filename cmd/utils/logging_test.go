@@ -5,7 +5,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 )
-
 func TestInitLogger(t *testing.T) {
 	// Test with debug mode enabled
 	logger := InitLogger(true)
@@ -51,3 +50,21 @@ func TestLoggingWithNilLogger(t *testing.T) {
 	// Test passes if we get here without panicking
 	assert.True(t, true)
 }
+
+// TestCriticalNilLogger tests that the Critical function doesn't panic with a nil logger
+func TestCriticalNilLogger(t *testing.T) {
+	// Save original logger and restore after test
+	originalLogger := Logger
+	defer func() { Logger = originalLogger }()
+	
+	// Set logger to nil
+	Logger = nil
+	
+	// This should not panic
+	Critical("Critical message", map[string]interface{}{"key": "value"})
+	
+	// Test passes if we get here without panicking
+	assert.True(t, true)
+}
+
+// Note: We don't test Critical with an actual logger because it calls os.Exit

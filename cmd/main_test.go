@@ -16,7 +16,7 @@ type Tests struct {
 }
 
 var (
-	assert          *assertions.Assertions
+	assertObj       *assertions.Assertions
 	testCurrentPath string
 )
 
@@ -25,7 +25,7 @@ func (suite *Tests) SetupTest() {
 	if err != nil {
 		utils.Critical("Unable to change directory to test directory", map[string]interface{}{"error": err})
 	}
-	assert = assertions.New(suite.T())
+	assertObj = assertions.New(suite.T())
 	params.varDebug = true
 	params.varRepoBranch = "main"
 }
@@ -89,7 +89,7 @@ func (suite *Tests) TestSetup_getSemver() {
 				Semver: tt.fields.Semver,
 			}
 			got := s.getSemver()
-			assert.Equal(tt.want, got, "Unexpected result in "+tt.name)
+			assertObj.Equal(tt.want, got, "Unexpected result in "+tt.name)
 		})
 	}
 }
@@ -199,7 +199,7 @@ func (suite *Tests) TestSetup_ForcedVersioning() {
 			}
 			utils.ApplyForcedVersioning(s.Config.Force, &s.Semver)
 			got := s.getSemver()
-			assert.Equal(tt.want, got, "Unexpected result in "+tt.name)
+			assertObj.Equal(tt.want, got, "Unexpected result in "+tt.name)
 		})
 	}
 }
@@ -278,7 +278,7 @@ func (suite *Tests) Test_checkMatches() {
 			}
 			
 			got := utils.CheckMatches(tt.args.content, tt.args.targets, tt.blacklist)
-			assert.Equal(tt.want, got, "Unexpected result in "+tt.name)
+			assertObj.Equal(tt.want, got, "Unexpected result in "+tt.name)
 		})
 	}
 }
@@ -371,11 +371,11 @@ func (suite *Tests) Test_parseExistingSemver() {
 	for _, tt := range tests {
 		suite.T().Run(tt.name, func(t *testing.T) {
 			got := utils.ParseExistingSemver(tt.args.tagName, tt.currentSemver)
-			assert.Equal(tt.wantSemanticVersion.Major, got.Major, "Unexpected MAJOR semver result in "+tt.name)
-			assert.Equal(tt.wantSemanticVersion.Minor, got.Minor, "Unexpected MINOR semver result in "+tt.name)
-			assert.Equal(tt.wantSemanticVersion.Patch, got.Patch, "Unexpected PATCH semver result in "+tt.name)
-			assert.Equal(tt.wantSemanticVersion.Release, got.Release, "Unexpected RELEASE semver result in "+tt.name)
-			assert.Equal(tt.wantSemanticVersion.EnableReleaseCandidate, got.EnableReleaseCandidate, "Unexpected EnableReleaseCandidate in "+tt.name)
+			assertObj.Equal(tt.wantSemanticVersion.Major, got.Major, "Unexpected MAJOR semver result in "+tt.name)
+			assertObj.Equal(tt.wantSemanticVersion.Minor, got.Minor, "Unexpected MINOR semver result in "+tt.name)
+			assertObj.Equal(tt.wantSemanticVersion.Patch, got.Patch, "Unexpected PATCH semver result in "+tt.name)
+			assertObj.Equal(tt.wantSemanticVersion.Release, got.Release, "Unexpected RELEASE semver result in "+tt.name)
+			assertObj.Equal(tt.wantSemanticVersion.EnableReleaseCandidate, got.EnableReleaseCandidate, "Unexpected EnableReleaseCandidate in "+tt.name)
 		})
 	}
 }
@@ -461,11 +461,11 @@ func (suite *Tests) TestSetup_ListCommits() {
 			if err == nil {
 				listOfCommits, err := utils.ListCommits(&s.GitRepo)
 				if !tt.wantErr {
-					assert.NoError(err, "Error should not be present in "+tt.name)
+					assertObj.NoError(err, "Error should not be present in "+tt.name)
 				} else {
-					assert.Error(err, "Error should be present in "+tt.name)
+					assertObj.Error(err, "Error should be present in "+tt.name)
 				}
-				assert.Equal(tt.noCommits, pandati.IsZero(listOfCommits), "Unexpected commits count"+tt.name)
+				assertObj.Equal(tt.noCommits, pandati.IsZero(listOfCommits), "Unexpected commits count"+tt.name)
 			}
 		})
 	}
