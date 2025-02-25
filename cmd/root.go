@@ -32,11 +32,14 @@ Visit https://github.com/lukaszraczylo/semver-generator for more information, do
 	},
 }
 
+// Execute executes the root command
 func Execute() {
 	cobra.CheckErr(rootCmd.Execute())
 }
 
+// setupCobra sets up the cobra command flags
 func (r *Setup) setupCobra() {
+	var err error
 	r.RepositoryName, err = rootCmd.Flags().GetString("repository")
 	if err != nil {
 		panic(err)
@@ -50,11 +53,9 @@ func (r *Setup) setupCobra() {
 		panic(err)
 	}
 	r.UseLocal = params.varUseLocal
-	if err != nil {
-		panic(err)
-	}
 }
 
+// myParams holds the command line parameters
 type myParams struct {
 	varRepoName       string
 	varRepoBranch     string
@@ -81,5 +82,5 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&params.varDebug, "debug", "d", false, "Enable debug mode")
 	rootCmd.PersistentFlags().BoolVarP(&params.varUpdate, "update", "u", false, "Update binary with latest")
 	rootCmd.PersistentFlags().BoolVarP(&params.varStrict, "strict", "s", false, "Strict matching")
-	rootCmd.PersistentFlags().BoolVarP(&params.varExisting, "existing", "e", false, "Respect existing tags")
+	rootCmd.PersistentFlags().BoolVarP(&params.varExisting, "existing", "e", true, "Respect existing tags")
 }

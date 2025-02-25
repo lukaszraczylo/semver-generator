@@ -1,8 +1,13 @@
 version: 1
 force:
   major: 1
-  existing: false
+  existing: true
   strict: false
+blacklist:
+  - "Merge branch"
+  - "Merge pull request"
+  - "feature/"
+  - "feature:"
 wording:
   patch:
     - update
