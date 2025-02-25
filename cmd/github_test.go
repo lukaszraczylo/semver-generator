@@ -3,11 +3,11 @@ package cmd
 import (
 	"testing"
 
-	libpack_logging "github.com/lukaszraczylo/graphql-monitoring-proxy/logging"
+	"github.com/lukaszraczylo/semver-generator/cmd/utils"
 )
 
 func Test_checkLatestRelease(t *testing.T) {
-	logger = libpack_logging.New()
+	utils.InitLogger(true)
 	tests := []struct {
 		name  string
 		want  string
@@ -29,7 +29,7 @@ func Test_checkLatestRelease(t *testing.T) {
 }
 
 func Test_updatePackage(t *testing.T) {
-	logger = libpack_logging.New()
+	utils.InitLogger(true)
 	if testing.Short() {
 		t.Skip("Skipping test in short / CI mode")
 	}
