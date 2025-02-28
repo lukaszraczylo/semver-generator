@@ -58,14 +58,14 @@ func TestParseExistingSemver(t *testing.T) {
 	InitLogger(false)
 
 	tests := []struct {
-		name         string
-		tagName      string
+		name          string
+		tagName       string
 		currentSemver SemVer
-		want         SemVer
+		want          SemVer
 	}{
 		{
-			name:    "Standard semver",
-			tagName: "1.2.3",
+			name:          "Standard semver",
+			tagName:       "1.2.3",
 			currentSemver: SemVer{},
 			want: SemVer{
 				Major: 1,
@@ -74,8 +74,8 @@ func TestParseExistingSemver(t *testing.T) {
 			},
 		},
 		{
-			name:    "With v prefix",
-			tagName: "v2.3.4",
+			name:          "With v prefix",
+			tagName:       "v2.3.4",
 			currentSemver: SemVer{},
 			want: SemVer{
 				Major: 2,
@@ -84,8 +84,8 @@ func TestParseExistingSemver(t *testing.T) {
 			},
 		},
 		{
-			name:    "With release candidate",
-			tagName: "3.4.5-rc.2",
+			name:          "With release candidate",
+			tagName:       "3.4.5-rc.2",
 			currentSemver: SemVer{},
 			want: SemVer{
 				Major:                  3,

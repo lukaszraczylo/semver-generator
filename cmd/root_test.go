@@ -30,13 +30,13 @@ func TestExecute(t *testing.T) {
 		Short: "Test command",
 		Run:   func(cmd *cobra.Command, args []string) {},
 	}
-	
+
 	// Add all the required flags to the test command
 	testCmd.Flags().Bool("version", false, "Print version information")
 	testCmd.Flags().String("repository", "test-repo", "Repository URL")
 	testCmd.Flags().String("branch", "test-branch", "Repository branch")
 	testCmd.Flags().String("config", "test-config", "Config file path")
-	
+
 	rootCmd = testCmd
 
 	// Execute should not panic
