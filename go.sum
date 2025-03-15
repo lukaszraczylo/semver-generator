@@ -75,8 +75,8 @@ github.com/lukaszraczylo/ask v0.0.0-20240916204100-6e9ef53a62d9 h1:pL8B9mjv6RPUf
 github.com/lukaszraczylo/ask v0.0.0-20240916204100-6e9ef53a62d9/go.mod h1:M+UVdyqZs++xtEPrascaVmZdOMhCnxjZ2SgH+xHpR0c=
 github.com/lukaszraczylo/go-simple-graphql v1.2.47 h1:70TQ7vK4V92y5mKkf+TAqqubmWhDls1+3qornyUXv9w=
 github.com/lukaszraczylo/go-simple-graphql v1.2.47/go.mod h1:HD/4/Gk69OJ5AM6wS5PxUvLm8+Z/YJ8CjqGwQ7TGhd0=
-github.com/lukaszraczylo/graphql-monitoring-proxy v0.28.43 h1:WZgsqyy51g5qq2ogUAPkA/Wy1KAlWhwZfA9I7nWkElg=
-github.com/lukaszraczylo/graphql-monitoring-proxy v0.28.43/go.mod h1:L91qBsrxvUKrbIij6sLoCIQy+C7vYp51RRQCDaP/Kj8=
+github.com/lukaszraczylo/graphql-monitoring-proxy v0.28.47 h1:kcg0S10CFgm4zi7MEPp7N9TMRf5h6NaB22AxX9Vcz8Q=
+github.com/lukaszraczylo/graphql-monitoring-proxy v0.28.47/go.mod h1:wnVHAktYBx7ptXkBq33pzUT58AH/dH9paoKKTO01ma0=
 github.com/lukaszraczylo/pandati v0.0.29 h1:WUEWm1+hWjE5KJbIL8OctG00x2dk4XKGJSlrjhxZ55k=
 github.com/lukaszraczylo/pandati v0.0.29/go.mod h1:+DyTWKFaXd+jIfe7GW5w2S5PyTko/RXxMyOa+Vl713A=
 github.com/magiconair/properties v1.8.9 h1:nWcCbLq1N2v/cpNsy5WvQ37Fb+YElfq20WJ/a8RkpQM=
@@ -120,8 +120,8 @@ github.com/skeema/knownhosts v1.3.1 h1:X2osQ+RAjK76shCbvhHHHVl3ZlgDm8apHEHFqRjnB
 github.com/skeema/knownhosts v1.3.1/go.mod h1:r7KTdC8l4uxWRyK2TpQZ/1o5HaSzh06ePQNxPwTcfiY=
 github.com/sourcegraph/conc v0.3.0 h1:OQTbbt6P72L20UqAkXXuLOj79LfEanQ+YQFNpLA9ySo=
 github.com/sourcegraph/conc v0.3.0/go.mod h1:Sdozi7LEKbFPqYX2/J+iBAM6HpqSLTASQIKqDmF7Mt0=
-github.com/spf13/afero v1.12.0 h1:UcOPyRBYczmFn6yvphxkn9ZEOY65cpwGKb5mL36mrqs=
-github.com/spf13/afero v1.12.0/go.mod h1:ZTlWwG4/ahT8W7T0WQ5uYmjI9duaLQGy3Q2OAl4sk/4=
+github.com/spf13/afero v1.13.0 h1:vsS0j+yJBlVMOn+zGCK3C5uhtp8GDT8RsJCdlr3Ne2s=
+github.com/spf13/afero v1.13.0/go.mod h1:YyftDRCfbalZwshZ4hPgI6ZXNussxDgGOacazISk/84=
 github.com/spf13/cast v1.7.1 h1:cuNEagBQEHWN1FnbGEjCXL2szYEXqfJPbP2HNUaca9Y=
 github.com/spf13/cast v1.7.1/go.mod h1:ancEpBxwJDODSW/UG4rDrAqiKolqNNh2DX3mk86cAdo=
 github.com/spf13/cobra v1.9.1 h1:CXSaggrXdbHK9CF+8ywj8Amf7PBRmPCOJugH954Nnlo=
