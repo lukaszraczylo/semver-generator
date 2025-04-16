@@ -267,7 +267,7 @@ func (suite *Tests) Test_checkMatches() {
 				if tt.name == "No match" {
 					return nil
 				}
-				
+
 				// For other test cases, match if the needle is in the haystack
 				for _, h := range haystack {
 					if strings.Contains(h, needle) || strings.Contains(needle, h) {
@@ -276,7 +276,7 @@ func (suite *Tests) Test_checkMatches() {
 				}
 				return nil
 			}
-			
+
 			got := utils.CheckMatches(tt.args.content, tt.args.targets, tt.blacklist)
 			assertObj.Equal(tt.want, got, "Unexpected result in "+tt.name)
 		})
@@ -382,10 +382,10 @@ func (suite *Tests) Test_parseExistingSemver() {
 
 func (suite *Tests) TestSetup_ListCommits() {
 	type fields struct {
-		RepositoryName      string
-		RepositoryBranch    string
-		LocalConfigFile     string
-		GitRepo             utils.GitRepository
+		RepositoryName   string
+		RepositoryBranch string
+		LocalConfigFile  string
+		GitRepo          utils.GitRepository
 	}
 
 	tests := []struct {
@@ -441,23 +441,23 @@ func (suite *Tests) TestSetup_ListCommits() {
 			if tt.name == "List commits from existing repository" {
 				t.Skip("Skipping test that requires repository access")
 			}
-			
+
 			s := &Setup{
 				RepositoryName:   tt.fields.RepositoryName,
 				RepositoryBranch: tt.fields.RepositoryBranch,
 				GitRepo:          tt.fields.GitRepo,
 			}
-			
+
 			config, _ := utils.ReadConfig(tt.fields.LocalConfigFile)
 			s.Config = config
-			
+
 			err := utils.PrepareRepository(&s.GitRepo)
 			if err != nil && !tt.wantErr {
 				if tt.name != "List commits starting with certain hash" {
 					t.Fatalf("Failed to prepare repository: %v", err)
 				}
 			}
-			
+
 			if err == nil {
 				listOfCommits, err := utils.ListCommits(&s.GitRepo)
 				if !tt.wantErr {
