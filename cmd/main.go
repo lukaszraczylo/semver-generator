@@ -26,27 +26,26 @@ import (
 )
 
 var (
-	err         error
 	repo        *Setup
 	PKG_VERSION string
 )
 
 // Setup represents the application setup
 type Setup struct {
-	RepositoryName      string
-	RepositoryBranch    string
-	LocalConfigFile     string
-	Generate            bool
-	UseLocal            bool
-	GitRepo             utils.GitRepository
-	Config              *utils.Config
-	Semver              utils.SemVer
+	RepositoryName   string
+	RepositoryBranch string
+	LocalConfigFile  string
+	Generate         bool
+	UseLocal         bool
+	GitRepo          utils.GitRepository
+	Config           *utils.Config
+	Semver           utils.SemVer
 }
 
 // Initialize the fuzzy search function in the utils package
 func init() {
 	utils.InitLogger(false) // Will be updated in main based on debug flag
-	
+
 	// Set the fuzzy search function
 	utils.FuzzyFind = fuzzy.FindNormalizedFold
 }
@@ -72,12 +71,12 @@ func main() {
 		if PKG_VERSION != latestRelease && latestReleaseOk {
 			outdatedMsg = fmt.Sprintf("(Latest available: %s)", latestRelease)
 		}
-		
+
 		utils.Info("semver-gen", map[string]interface{}{
-			"version": PKG_VERSION,
+			"version":  PKG_VERSION,
 			"outdated": outdatedMsg,
 		})
-		
+
 		if outdatedMsg != "" {
 			utils.Info("semver-gen", map[string]interface{}{
 				"message": "You can update automatically with: semver-gen -u",
