@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 )
+
 func TestInitLogger(t *testing.T) {
 	// Test with debug mode enabled
 	logger := InitLogger(true)
@@ -25,10 +26,10 @@ func TestLoggingFunctions(t *testing.T) {
 	Debug("Debug message", map[string]interface{}{"key": "value"})
 	Info("Info message", map[string]interface{}{"key": "value"})
 	Error("Error message", map[string]interface{}{"key": "value"})
-	
+
 	// Skip testing Critical as it might call os.Exit
 	// Critical("Critical message", map[string]interface{}{"key": "value"})
-	
+
 	// Test passes if we get here without panicking
 	assert.True(t, true)
 }
@@ -43,10 +44,10 @@ func TestLoggingWithNilLogger(t *testing.T) {
 	Debug("Debug message", map[string]interface{}{"key": "value"})
 	Info("Info message", map[string]interface{}{"key": "value"})
 	Error("Error message", map[string]interface{}{"key": "value"})
-	
+
 	// Skip testing Critical as it might call os.Exit
 	// Critical("Critical message", map[string]interface{}{"key": "value"})
-	
+
 	// Test passes if we get here without panicking
 	assert.True(t, true)
 }
@@ -56,13 +57,13 @@ func TestCriticalNilLogger(t *testing.T) {
 	// Save original logger and restore after test
 	originalLogger := Logger
 	defer func() { Logger = originalLogger }()
-	
+
 	// Set logger to nil
 	Logger = nil
-	
+
 	// This should not panic
 	Critical("Critical message", map[string]interface{}{"key": "value"})
-	
+
 	// Test passes if we get here without panicking
 	assert.True(t, true)
 }
