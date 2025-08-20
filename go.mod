@@ -9,7 +9,7 @@ require (
 	github.com/lithammer/fuzzysearch v1.1.8
 	github.com/lukaszraczylo/ask v0.0.0-20240916204100-6e9ef53a62d9
 	github.com/lukaszraczylo/go-simple-graphql v1.2.78
-	github.com/lukaszraczylo/graphql-monitoring-proxy v0.28.253
+	github.com/lukaszraczylo/graphql-monitoring-proxy v0.28.257
 	github.com/lukaszraczylo/pandati v0.0.29
 	github.com/melbahja/got v0.7.0
 	github.com/spf13/cobra v1.9.1
@@ -35,7 +35,7 @@ require (
 	github.com/gookit/goutil v0.7.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
-	github.com/kevinburke/ssh_config v1.2.0 // indirect
+	github.com/kevinburke/ssh_config v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
