@@ -54,33 +54,33 @@ var extractNumber = regexp.MustCompile("[0-9]+")
 // ParseExistingSemver parses a semantic version from a tag name
 func ParseExistingSemver(tagName string, currentSemver SemVer) SemVer {
 	Debug("Parsing existing semver", map[string]interface{}{"tag": tagName})
-	
+
 	tagNameParts := strings.Split(tagName, ".")
 	if len(tagNameParts) < 3 {
 		Debug("Unable to parse incompatible semver (non x.y.z)", map[string]interface{}{"tag": tagName})
 		return currentSemver
 	}
-	
+
 	semanticVersion := SemVer{}
-	
+
 	// Extract major version
 	majorMatches := extractNumber.FindAllString(tagNameParts[0], -1)
 	if len(majorMatches) > 0 {
 		semanticVersion.Major, _ = strconv.Atoi(majorMatches[0])
 	}
-	
+
 	// Extract minor version
 	minorMatches := extractNumber.FindAllString(tagNameParts[1], -1)
 	if len(minorMatches) > 0 {
 		semanticVersion.Minor, _ = strconv.Atoi(minorMatches[0])
 	}
-	
+
 	// Extract patch version
 	patchMatches := extractNumber.FindAllString(tagNameParts[2], -1)
 	if len(patchMatches) > 0 {
 		semanticVersion.Patch, _ = strconv.Atoi(patchMatches[0])
 	}
-	
+
 	// Extract release candidate version if present
 	if len(tagNameParts) > 3 {
 		releaseMatches := extractNumber.FindAllString(tagNameParts[3], -1)
@@ -89,14 +89,14 @@ func ParseExistingSemver(tagName string, currentSemver SemVer) SemVer {
 			semanticVersion.EnableReleaseCandidate = true
 		}
 	}
-	
+
 	return semanticVersion
 }
 
 // CheckMatches checks if any of the targets match the content
 func CheckMatches(content []string, targets []string, blacklist []string) bool {
 	contentStr := strings.Join(content, " ")
-	
+
 	// First check if any target matches
 	hasMatch := false
 	for _, tgt := range targets {
@@ -104,8 +104,8 @@ func CheckMatches(content []string, targets []string, blacklist []string) bool {
 		if len(matches) > 0 {
 			hasMatch = true
 			Debug("Found match", map[string]interface{}{
-				"target": tgt,
-				"match": strings.Join(matches, ","),
+				"target":  tgt,
+				"match":   strings.Join(matches, ","),
 				"content": contentStr,
 			})
 			break
@@ -117,14 +117,14 @@ func CheckMatches(content []string, targets []string, blacklist []string) bool {
 		for _, blacklistTerm := range blacklist {
 			if strings.Contains(strings.ToLower(contentStr), strings.ToLower(blacklistTerm)) {
 				Debug("Blacklisted term detected, ignoring commit", map[string]interface{}{
-					"content": contentStr, 
+					"content":        contentStr,
 					"blacklist_term": blacklistTerm,
 				})
 				return false
 			}
 		}
 	}
-	
+
 	return hasMatch
 }
 

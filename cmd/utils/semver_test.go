@@ -19,7 +19,7 @@ func TestCalculateSemver(t *testing.T) {
 		// More sophisticated mock implementation for testing
 		for _, h := range haystack {
 			// Check for substring match to better simulate fuzzy search
-			if h == needle || (len(h) >= 3 && len(needle) >= 3 && 
+			if h == needle || (len(h) >= 3 && len(needle) >= 3 &&
 				(h[:3] == needle[:3] || h[len(h)-3:] == needle[len(needle)-3:])) {
 				return []string{h}
 			}
@@ -29,7 +29,7 @@ func TestCalculateSemver(t *testing.T) {
 
 	// Test data
 	now := time.Now()
-	
+
 	// Common wording and blacklist for all tests
 	wording := Wording{
 		Patch:   []string{"update", "fix", "initial"},
@@ -77,10 +77,10 @@ func TestCalculateSemver(t *testing.T) {
 			respectExisting: true,
 			strictMode:      false,
 			want: SemVer{
-				Major: 2,
-				Minor: 0,
-				Patch: 1, // Initial tag 2.0.0 + one patch increment
-				Release: 1,
+				Major:                  2,
+				Minor:                  0,
+				Patch:                  1, // Initial tag 2.0.0 + one patch increment
+				Release:                1,
 				EnableReleaseCandidate: true,
 			},
 		},
@@ -110,10 +110,10 @@ func TestCalculateSemver(t *testing.T) {
 			respectExisting: true,
 			strictMode:      true,
 			want: SemVer{
-				Major: 2,
-				Minor: 0,
-				Patch: 1, // Initial tag 2.0.0 + patch from "update" keyword
-				Release: 1,
+				Major:                  2,
+				Minor:                  0,
+				Patch:                  1, // Initial tag 2.0.0 + patch from "update" keyword
+				Release:                1,
 				EnableReleaseCandidate: true,
 			},
 		},

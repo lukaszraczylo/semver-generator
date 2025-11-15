@@ -64,7 +64,7 @@ func TestListCommits(t *testing.T) {
 	t.Run("Test commit filtering logic", func(t *testing.T) {
 		// Create a test repository with predefined commits
 		repo := &GitRepository{}
-		
+
 		// Manually populate the commits for testing
 		repo.Commits = []CommitDetails{
 			{
@@ -83,7 +83,7 @@ func TestListCommits(t *testing.T) {
 
 		// Test with StartCommit specified
 		repo.StartCommit = "def456"
-		
+
 		// Instead of calling ListCommits which would try to use the nil Handler,
 		// we'll just test the filtering logic directly
 		if repo.StartCommit != "" {
@@ -94,19 +94,19 @@ func TestListCommits(t *testing.T) {
 				}
 			}
 		}
-		
+
 		// Verify the filtering worked correctly
 		assert.Len(t, repo.Commits, 1, "Should filter commits starting from specified hash")
 		assert.Equal(t, "def456", repo.Commits[0].Hash, "Commit hash should match")
 	})
-	
+
 	t.Run("Test with nil Handler", func(t *testing.T) {
 		// Create a test repository with nil Handler
 		repo := &GitRepository{}
-		
+
 		// Now we can safely call ListCommits since we've added a nil check
 		commits, err := ListCommits(repo)
-		
+
 		// Verify the function returns without error
 		assert.NoError(t, err, "Should not error with nil Handler")
 		assert.Empty(t, commits, "Should return empty commits with nil Handler")
@@ -120,10 +120,10 @@ func TestListExistingTags(t *testing.T) {
 	t.Run("Test tag processing", func(t *testing.T) {
 		// Create a test repository
 		repo := &GitRepository{}
-		
+
 		// Since we can't test the actual git operations, we'll test the function's behavior
 		// by manually setting up the repository state
-		
+
 		// Manually add tags to verify they're processed correctly
 		repo.Tags = []TagDetails{
 			{
@@ -131,19 +131,19 @@ func TestListExistingTags(t *testing.T) {
 				Hash: "abc123",
 			},
 		}
-		
+
 		assert.Len(t, repo.Tags, 1, "Should have 1 tag")
 		assert.Equal(t, "v1.0.0", repo.Tags[0].Name, "Tag name should match")
 		assert.Equal(t, "abc123", repo.Tags[0].Hash, "Tag hash should match")
 	})
-	
+
 	t.Run("Test with nil Handler", func(t *testing.T) {
 		// Create a test repository with nil Handler
 		repo := &GitRepository{}
-		
+
 		// Now we can safely call ListExistingTags since we've added a nil check
 		ListExistingTags(repo)
-		
+
 		// Verify no tags were added
 		assert.Empty(t, repo.Tags, "Should have no tags after calling with nil Handler")
 	})
