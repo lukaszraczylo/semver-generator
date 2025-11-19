@@ -8,8 +8,8 @@ require (
 	github.com/go-git/go-git/v5 v5.16.3
 	github.com/lithammer/fuzzysearch v1.1.8
 	github.com/lukaszraczylo/ask v0.0.0-20240916204100-6e9ef53a62d9
-	github.com/lukaszraczylo/go-simple-graphql v1.2.84
-	github.com/lukaszraczylo/graphql-monitoring-proxy v0.36.3
+	github.com/lukaszraczylo/go-simple-graphql v1.2.89
+	github.com/lukaszraczylo/graphql-monitoring-proxy v0.36.19
 	github.com/lukaszraczylo/pandati v0.0.29
 	github.com/melbahja/got v0.7.0
 	github.com/spf13/cobra v1.10.1
@@ -32,7 +32,7 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
-	github.com/gookit/goutil v0.7.1 // indirect
+	github.com/gookit/goutil v0.7.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v1.4.0 // indirect
