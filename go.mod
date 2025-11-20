@@ -9,7 +9,7 @@ require (
 	github.com/lithammer/fuzzysearch v1.1.8
 	github.com/lukaszraczylo/ask v0.0.0-20240916204100-6e9ef53a62d9
 	github.com/lukaszraczylo/go-simple-graphql v1.2.89
-	github.com/lukaszraczylo/graphql-monitoring-proxy v0.36.19
+	github.com/lukaszraczylo/graphql-monitoring-proxy v0.36.23
 	github.com/lukaszraczylo/pandati v0.0.29
 	github.com/melbahja/got v0.7.0
 	github.com/spf13/cobra v1.10.1
@@ -23,7 +23,7 @@ require (
 	github.com/ProtonMail/go-crypto v1.3.0 // indirect
 	github.com/avast/retry-go/v4 v4.7.0 // indirect
 	github.com/cloudflare/circl v1.6.1 // indirect
-	github.com/cyphar/filepath-securejoin v0.6.0 // indirect
+	github.com/cyphar/filepath-securejoin v0.6.1 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
@@ -57,7 +57,7 @@ require (
 	github.com/wI2L/jsondiff v0.6.1 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/crypto v0.44.0 // indirect
+	golang.org/x/crypto v0.45.0 // indirect
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
 	golang.org/x/net v0.47.0 // indirect
 	golang.org/x/sync v0.18.0 // indirect
