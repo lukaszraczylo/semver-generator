@@ -57,7 +57,7 @@ jobs:
   test:
     needs: [ prepare ]
     name: Code checks pipeline
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     container: github/super-linter:v3.15.5
     env:
       CI: true
@@ -96,7 +96,7 @@ jobs:
   code_scans:
     needs: [ prepare ]
     name: Code scans pipeline
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
