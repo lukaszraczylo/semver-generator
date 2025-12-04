@@ -9,10 +9,10 @@ require (
 	github.com/lithammer/fuzzysearch v1.1.8
 	github.com/lukaszraczylo/ask v0.0.0-20240916204100-6e9ef53a62d9
 	github.com/lukaszraczylo/go-simple-graphql v1.2.89
-	github.com/lukaszraczylo/graphql-monitoring-proxy v0.41.13
+	github.com/lukaszraczylo/graphql-monitoring-proxy v0.41.20
 	github.com/lukaszraczylo/pandati v0.0.29
 	github.com/melbahja/got v0.7.0
-	github.com/spf13/cobra v1.10.1
+	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
 )
