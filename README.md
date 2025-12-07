@@ -217,7 +217,7 @@ wording:
 * `blacklist`: terms to ignore when processing commits. Any commit containing these terms will be skipped in version calculations. Useful for ignoring merge commits, feature branch names, and other unwanted triggers.
 * `wording`: words the program should look for in the git commits to increment (patch|minor|major)
 
-### Good to know
+### Good to knows
 
 * Word matching uses fuzzy search AND is case INSENSITIVE
 * I do not recommend using common words ( like "the" from the example configuration )
