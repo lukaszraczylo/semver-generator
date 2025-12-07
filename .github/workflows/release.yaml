@@ -1,222 +1,26 @@
-name: Test, scan, build, release
+name: Test, build, release
 
 on:
   workflow_dispatch:
   push:
     paths-ignore:
-    - '**.md'
-    - '**/release.yaml'
-    - 'action.yml'
+      - '**.md'
+      - '**/release.yaml'
+      - 'action.yml'
     branches:
-      - "master"
-      - "main"
+      - main
 
-env:
-  ENABLE_CODE_LINT: false
-  ENABLE_CODE_SCANS: false
-  DEPLOY: false
-  GO_VERSION: 1.21
+permissions:
+  contents: write
+  packages: write
 
 jobs:
-  prepare:
-    name: Preparing build context
-    runs-on: ubuntu-latest
-    outputs:
-      SANITISED_REPOSITORY_NAME: ${{ steps.get_env.outputs.SANITISED_REPOSITORY_NAME }}
-      DOCKER_IMAGE: ${{ steps.get_env.outputs.DOCKER_IMAGE }}
-      GITHUB_COMMIT_NUMBER: ${{ steps.get_env.outputs.GITHUB_COMMIT_NUMBER }}
-      GITHUB_SHA: ${{ steps.get_env.outputs.GITHUB_SHA }}
-      GITHUB_RUN_ID: ${{ steps.get_env.outputs.GITHUB_RUN_ID }}
-      RELEASE_VERSION: ${{ steps.get_env.outputs.RELEASE_VERSION }}
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: '0'
-      - name: Setting environment variables
-        id: get_env
-        run: |
-          DOWNLOAD_URL=$(curl -s https://api.github.com/repos/lukaszraczylo/semver-generator/releases/latest | grep -E ".*browser_download_url.*linux-" | grep -vE "(arm64|md5)" \
-            | cut -d '"' -f 4)
-          curl -s -L -o semver-gen "$DOWNLOAD_URL" && chmod +x semver-gen
-          TMP_SANITISED_REPOSITORY_NAME=$(echo ${{ github.event.repository.name }} | sed -e 's|\.|-|g')
-          TMP_GITHUB_COMMITS_COUNT=$(git rev-list --count HEAD)
-          TMP_GITHUB_COUNT_NUMBER=$(echo ${GITHUB_RUN_NUMBER})
-          TMP_RELEASE_VERSION=$(./semver-gen generate -l -c config-release.yaml | sed -e 's|SEMVER ||g')
-
-          echo ">> Release version: $TMP_RELEASE_VERSION <<"
-
-          # Setting outputs
-          echo "SANITISED_REPOSITORY_NAME=$TMP_SANITISED_REPOSITORY_NAME" > $GITHUB_OUTPUT
-          echo "DOCKER_IMAGE=ghcr.io/${{ github.repository_owner }}/$TMP_SANITISED_REPOSITORY_NAME" >> $GITHUB_OUTPUT
-          echo "GITHUB_COMMIT_NUMBER=$TMP_GITHUB_COMMITS_COUNT" >> $GITHUB_OUTPUT
-          echo "GITHUB_SHA=$(echo ${GITHUB_SHA::8})" >> $GITHUB_OUTPUT
-          echo "GITHUB_RUN_ID=$TMP_GITHUB_COUNT_NUMBER" >> $GITHUB_OUTPUT
-          echo "RELEASE_VERSION=$TMP_RELEASE_VERSION" >> $GITHUB_OUTPUT
-
-  test:
-    needs: [ prepare ]
-    name: Code checks pipeline
-    runs-on: ubuntu-latest
-    container: github/super-linter:v3.15.5
-    env:
-      CI: true
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-      - name: Install Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: ${{ env.GO_VERSION }}
-      - name: Lint Code Base
-        if: env.ENABLE_CODE_LINT == true
-        env:
-          VALIDATE_ALL_CODEBASE: true
-          VALIDATE_DOCKERFILE: false # this leaves us with hadolint only
-          VALIDATE_GO: false # disable bulk validation of go files, run the linter manually
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GHCR_TOKEN }}
-          LOG_LEVEL: WARN
-        run: |
-          golangci-lint run --exclude-use-default ./...
-          /action/lib/linter.sh
-      - name: Run unit tests
-        env:
-          GITHUB_TOKEN: ${{ secrets.GHCR_TOKEN }}
-        run: |
-          make test CI_RUN=${CI}
-      - name: Upload codecov result
-        uses: codecov/codecov-action@v3
-        continue-on-error: true
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-          files: coverage.out
-          fail_ci_if_error: false
-
-  code_scans:
-    needs: [ prepare ]
-    name: Code scans pipeline
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-      - name: Install Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: ${{ env.GO_VERSION }}
-      - name: Configure git for private modules
-        run: |
-          make update
-      - name: WriteGoList
-        run: go list -json -m all > go.list
-      - name: Running nancy
-        if: env.ENABLE_CODE_SCANS == true
-        uses: sonatype-nexus-community/nancy-github-action@main
-      - name: Running gosec
-        if: env.ENABLE_CODE_SCANS == true
-        uses: securego/gosec@master
-        with:
-          args: ./...
-
-
-  build-binary:
-    needs: [ prepare, test, code_scans ]
-    name: Binary compilation and release
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Install Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: ${{ env.GO_VERSION }}
-      - name: Build binaries
-        run: |
-          LOCAL_VERSION=${{ needs.prepare.outputs.RELEASE_VERSION }} make dist-release
-
-      - name: Get list of the commits since last release
-        run: |
-          echo "$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%h %s")" > .release_notes
-
-      - name: Create release [semver]
-        uses: ncipollo/release-action@v1
-        with:
-          bodyFile: ./.release_notes
-          name: version ${{ needs.prepare.outputs.RELEASE_VERSION }}
-          token: ${{ secrets.GHCR_TOKEN }}
-          tag: ${{ needs.prepare.outputs.RELEASE_VERSION }}
-          prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
-          artifacts: "dist/*"
-          allowUpdates: true
-
-      - name: Delete existing v1 tag and release
-        run: |
-          gh release delete v1 --cleanup-tag -y
-        env:
-          GH_TOKEN: ${{ secrets.GHCR_TOKEN }}
-
-      - name: Create release [v1]
-        uses: ncipollo/release-action@v1
-        with:
-          bodyFile: ./.release_notes
-          name: v1 - ${{ needs.prepare.outputs.RELEASE_VERSION }}
-          token: ${{ secrets.GHCR_TOKEN }}
-          tag: v1
-          prerelease: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
-          artifacts: "dist/*"
-          allowUpdates: true
-          makeLatest: false
-
-  build-docker:
-    needs: [ prepare, test, code_scans, build-binary ]
-    name: Docker image build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Login to GHCR
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.ACTOR }}
-          password: ${{ secrets.GHCR_TOKEN }}
-      - name: Prepare for push
-        id: prep
-        run: |
-          if [ -z "${{ needs.prepare.outputs.RELEASE_VERSION }}" ]; then
-            TAGS="${{ needs.prepare.outputs.DOCKER_IMAGE  }}:${{ needs.prepare.outputs.GITHUB_SHA }},${{ needs.prepare.outputs.DOCKER_IMAGE  }}:latest,${{ needs.prepare.outputs.DOCKER_IMAGE  }}:v1"
-          else
-            TAGS="${{ needs.prepare.outputs.DOCKER_IMAGE  }}:${{ needs.prepare.outputs.GITHUB_SHA }},${{ needs.prepare.outputs.DOCKER_IMAGE  }}:${{ needs.prepare.outputs.RELEASE_VERSION }},${{ needs.prepare.outputs.DOCKER_IMAGE  }}:latest,${{ needs.prepare.outputs.DOCKER_IMAGE  }}:v1"
-          fi
-          echo "TAGS=$TAGS" >> $GITHUB_OUTPUT
-          BRANCH=$(echo ${GITHUB_REF##*/} | tr '[A-Z]' '[a-z]')
-          LABELS="org.opencontainers.image.revision=${{ needs.prepare.outputs.GITHUB_SHA }}"
-          LABELS="$LABELS,org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-          LABELS="$LABELS,org.opencontainers.image.version=$VERSION"
-          LABELS="$LABELS,com.github.repo.branch=$BRANCH"
-          LABELS="$LABELS,com.github.repo.dockerfile=Dockerfile"
-          echo "LABELS=$LABELS" >> $GITHUB_OUTPUT
-          BUILD_ARGS="BRANCH=$BRANCH"
-          echo "args=$BUILD_ARGS" >> $GITHUB_OUTPUT
-      - name: Build image
-        id: docker_build
-        uses: docker/build-push-action@v4
-        with:
-          builder: ${{ steps.buildx.outputs.name }}
-          platforms: linux/arm64,linux/amd64
-          push: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
-          tags: ${{ steps.prep.outputs.tags }}
-          build-args: |
-            GITHUB_AUTH_TOKEN=${{ secrets.GHCR_TOKEN }}
-            MICROSERVICE_NAME=${{ github.event.repository.name }}
-            GITHUB_COMMIT_NUMBER=${{ needs.prepare.outputs.GITHUB_COMMIT_NUMBER }}
-            GITHUB_SHA=${{ needs.prepare.outputs.GITHUB_SHA }}
-            ${{ steps.prep.outputs.args }}
-          labels: ${{ steps.prep.outputs.labels }}
-          no-cache: false
+  release:
+    uses: lukaszraczylo/shared-actions/.github/workflows/go-release.yaml@main
+    with:
+      go-version: "1.24"
+      docker-enabled: true
+      rolling-release-tag: "v1"
+      semver-config: "config-release.yaml"
+    secrets:
+      homebrew-tap-token: ${{ secrets.HOMEBREW_TAP_TOKEN }}

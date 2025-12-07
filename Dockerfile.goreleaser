@@ -1,0 +1,6 @@
+FROM ubuntu:jammy
+COPY semver-gen /go/src/app/semver-gen
+COPY config-release.yaml /go/src/app/config.yaml
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]

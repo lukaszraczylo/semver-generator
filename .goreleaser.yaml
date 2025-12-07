@@ -1,0 +1,126 @@
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: semver-gen
+    main: .
+    binary: semver-gen
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.PKG_VERSION={{.Version}}
+
+archives:
+  - id: semver-gen
+    formats: [tar.gz]
+    name_template: "semver-gen-{{ .Version }}-{{ .Os }}-{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - LICENSE
+      - README.md
+      - config.yaml
+
+checksum:
+  name_template: "semver-gen-{{ .Version }}-checksums.txt"
+  algorithm: sha256
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^Merge'
+      - '^WIP'
+      - '^Update go.mod'
+
+release:
+  github:
+    owner: lukaszraczylo
+    name: semver-generator
+  name_template: "version {{.Version}}"
+  draft: false
+  prerelease: auto
+
+dockers:
+  - id: semver-gen-amd64
+    goos: linux
+    goarch: amd64
+    ids:
+      - semver-gen
+    image_templates:
+      - "ghcr.io/lukaszraczylo/semver-generator:{{ .Version }}-amd64"
+      - "ghcr.io/lukaszraczylo/semver-generator:latest-amd64"
+      - "ghcr.io/lukaszraczylo/semver-generator:v1-amd64"
+    dockerfile: Dockerfile.goreleaser
+    use: buildx
+    build_flag_templates:
+      - "--platform=linux/amd64"
+    extra_files:
+      - config-release.yaml
+      - entrypoint.sh
+
+  - id: semver-gen-arm64
+    goos: linux
+    goarch: arm64
+    ids:
+      - semver-gen
+    image_templates:
+      - "ghcr.io/lukaszraczylo/semver-generator:{{ .Version }}-arm64"
+      - "ghcr.io/lukaszraczylo/semver-generator:latest-arm64"
+      - "ghcr.io/lukaszraczylo/semver-generator:v1-arm64"
+    dockerfile: Dockerfile.goreleaser
+    use: buildx
+    build_flag_templates:
+      - "--platform=linux/arm64"
+    extra_files:
+      - config-release.yaml
+      - entrypoint.sh
+
+docker_manifests:
+  - name_template: "ghcr.io/lukaszraczylo/semver-generator:{{ .Version }}"
+    image_templates:
+      - "ghcr.io/lukaszraczylo/semver-generator:{{ .Version }}-amd64"
+      - "ghcr.io/lukaszraczylo/semver-generator:{{ .Version }}-arm64"
+
+  - name_template: "ghcr.io/lukaszraczylo/semver-generator:latest"
+    image_templates:
+      - "ghcr.io/lukaszraczylo/semver-generator:latest-amd64"
+      - "ghcr.io/lukaszraczylo/semver-generator:latest-arm64"
+
+  - name_template: "ghcr.io/lukaszraczylo/semver-generator:v1"
+    image_templates:
+      - "ghcr.io/lukaszraczylo/semver-generator:v1-amd64"
+      - "ghcr.io/lukaszraczylo/semver-generator:v1-arm64"
+
+homebrew_casks:
+  - repository:
+      owner: lukaszraczylo
+      name: homebrew-taps
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    directory: Casks
+    homepage: https://github.com/lukaszraczylo/semver-generator
+    description: "Automatic semantic version generator based on git commit messages"
+    license: MIT
+    url:
+      verified: github.com/lukaszraczylo/semver-generator
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr",
+                           args: ["-dr", "com.apple.quarantine", "#{staged_path}/semver-gen"]
+          end

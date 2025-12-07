@@ -49,6 +49,14 @@ export GITHUB_TOKEN=yourPersonalApiToken
 
 #### As a binary
 
+##### Homebrew (macOS)
+
+```bash
+brew install --cask lukaszraczylo/taps/semver-gen
+```
+
+##### Manual Download
+
 You can download latest versions of the binaries from the [release page](https://github.com/lukaszraczylo/semver-generator/releases/latest).
 
 **Supported OS and architectures:**

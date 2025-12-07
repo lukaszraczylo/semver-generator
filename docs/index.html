@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>semver-generator - Automatic Semantic Version Generator</title>
+        <meta
+            name="description"
+            content="Automatic semantic version generator based on git commit messages. Use as CLI, GitHub Action, or Docker container."
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                darkMode: 'class'
+            }
+        </script>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            body { font-family: "Inter", sans-serif; }
+            code, pre { font-family: "JetBrains Mono", monospace; }
+            .theme-transition {
+                transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            }
+            @keyframes fadeInUp {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+            }
+            .animate-fade-in-up { animation: fadeInUp 0.6s ease-out; }
+            .animate-float { animation: float 3s ease-in-out infinite; }
+            .glass {
+                background: rgba(255, 255, 255, 0.7);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .dark .glass {
+                background: rgba(17, 24, 39, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .gradient-text {
+                background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+            .dark .gradient-text {
+                background: linear-gradient(135deg, #34d399 0%, #60a5fa 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+            .shadow-modern { box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1); }
+            .dark .shadow-modern { box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.4); }
+            html { scroll-behavior: smooth; }
+        </style>
+        <script>
+            if (localStorage.theme === "dark" || (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+                document.documentElement.classList.add("dark");
+            } else {
+                document.documentElement.classList.remove("dark");
+            }
+        </script>
+    </head>
+    <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 theme-transition">
+        <!-- Navigation -->
+        <nav class="fixed w-full glass shadow-modern z-50 theme-transition">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6">
+                <div class="flex justify-between h-16 items-center">
+                    <a href="#" class="flex items-center hover:opacity-80 transition-opacity duration-300 gap-2">
+                        <i class="fas fa-code-branch text-2xl gradient-text"></i>
+                        <span class="text-xl font-bold gradient-text">semver-generator</span>
+                    </a>
+                    <div class="hidden md:flex space-x-6">
+                        <a href="#features" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 font-medium">Features</a>
+                        <a href="#installation" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 font-medium">Installation</a>
+                        <a href="#usage" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 font-medium">Usage</a>
+                        <a href="#configuration" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 font-medium">Configuration</a>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button id="theme-toggle" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="Toggle theme">
+                            <i class="fas fa-moon dark:hidden text-xl"></i>
+                            <i class="fas fa-sun hidden dark:inline text-xl"></i>
+                        </button>
+                        <a href="https://github.com/lukaszraczylo/semver-generator" target="_blank" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="View on GitHub">
+                            <i class="fab fa-github text-xl"></i>
+                        </a>
+                        <button id="mobile-menu-toggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="Toggle menu">
+                            <i class="fas fa-bars text-xl" id="menu-open-icon"></i>
+                            <i class="fas fa-times text-xl hidden" id="menu-close-icon"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="mobile-menu" class="hidden md:hidden border-t border-gray-200 dark:border-gray-700">
+                <div class="px-4 py-3 space-y-1 bg-white dark:bg-gray-800">
+                    <a href="#features" class="block px-3 py-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 rounded font-medium">Features</a>
+                    <a href="#installation" class="block px-3 py-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 rounded font-medium">Installation</a>
+                    <a href="#usage" class="block px-3 py-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 rounded font-medium">Usage</a>
+                    <a href="#configuration" class="block px-3 py-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 rounded font-medium">Configuration</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="relative pt-24 sm:pt-32 pb-12 sm:pb-20 overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-emerald-50 via-cyan-50 to-blue-50 dark:from-gray-900 dark:via-emerald-900/20 dark:to-blue-900/20 theme-transition"></div>
+            <div class="absolute top-0 -left-4 w-72 h-72 bg-emerald-300 dark:bg-emerald-500 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-xl opacity-20 animate-float"></div>
+            <div class="absolute top-0 -right-4 w-72 h-72 bg-cyan-300 dark:bg-cyan-500 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-xl opacity-20 animate-float" style="animation-delay: 1s;"></div>
+            <div class="absolute -bottom-8 left-20 w-72 h-72 bg-blue-300 dark:bg-blue-500 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-xl opacity-20 animate-float" style="animation-delay: 2s;"></div>
+
+            <div class="relative max-w-6xl mx-auto px-4 sm:px-6">
+                <div class="text-center">
+                    <div class="mb-8 sm:mb-10 flex justify-center animate-fade-in-up">
+                        <div class="text-8xl sm:text-9xl animate-float">
+                            <i class="fas fa-code-branch gradient-text"></i>
+                        </div>
+                    </div>
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6 leading-tight animate-fade-in-up" style="animation-delay: 0.1s;">
+                        Semantic Version<br /><span class="gradient-text">Generator</span>
+                    </h1>
+                    <p class="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed px-4 animate-fade-in-up" style="animation-delay: 0.2s;">
+                        Automatic semantic versioning based on git commit messages. Use as a CLI tool, GitHub Action, or Docker container.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12 px-4 animate-fade-in-up" style="animation-delay: 0.3s;">
+                        <a href="#installation" class="group relative bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-all duration-300 min-h-[48px] flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105">
+                            <span class="relative z-10">Get Started</span>
+                        </a>
+                        <a href="https://github.com/lukaszraczylo/semver-generator" class="group glass hover:shadow-lg text-gray-900 dark:text-gray-100 px-8 py-3 rounded-lg font-medium transition-all duration-300 min-h-[48px] flex items-center justify-center hover:scale-105">
+                            <i class="fab fa-github mr-2"></i>View on GitHub
+                        </a>
+                    </div>
+                    <div class="flex flex-wrap justify-center gap-2 sm:gap-4 text-sm px-4">
+                        <img src="https://img.shields.io/github/v/release/lukaszraczylo/semver-generator" alt="Version" class="h-5" />
+                        <img src="https://img.shields.io/github/license/lukaszraczylo/semver-generator" alt="License" class="h-5" />
+                        <img src="https://goreportcard.com/badge/github.com/lukaszraczylo/semver-generator" alt="Go Report" class="h-5" />
+                    </div>
+                    <div class="mt-12 sm:mt-16 max-w-3xl mx-auto px-4 animate-fade-in-up" style="animation-delay: 0.4s;">
+                        <div class="relative group">
+                            <div class="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-blue-600 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
+                            <div class="relative bg-gray-900 rounded-xl p-6 text-left">
+                                <div class="flex items-center gap-2 mb-4">
+                                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                                    <span class="ml-2 text-gray-400 text-sm">terminal</span>
+                                </div>
+                                <pre class="text-gray-100 text-sm sm:text-base overflow-x-auto"><code><span class="text-gray-400">$</span> semver-gen generate -l
+<span class="text-emerald-400">SEMVER</span> 1.5.2
+
+<span class="text-gray-400">$</span> semver-gen generate -r https://github.com/user/repo
+<span class="text-emerald-400">SEMVER</span> 2.3.0</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="py-12 sm:py-16 md:py-20 bg-white dark:bg-gray-900 theme-transition">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6">
+                <div class="text-center mb-8 sm:mb-12">
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">Features</h2>
+                    <p class="text-base sm:text-lg text-gray-600 dark:text-gray-300 px-4">Automatic versioning that just works</p>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="glass p-5 rounded-xl group hover:shadow-lg transition-all duration-300">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                                <i class="fas fa-magic text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Automatic Versioning</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Calculates version based on commit message keywords</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass p-5 rounded-xl group hover:shadow-lg transition-all duration-300">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                                <i class="fab fa-github text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">GitHub Action</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Use directly in your CI/CD workflows</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass p-5 rounded-xl group hover:shadow-lg transition-all duration-300">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                                <i class="fab fa-docker text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Docker Ready</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Multi-arch Docker images for any environment</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass p-5 rounded-xl group hover:shadow-lg transition-all duration-300">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                                <i class="fas fa-cog text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Configurable Keywords</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Define your own trigger words for version bumps</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass p-5 rounded-xl group hover:shadow-lg transition-all duration-300">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                                <i class="fas fa-tag text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Respects Tags</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Optional mode to respect existing git tags</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass p-5 rounded-xl group hover:shadow-lg transition-all duration-300">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                                <i class="fas fa-flask text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Release Candidates</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Support for RC versions like 1.3.37-rc.1</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation Section -->
+        <section id="installation" class="py-12 sm:py-16 md:py-20 bg-gray-50 dark:bg-gray-800 theme-transition">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6">
+                <div class="text-center mb-8 sm:mb-12">
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">Installation</h2>
+                    <p class="text-base sm:text-lg text-gray-600 dark:text-gray-300 px-4">Get started in seconds</p>
+                </div>
+                <div class="max-w-3xl mx-auto space-y-6">
+                    <div class="glass p-6 rounded-xl">
+                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                            <i class="fas fa-beer mr-2 text-amber-500"></i>
+                            Homebrew (macOS)
+                        </h3>
+                        <pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto"><code>brew install --cask lukaszraczylo/taps/semver-gen</code></pre>
+                    </div>
+                    <div class="glass p-6 rounded-xl">
+                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                            <i class="fas fa-download mr-2 text-emerald-500"></i>
+                            Manual Download
+                        </h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-3">Download from the <a href="https://github.com/lukaszraczylo/semver-generator/releases/latest" class="text-emerald-600 dark:text-emerald-400 hover:underline">releases page</a>.</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Supported: Darwin ARM64/AMD64, Linux ARM64/AMD64, Windows AMD64</p>
+                    </div>
+                    <div class="glass p-6 rounded-xl">
+                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                            <i class="fab fa-docker mr-2 text-blue-500"></i>
+                            Docker
+                        </h3>
+                        <pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto"><code>docker pull ghcr.io/lukaszraczylo/semver-generator:latest</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Usage Section -->
+        <section id="usage" class="py-12 sm:py-16 md:py-20 bg-white dark:bg-gray-900 theme-transition">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6">
+                <div class="text-center mb-8 sm:mb-12">
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">Usage</h2>
+                    <p class="text-base sm:text-lg text-gray-600 dark:text-gray-300 px-4">Multiple ways to use semver-generator</p>
+                </div>
+                <div class="max-w-4xl mx-auto space-y-8">
+                    <div class="glass p-6 rounded-xl">
+                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center text-xl">
+                            <i class="fas fa-terminal mr-2 text-emerald-500"></i>
+                            CLI Usage
+                        </h3>
+                        <pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto mb-4"><code><span class="text-gray-400"># Local repository</span>
+semver-gen generate -l
+
+<span class="text-gray-400"># Remote repository</span>
+semver-gen generate -r https://github.com/user/repo
+
+<span class="text-gray-400"># With custom config</span>
+semver-gen generate -l -c semver.yaml
+
+<span class="text-gray-400"># Strict mode (only exact matches)</span>
+semver-gen generate -l -s
+
+<span class="text-gray-400"># Respect existing tags</span>
+semver-gen generate -l -e</code></pre>
+                        <div class="grid sm:grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-2">Flags</h4>
+                                <ul class="space-y-1 text-gray-600 dark:text-gray-400">
+                                    <li><code class="text-emerald-600 dark:text-emerald-400">-l, --local</code> Use local repository</li>
+                                    <li><code class="text-emerald-600 dark:text-emerald-400">-r, --repository</code> Remote repository URL</li>
+                                    <li><code class="text-emerald-600 dark:text-emerald-400">-c, --config</code> Path to config file</li>
+                                    <li><code class="text-emerald-600 dark:text-emerald-400">-s, --strict</code> Strict matching</li>
+                                    <li><code class="text-emerald-600 dark:text-emerald-400">-e, --existing</code> Respect existing tags</li>
+                                    <li><code class="text-emerald-600 dark:text-emerald-400">-d, --debug</code> Enable debug mode</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass p-6 rounded-xl">
+                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center text-xl">
+                            <i class="fab fa-github mr-2 text-blue-500"></i>
+                            GitHub Action
+                        </h3>
+                        <pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm"><code>jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.semver.outputs.semantic_version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+
+      - name: Generate version
+        id: semver
+        uses: lukaszraczylo/semver-generator@v1
+        with:
+          config_file: semver.yaml
+          repository_local: true
+
+      - name: Use version
+        run: echo "Version: ${{ steps.semver.outputs.semantic_version }}"</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="py-12 sm:py-16 md:py-20 bg-gray-50 dark:bg-gray-800 theme-transition">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6">
+                <div class="text-center mb-8 sm:mb-12">
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">How It Works</h2>
+                    <p class="text-base sm:text-lg text-gray-600 dark:text-gray-300 px-4">Version calculation based on commit messages</p>
+                </div>
+                <div class="max-w-3xl mx-auto">
+                    <div class="glass p-6 rounded-xl">
+                        <pre class="text-gray-700 dark:text-gray-300 text-sm overflow-x-auto"><code>0.0.1 - PATCH - starting commit
+0.0.2 - PATCH - another commit
+0.0.4 - PATCH - commit with 'Update' => DOUBLE increment PATCH
+0.1.0 - MINOR - commit with 'Change' => increment MINOR, reset PATCH
+0.1.1 - PATCH - additional commit
+1.0.1 - MAJOR - commit with 'BREAKING' => INCREMENT MAJOR, reset MINOR
+1.0.2 - PATCH - another commit</code></pre>
+                    </div>
+                    <div class="mt-6 grid sm:grid-cols-3 gap-4 text-center">
+                        <div class="glass p-4 rounded-xl">
+                            <div class="text-3xl font-bold text-red-500 mb-2">MAJOR</div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Breaking changes</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">Keywords: "breaking"</p>
+                        </div>
+                        <div class="glass p-4 rounded-xl">
+                            <div class="text-3xl font-bold text-yellow-500 mb-2">MINOR</div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">New features</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">Keywords: "change", "improve"</p>
+                        </div>
+                        <div class="glass p-4 rounded-xl">
+                            <div class="text-3xl font-bold text-emerald-500 mb-2">PATCH</div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Bug fixes</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">Keywords: "update", "initial"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Configuration Section -->
+        <section id="configuration" class="py-12 sm:py-16 md:py-20 bg-white dark:bg-gray-900 theme-transition">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6">
+                <div class="text-center mb-8 sm:mb-12">
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">Configuration</h2>
+                    <p class="text-base sm:text-lg text-gray-600 dark:text-gray-300 px-4">Customize keywords and behavior</p>
+                </div>
+                <div class="max-w-3xl mx-auto">
+                    <div class="glass p-6 rounded-xl">
+                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-4">semver.yaml</h3>
+                        <pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm"><code><span class="text-gray-400">version:</span> 1
+
+<span class="text-gray-400"># Starting version (optional)</span>
+<span class="text-emerald-400">force:</span>
+  <span class="text-blue-400">major:</span> 1
+  <span class="text-blue-400">minor:</span> 0
+  <span class="text-blue-400">patch:</span> 0
+  <span class="text-blue-400">commit:</span> 69fbe2df696f40281b9104ff073d26186cde1024
+
+<span class="text-gray-400"># Commits to ignore</span>
+<span class="text-emerald-400">blacklist:</span>
+  - "Merge branch"
+  - "Merge pull request"
+  - "feature/"
+
+<span class="text-gray-400"># Keywords for version bumps</span>
+<span class="text-emerald-400">wording:</span>
+  <span class="text-blue-400">patch:</span>
+    - update
+    - initial
+    - fix
+  <span class="text-blue-400">minor:</span>
+    - change
+    - improve
+    - add
+  <span class="text-blue-400">major:</span>
+    - breaking
+  <span class="text-blue-400">release:</span>
+    - release-candidate
+    - add-rc</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="py-8 bg-gray-100 dark:bg-gray-800 theme-transition">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-code-branch text-xl gradient-text"></i>
+                        <span class="font-semibold gradient-text">semver-generator</span>
+                    </div>
+                    <div class="flex items-center gap-6">
+                        <a href="https://github.com/lukaszraczylo/semver-generator" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
+                            <i class="fab fa-github text-xl"></i>
+                        </a>
+                        <a href="https://github.com/lukaszraczylo/semver-generator/issues" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm">
+                            Issues
+                        </a>
+                        <a href="https://github.com/lukaszraczylo/semver-generator/releases" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm">
+                            Releases
+                        </a>
+                    </div>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">MIT License</p>
+                </div>
+            </div>
+        </footer>
+
+        <script>
+            // Theme toggle
+            document.getElementById('theme-toggle').addEventListener('click', function() {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.theme = 'light';
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.theme = 'dark';
+                }
+            });
+
+            // Mobile menu toggle
+            document.getElementById('mobile-menu-toggle').addEventListener('click', function() {
+                const menu = document.getElementById('mobile-menu');
+                const openIcon = document.getElementById('menu-open-icon');
+                const closeIcon = document.getElementById('menu-close-icon');
+
+                menu.classList.toggle('hidden');
+                openIcon.classList.toggle('hidden');
+                closeIcon.classList.toggle('hidden');
+            });
+
+            // Close mobile menu when clicking a link
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    document.getElementById('mobile-menu').classList.add('hidden');
+                    document.getElementById('menu-open-icon').classList.remove('hidden');
+                    document.getElementById('menu-close-icon').classList.add('hidden');
+                });
+            });
+        </script>
+    </body>
+</html>
