@@ -7,7 +7,7 @@ before:
 builds:
   - id: semver-gen
     main: .
-    binary: semver-gen
+    binary: semver-generator
     env:
       - CGO_ENABLED=0
     goos:
@@ -24,7 +24,7 @@ builds:
 archives:
   - id: semver-gen
     formats: [tar.gz]
-    name_template: "semver-gen-{{ .Os }}-{{ .Arch }}"
+    name_template: "semver-generator-{{ .Os }}-{{ .Arch }}"
     format_overrides:
       - goos: windows
         formats: [zip]
@@ -34,7 +34,7 @@ archives:
       - config.yaml
 
 checksum:
-  name_template: "semver-gen-checksums.txt"
+  name_template: "semver-generator-checksums.txt"
   algorithm: sha256
 
 changelog:
@@ -87,5 +87,5 @@ homebrew_casks:
         install: |
           if OS.mac?
             system_command "/usr/bin/xattr",
-                           args: ["-dr", "com.apple.quarantine", "#{staged_path}/semver-gen"]
+                           args: ["-dr", "com.apple.quarantine", "#{staged_path}/semver-generator"]
           end

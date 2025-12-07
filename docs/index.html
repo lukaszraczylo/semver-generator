@@ -157,10 +157,10 @@
                                     <div class="w-3 h-3 rounded-full bg-green-500"></div>
                                     <span class="ml-2 text-gray-400 text-sm">terminal</span>
                                 </div>
-                                <pre class="text-gray-100 text-sm sm:text-base overflow-x-auto"><code><span class="text-gray-400">$</span> semver-gen generate -l
+                                <pre class="text-gray-100 text-sm sm:text-base overflow-x-auto"><code><span class="text-gray-400">$</span> semver-generator generate -l
 <span class="text-emerald-400">SEMVER</span> 1.5.2
 
-<span class="text-gray-400">$</span> semver-gen generate -r https://github.com/user/repo
+<span class="text-gray-400">$</span> semver-generator generate -r https://github.com/user/repo
 <span class="text-emerald-400">SEMVER</span> 2.3.0</code></pre>
                             </div>
                         </div>
@@ -295,22 +295,22 @@
                             CLI Usage
                         </h3>
                         <pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto mb-4"><code><span class="text-gray-400"># Local repository</span>
-semver-gen generate -l
+semver-generator generate -l
 
 <span class="text-gray-400"># Remote repository</span>
-semver-gen generate -r https://github.com/user/repo
+semver-generator generate -r https://github.com/user/repo
 
 <span class="text-gray-400"># With custom config</span>
-semver-gen generate -l -c semver.yaml
+semver-generator generate -l -c semver.yaml
 
 <span class="text-gray-400"># Strict mode (only exact matches)</span>
-semver-gen generate -l -s
+semver-generator generate -l -s
 
 <span class="text-gray-400"># Respect existing tags</span>
-semver-gen generate -l -e
+semver-generator generate -l -e
 
 <span class="text-gray-400"># Self-update to latest version (no auth required)</span>
-semver-gen -u</code></pre>
+semver-generator -u</code></pre>
                         <div class="grid sm:grid-cols-2 gap-4 text-sm">
                             <div>
                                 <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-2">Flags</h4>

@@ -209,7 +209,7 @@ func downloadBinary(url string) (string, error) {
 	}
 
 	// Create temp file
-	tempFile, err := os.CreateTemp("", "semver-gen-update-*")
+	tempFile, err := os.CreateTemp("", "semver-generator-update-*")
 	if err != nil {
 		return "", err
 	}
@@ -236,13 +236,13 @@ func downloadBinary(url string) (string, error) {
 	return tempPath, nil
 }
 
-// extractTarGz extracts the semver-gen binary from a tar.gz archive
+// extractTarGz extracts the semver-generator binary from a tar.gz archive
 func extractTarGz(r io.Reader, destFile *os.File) error {
 	// For simplicity, we'll download the whole archive to a temp file first,
 	// then use tar command to extract. This avoids adding archive/tar dependency.
 
 	// Create temp archive file
-	archiveFile, err := os.CreateTemp("", "semver-gen-archive-*.tar.gz")
+	archiveFile, err := os.CreateTemp("", "semver-generator-archive-*.tar.gz")
 	if err != nil {
 		return err
 	}
@@ -256,7 +256,7 @@ func extractTarGz(r io.Reader, destFile *os.File) error {
 	archiveFile.Close()
 
 	// Extract using tar command
-	extractDir, err := os.MkdirTemp("", "semver-gen-extract-*")
+	extractDir, err := os.MkdirTemp("", "semver-generator-extract-*")
 	if err != nil {
 		return err
 	}
@@ -268,7 +268,7 @@ func extractTarGz(r io.Reader, destFile *os.File) error {
 		return fmt.Errorf("failed to extract archive: %w", err)
 	}
 
-	// Find the semver-gen binary in the extracted files
+	// Find the semver-generator binary in the extracted files
 	binaryPath := ""
 	entries, err := os.ReadDir(extractDir)
 	if err != nil {
@@ -276,14 +276,14 @@ func extractTarGz(r io.Reader, destFile *os.File) error {
 	}
 
 	for _, entry := range entries {
-		if entry.Name() == "semver-gen" || strings.HasPrefix(entry.Name(), "semver-gen") && !strings.Contains(entry.Name(), ".") {
+		if entry.Name() == "semver-generator" || strings.HasPrefix(entry.Name(), "semver-generator") && !strings.Contains(entry.Name(), ".") {
 			binaryPath = fmt.Sprintf("%s/%s", extractDir, entry.Name())
 			break
 		}
 	}
 
 	if binaryPath == "" {
-		return fmt.Errorf("semver-gen binary not found in archive")
+		return fmt.Errorf("semver-generator binary not found in archive")
 	}
 
 	// Copy the binary to the destination

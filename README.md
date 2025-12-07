@@ -63,9 +63,9 @@ You can download latest versions of the binaries from the [release page](https:/
 Darwin ARM64/AMD64, Linux ARM64/AMD64, Windows AMD64
 
 ```bash
-bash$ ./semver-gen generate -r https://github.com/nextapps-de/winbox
+bash$ semver-generator generate -r https://github.com/nextapps-de/winbox
 SEMVER 9.0.10
-bash$ ./semver-gen generate -l
+bash$ semver-generator generate -l
 SEMVER 5.1.1
 ```
 
@@ -73,8 +73,8 @@ SEMVER 5.1.1
 
 ```yaml
 Usage:
-  semver-gen generate [flags]
-  semver-gen [command]
+  semver-generator generate [flags]
+  semver-generator [command]
 
 Available Commands:
   generate    Generates semantic version
@@ -84,7 +84,7 @@ Flags:
   -c, --config string       Path to config file (default "semver.yaml")
   -d, --debug               Enable debug mode
   -e, --existing            Respect existing tags
-  -h, --help                help for semver-gen
+  -h, --help                help for semver-generator
   -l, --local               Use local repository
   -r, --repository string   Remote repository URL. (default "https://github.com/lukaszraczylo/simple-gql-client")
   -b, --branch string       Remote repository URL Branch. (default "main")
@@ -98,7 +98,7 @@ Flags:
 The binary can update itself to the latest version:
 
 ```bash
-semver-gen -u
+semver-generator -u
 ```
 
 This downloads the latest release for your platform directly from GitHub releases. No authentication is required.
