@@ -71,7 +71,8 @@ dockers_v2:
       - entrypoint.sh
 
 homebrew_casks:
-  - repository:
+  - name: semver-generator
+    repository:
       owner: lukaszraczylo
       name: homebrew-taps
       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"

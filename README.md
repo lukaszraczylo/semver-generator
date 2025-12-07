@@ -52,7 +52,7 @@ export GITHUB_TOKEN=yourPersonalApiToken
 ##### Homebrew (macOS)
 
 ```bash
-brew install --cask lukaszraczylo/taps/semver-gen
+brew install --cask lukaszraczylo/taps/semver-generator
 ```
 
 ##### Manual Download
