@@ -22,5 +22,4 @@ jobs:
       docker-enabled: true
       rolling-release-tag: "v1"
       semver-config: "config-release.yaml"
-    secrets:
-      homebrew-tap-token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+    secrets: inherit
