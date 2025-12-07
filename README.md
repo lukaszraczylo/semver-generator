@@ -89,9 +89,19 @@ Flags:
   -r, --repository string   Remote repository URL. (default "https://github.com/lukaszraczylo/simple-gql-client")
   -b, --branch string       Remote repository URL Branch. (default "main")
   -s, --strict              Strict matching
-  -u, --update              Update binary with latest
+  -u, --update              Update binary with latest (no authentication required)
   -v, --version             Display version
 ```
+
+##### Self-Update
+
+The binary can update itself to the latest version:
+
+```bash
+semver-gen -u
+```
+
+This downloads the latest release for your platform directly from GitHub releases. No authentication is required.
 
 #### As a github action
 

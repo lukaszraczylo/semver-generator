@@ -307,7 +307,10 @@ semver-gen generate -l -c semver.yaml
 semver-gen generate -l -s
 
 <span class="text-gray-400"># Respect existing tags</span>
-semver-gen generate -l -e</code></pre>
+semver-gen generate -l -e
+
+<span class="text-gray-400"># Self-update to latest version (no auth required)</span>
+semver-gen -u</code></pre>
                         <div class="grid sm:grid-cols-2 gap-4 text-sm">
                             <div>
                                 <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-2">Flags</h4>
@@ -318,6 +321,8 @@ semver-gen generate -l -e</code></pre>
                                     <li><code class="text-emerald-600 dark:text-emerald-400">-s, --strict</code> Strict matching</li>
                                     <li><code class="text-emerald-600 dark:text-emerald-400">-e, --existing</code> Respect existing tags</li>
                                     <li><code class="text-emerald-600 dark:text-emerald-400">-d, --debug</code> Enable debug mode</li>
+                                    <li><code class="text-emerald-600 dark:text-emerald-400">-u, --update</code> Self-update to latest version</li>
+                                    <li><code class="text-emerald-600 dark:text-emerald-400">-v, --version</code> Display current version</li>
                                 </ul>
                             </div>
                         </div>
