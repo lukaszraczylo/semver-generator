@@ -268,22 +268,34 @@ func extractTarGz(r io.Reader, destFile *os.File) error {
 		return fmt.Errorf("failed to extract archive: %w", err)
 	}
 
-	// Find the semver-generator binary in the extracted files
+	// Find the binary in the extracted files
+	// Support both new name (semver-generator) and old name (semver-gen) for backwards compatibility
 	binaryPath := ""
 	entries, err := os.ReadDir(extractDir)
 	if err != nil {
 		return err
 	}
 
+	// First try to find semver-generator (new name)
 	for _, entry := range entries {
-		if entry.Name() == "semver-generator" || strings.HasPrefix(entry.Name(), "semver-generator") && !strings.Contains(entry.Name(), ".") {
+		if entry.Name() == "semver-generator" {
 			binaryPath = fmt.Sprintf("%s/%s", extractDir, entry.Name())
 			break
 		}
 	}
 
+	// Fallback to semver-gen (old name) for older releases
 	if binaryPath == "" {
-		return fmt.Errorf("semver-generator binary not found in archive")
+		for _, entry := range entries {
+			if entry.Name() == "semver-gen" {
+				binaryPath = fmt.Sprintf("%s/%s", extractDir, entry.Name())
+				break
+			}
+		}
+	}
+
+	if binaryPath == "" {
+		return fmt.Errorf("binary not found in archive (looked for semver-generator and semver-gen)")
 	}
 
 	// Copy the binary to the destination
