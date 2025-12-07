@@ -24,7 +24,7 @@ builds:
 archives:
   - id: semver-gen
     formats: [tar.gz]
-    name_template: "semver-gen-{{ .Version }}-{{ .Os }}-{{ .Arch }}"
+    name_template: "semver-gen-{{ .Os }}-{{ .Arch }}"
     format_overrides:
       - goos: windows
         formats: [zip]
@@ -34,7 +34,7 @@ archives:
       - config.yaml
 
 checksum:
-  name_template: "semver-gen-{{ .Version }}-checksums.txt"
+  name_template: "semver-gen-checksums.txt"
   algorithm: sha256
 
 changelog:
