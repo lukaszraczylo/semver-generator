@@ -60,11 +60,11 @@ if [[ ! -z "$INPUT_DEBUGMODE" ]]; then
   echo "----"
   echo "FLAGS: $FLAGS"
   echo "----"
-  /go/src/app/semver-gen generate $FLAGS $*
+  /go/src/app/semver-generator generate $FLAGS $*
   echo "----"
 fi
 
-OUT_SEMVER_GEN=$(/go/src/app/semver-gen generate $FLAGS $*)
+OUT_SEMVER_GEN=$(/go/src/app/semver-generator generate $FLAGS $*)
 [ $? -eq 0 ] || exit 1
 CLEAN_SEMVER=$(echo $OUT_SEMVER_GEN | sed -e 's|SEMVER ||g')
 echo "semantic_version=$CLEAN_SEMVER" >> $GITHUB_OUTPUT
