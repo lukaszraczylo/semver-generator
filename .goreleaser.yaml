@@ -80,8 +80,6 @@ homebrew_casks:
     homepage: https://github.com/lukaszraczylo/semver-generator
     description: "Automatic semantic version generator based on git commit messages"
     license: MIT
-    url:
-      verified: github.com/lukaszraczylo/semver-generator
     hooks:
       post:
         install: |
