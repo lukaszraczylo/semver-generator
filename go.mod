@@ -7,7 +7,7 @@ toolchain go1.24.6
 require (
 	github.com/go-git/go-git/v5 v5.16.4
 	github.com/lithammer/fuzzysearch v1.1.8
-	github.com/lukaszraczylo/graphql-monitoring-proxy v0.41.20
+	github.com/lukaszraczylo/graphql-monitoring-proxy v0.42.4
 	github.com/lukaszraczylo/pandati v0.0.29
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
