@@ -121,7 +121,11 @@ func main() {
 		}
 
 		// List commits
-		utils.ListCommits(&repo.GitRepo)
+		if _, err := utils.ListCommits(&repo.GitRepo); err != nil {
+			utils.Error("Unable to list commits", map[string]interface{}{
+				"error": err.Error(),
+			})
+		}
 
 		// List existing tags if needed
 		if params.varExisting || repo.Config.Force.Existing {
@@ -140,6 +144,7 @@ func main() {
 			repo.Semver,
 			params.varExisting || repo.Config.Force.Existing,
 			params.varStrict || repo.Config.Force.Strict,
+			repo.Config.TagPrefixes,
 		)
 
 		// Print semantic version

@@ -16,6 +16,7 @@ Project created overnight, to prove that management of semantic versioning is NO
     - [Calculations example \[standard\]](#calculations-example-standard)
     - [Calculations example \[strict matching\]](#calculations-example-strict-matching)
     - [Release candidates](#release-candidates)
+    - [Tag prefix stripping](#tag-prefix-stripping)
     - [Example configuration](#example-configuration)
   - [Good to know](#good-to-know)
 
@@ -29,6 +30,7 @@ Project created overnight, to prove that management of semantic versioning is NO
 
 * With flag `-e` or config `force.existing: true` the existing tags in versioning will be respected, helping you to avoid the version conflicts.
 * With config `force.commit: deadbeef` where `deadbeef` is the commit hash - calculations will start from the specified commit.
+* Tag prefix stripping: The `v` prefix is automatically stripped from tags (e.g., `v1.2.3` → `1.2.3`). Additional prefixes can be configured via `tag_prefixes` for monorepo setups (e.g., `app-1.2.3`, `infra-1.2.3`).
 
 ### Important changes
 
@@ -182,6 +184,36 @@ to generate the appropriate release in format `1.3.37-rc.1` and counting up unti
     - add-rc
 ```
 
+#### Tag prefix stripping
+
+When using the `-e` (existing tags) flag, the semver-generator needs to parse existing git tags to determine the current version. Tags often include prefixes that need to be stripped before version parsing.
+
+**Automatic `v` prefix stripping:**
+The `v` prefix is always stripped automatically from tags. For example:
+- `v1.2.3` → parsed as `1.2.3`
+- `v0.5.0` → parsed as `0.5.0`
+
+**Custom prefixes for monorepos:**
+In monorepo setups where different components have their own versioned tags, you can configure additional prefixes to strip:
+
+```yaml
+tag_prefixes:
+  - "app-"
+  - "infra-"
+  - "api-"
+  - "frontend-"
+```
+
+With this configuration:
+- `app-1.2.3` → parsed as `1.2.3`
+- `infra-0.5.0` → parsed as `0.5.0`
+- `api-2.0.0-rc.1` → parsed as `2.0.0-rc.1` (release candidate)
+
+This is particularly useful when:
+- You have multiple services/components in a single repository
+- Your CI/CD creates tags with component prefixes
+- You want to track versions separately for different parts of your codebase
+
 #### Example configuration
 
 ```yaml
@@ -196,6 +228,10 @@ blacklist:
   - "Merge pull request"
   - "feature/"
   - "feature:"
+tag_prefixes:
+  - "app-"
+  - "infra-"
+  - "service-"
 wording:
   patch:
     - update
@@ -215,6 +251,7 @@ wording:
 * `force`: sets the "starting" version, you don't need to specify this section as the default is always `0`
 * `force.commit`: allows you to set commit hash from which the calculations should start
 * `blacklist`: terms to ignore when processing commits. Any commit containing these terms will be skipped in version calculations. Useful for ignoring merge commits, feature branch names, and other unwanted triggers.
+* `tag_prefixes`: prefixes to strip from existing tags before parsing version numbers. Useful for monorepos where tags are prefixed with component names (e.g., `app-1.2.3`, `infra-0.5.0`). The `v` prefix is always stripped automatically.
 * `wording`: words the program should look for in the git commits to increment (patch|minor|major)
 
 ### Good to knows

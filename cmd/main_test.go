@@ -267,7 +267,7 @@ func (suite *Tests) Test_checkMatches() {
 				if tt.name == "No match" {
 					return nil
 				}
-				
+
 				// For other test cases, match if the needle is in the haystack
 				for _, h := range haystack {
 					if strings.Contains(h, needle) || strings.Contains(needle, h) {
@@ -276,7 +276,7 @@ func (suite *Tests) Test_checkMatches() {
 				}
 				return nil
 			}
-			
+
 			got := utils.CheckMatches(tt.args.content, tt.args.targets, tt.blacklist)
 			assertObj.Equal(tt.want, got, "Unexpected result in "+tt.name)
 		})
@@ -285,7 +285,8 @@ func (suite *Tests) Test_checkMatches() {
 
 func (suite *Tests) Test_parseExistingSemver() {
 	type args struct {
-		tagName string
+		tagName  string
+		prefixes []string
 	}
 	tests := []struct {
 		name                string
@@ -296,7 +297,8 @@ func (suite *Tests) Test_parseExistingSemver() {
 		{
 			name: "Test parsing existing semver",
 			args: args{
-				tagName: "1.2.3",
+				tagName:  "1.2.3",
+				prefixes: []string{},
 			},
 			currentSemver: utils.SemVer{Major: 1, Minor: 1, Patch: 1},
 			wantSemanticVersion: utils.SemVer{
@@ -308,7 +310,8 @@ func (suite *Tests) Test_parseExistingSemver() {
 		{
 			name: "Test parsing existing semver with v",
 			args: args{
-				tagName: "v1.2.3",
+				tagName:  "v1.2.3",
+				prefixes: []string{"v"},
 			},
 			currentSemver: utils.SemVer{Major: 1, Minor: 1, Patch: 1},
 			wantSemanticVersion: utils.SemVer{
@@ -320,7 +323,8 @@ func (suite *Tests) Test_parseExistingSemver() {
 		{
 			name: "Test parsing existing semver with rc",
 			args: args{
-				tagName: "1.2.5-rc.7",
+				tagName:  "1.2.5-rc.7",
+				prefixes: []string{},
 			},
 			currentSemver: utils.SemVer{Major: 1, Minor: 1, Patch: 1},
 			wantSemanticVersion: utils.SemVer{
@@ -332,9 +336,24 @@ func (suite *Tests) Test_parseExistingSemver() {
 			},
 		},
 		{
+			name: "Test parsing prefixed tag without rc",
+			args: args{
+				tagName:  "app-0.0.16",
+				prefixes: []string{"app-", "infra-"},
+			},
+			currentSemver: utils.SemVer{Major: 1, Minor: 1, Patch: 1},
+			wantSemanticVersion: utils.SemVer{
+				Major:                  0,
+				Minor:                  0,
+				Patch:                  16,
+				EnableReleaseCandidate: false,
+			},
+		},
+		{
 			name: "Test invalid semver format",
 			args: args{
-				tagName: "invalid",
+				tagName:  "invalid",
+				prefixes: []string{},
 			},
 			currentSemver: utils.SemVer{Major: 2, Minor: 3, Patch: 4},
 			wantSemanticVersion: utils.SemVer{
@@ -346,7 +365,8 @@ func (suite *Tests) Test_parseExistingSemver() {
 		{
 			name: "Test partial semver",
 			args: args{
-				tagName: "1.2",
+				tagName:  "1.2",
+				prefixes: []string{},
 			},
 			currentSemver: utils.SemVer{Major: 2, Minor: 3, Patch: 4},
 			wantSemanticVersion: utils.SemVer{
@@ -358,7 +378,8 @@ func (suite *Tests) Test_parseExistingSemver() {
 		{
 			name: "Test empty tag",
 			args: args{
-				tagName: "",
+				tagName:  "",
+				prefixes: []string{},
 			},
 			currentSemver: utils.SemVer{Major: 2, Minor: 3, Patch: 4},
 			wantSemanticVersion: utils.SemVer{
@@ -370,7 +391,7 @@ func (suite *Tests) Test_parseExistingSemver() {
 	}
 	for _, tt := range tests {
 		suite.T().Run(tt.name, func(t *testing.T) {
-			got := utils.ParseExistingSemver(tt.args.tagName, tt.currentSemver)
+			got := utils.ParseExistingSemver(tt.args.tagName, tt.currentSemver, tt.args.prefixes)
 			assertObj.Equal(tt.wantSemanticVersion.Major, got.Major, "Unexpected MAJOR semver result in "+tt.name)
 			assertObj.Equal(tt.wantSemanticVersion.Minor, got.Minor, "Unexpected MINOR semver result in "+tt.name)
 			assertObj.Equal(tt.wantSemanticVersion.Patch, got.Patch, "Unexpected PATCH semver result in "+tt.name)
@@ -382,10 +403,10 @@ func (suite *Tests) Test_parseExistingSemver() {
 
 func (suite *Tests) TestSetup_ListCommits() {
 	type fields struct {
-		RepositoryName      string
-		RepositoryBranch    string
-		LocalConfigFile     string
-		GitRepo             utils.GitRepository
+		RepositoryName   string
+		RepositoryBranch string
+		LocalConfigFile  string
+		GitRepo          utils.GitRepository
 	}
 
 	tests := []struct {
@@ -441,23 +462,23 @@ func (suite *Tests) TestSetup_ListCommits() {
 			if tt.name == "List commits from existing repository" {
 				t.Skip("Skipping test that requires repository access")
 			}
-			
+
 			s := &Setup{
 				RepositoryName:   tt.fields.RepositoryName,
 				RepositoryBranch: tt.fields.RepositoryBranch,
 				GitRepo:          tt.fields.GitRepo,
 			}
-			
+
 			config, _ := utils.ReadConfig(tt.fields.LocalConfigFile)
 			s.Config = config
-			
+
 			err := utils.PrepareRepository(&s.GitRepo)
 			if err != nil && !tt.wantErr {
 				if tt.name != "List commits starting with certain hash" {
 					t.Fatalf("Failed to prepare repository: %v", err)
 				}
 			}
-			
+
 			if err == nil {
 				listOfCommits, err := utils.ListCommits(&s.GitRepo)
 				if !tt.wantErr {

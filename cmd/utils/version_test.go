@@ -58,15 +58,17 @@ func TestParseExistingSemver(t *testing.T) {
 	InitLogger(false)
 
 	tests := []struct {
-		name         string
-		tagName      string
+		name          string
+		tagName       string
 		currentSemver SemVer
-		want         SemVer
+		prefixes      []string
+		want          SemVer
 	}{
 		{
-			name:    "Standard semver",
-			tagName: "1.2.3",
+			name:          "Standard semver",
+			tagName:       "1.2.3",
 			currentSemver: SemVer{},
+			prefixes:      []string{},
 			want: SemVer{
 				Major: 1,
 				Minor: 2,
@@ -74,9 +76,10 @@ func TestParseExistingSemver(t *testing.T) {
 			},
 		},
 		{
-			name:    "With v prefix",
-			tagName: "v2.3.4",
+			name:          "With v prefix configured",
+			tagName:       "v2.3.4",
 			currentSemver: SemVer{},
+			prefixes:      []string{"v"},
 			want: SemVer{
 				Major: 2,
 				Minor: 3,
@@ -84,15 +87,63 @@ func TestParseExistingSemver(t *testing.T) {
 			},
 		},
 		{
-			name:    "With release candidate",
-			tagName: "3.4.5-rc.2",
+			name:          "With app- prefix configured",
+			tagName:       "app-1.2.3",
 			currentSemver: SemVer{},
+			prefixes:      []string{"app-", "infra-"},
+			want: SemVer{
+				Major: 1,
+				Minor: 2,
+				Patch: 3,
+			},
+		},
+		{
+			name:          "With prefix but not in config - should still parse numbers",
+			tagName:       "v2.3.4",
+			currentSemver: SemVer{},
+			prefixes:      []string{}, // v not in prefixes
+			want: SemVer{
+				Major: 2,
+				Minor: 3,
+				Patch: 4,
+			},
+		},
+		{
+			name:          "With release candidate",
+			tagName:       "3.4.5-rc.2",
+			currentSemver: SemVer{},
+			prefixes:      []string{},
 			want: SemVer{
 				Major:                  3,
 				Minor:                  4,
 				Patch:                  5,
 				Release:                2,
 				EnableReleaseCandidate: true,
+			},
+		},
+		{
+			name:          "With prefix and release candidate",
+			tagName:       "app-1.0.0-rc.3",
+			currentSemver: SemVer{},
+			prefixes:      []string{"app-"},
+			want: SemVer{
+				Major:                  1,
+				Minor:                  0,
+				Patch:                  0,
+				Release:                3,
+				EnableReleaseCandidate: true,
+			},
+		},
+		{
+			name:          "Prefixed tag without RC should NOT be RC",
+			tagName:       "app-0.0.16",
+			currentSemver: SemVer{},
+			prefixes:      []string{"app-"},
+			want: SemVer{
+				Major:                  0,
+				Minor:                  0,
+				Patch:                  16,
+				EnableReleaseCandidate: false,
 			},
 		},
 		{
@@ -103,6 +154,7 @@ func TestParseExistingSemver(t *testing.T) {
 				Minor: 1,
 				Patch: 1,
 			},
+			prefixes: []string{},
 			want: SemVer{
 				Major: 1,
 				Minor: 1,
@@ -117,6 +169,7 @@ func TestParseExistingSemver(t *testing.T) {
 				Minor: 5,
 				Patch: 5,
 			},
+			prefixes: []string{},
 			want: SemVer{
 				Major: 5,
 				Minor: 5,
@@ -127,7 +180,7 @@ func TestParseExistingSemver(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := ParseExistingSemver(tt.tagName, tt.currentSemver)
+			got := ParseExistingSemver(tt.tagName, tt.currentSemver, tt.prefixes)
 			assert.Equal(t, tt.want.Major, got.Major, "Major version mismatch")
 			assert.Equal(t, tt.want.Minor, got.Minor, "Minor version mismatch")
 			assert.Equal(t, tt.want.Patch, got.Patch, "Patch version mismatch")

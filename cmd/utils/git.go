@@ -29,14 +29,14 @@ type TagDetails struct {
 
 // GitRepository represents a git repository
 type GitRepository struct {
-	Handler      *git.Repository
-	Name         string
-	Branch       string
-	LocalPath    string
-	UseLocal     bool
-	Commits      []CommitDetails
-	Tags         []TagDetails
-	StartCommit  string
+	Handler     *git.Repository
+	Name        string
+	Branch      string
+	LocalPath   string
+	UseLocal    bool
+	Commits     []CommitDetails
+	Tags        []TagDetails
+	StartCommit string
 }
 
 // PrepareRepository prepares the git repository for use
@@ -47,15 +47,15 @@ func PrepareRepository(repo *GitRepository) error {
 		u, err := url.Parse(repo.Name)
 		if err != nil {
 			Error("Unable to parse repository URL", map[string]interface{}{
-				"error": err.Error(), 
-				"url": repo.Name,
+				"error": err.Error(),
+				"url":   repo.Name,
 			})
 			return err
 		}
-		
+
 		repo.LocalPath = fmt.Sprintf("/tmp/semver/%s/%s", u.Path, repo.Branch)
-		os.RemoveAll(repo.LocalPath)
-		
+		_ = os.RemoveAll(repo.LocalPath) // Ignore error - directory may not exist
+
 		repo.Handler, err = git.PlainClone(repo.LocalPath, false, &git.CloneOptions{
 			URL:           repo.Name,
 			ReferenceName: plumbing.NewBranchReferenceName(repo.Branch),
@@ -66,11 +66,11 @@ func PrepareRepository(repo *GitRepository) error {
 			},
 			Tags: git.AllTags,
 		})
-		
+
 		if err != nil {
 			Error("Unable to clone repository", map[string]interface{}{
-				"error": err.Error(), 
-				"url": repo.Name,
+				"error": err.Error(),
+				"url":   repo.Name,
 			})
 			return err
 		}
@@ -79,14 +79,20 @@ func PrepareRepository(repo *GitRepository) error {
 		repo.Handler, err = git.PlainOpen(repo.LocalPath)
 		if err != nil {
 			Error("Unable to open local repository", map[string]interface{}{
-				"error": err.Error(), 
-				"path": repo.LocalPath,
+				"error": err.Error(),
+				"path":  repo.LocalPath,
 			})
 			return err
 		}
 	}
-	
-	os.Chdir(repo.LocalPath)
+
+	if err := os.Chdir(repo.LocalPath); err != nil {
+		Error("Unable to change directory", map[string]interface{}{
+			"error": err.Error(),
+			"path":  repo.LocalPath,
+		})
+		return err
+	}
 	return nil
 }
 
@@ -105,14 +111,14 @@ func ListCommits(repo *GitRepository) ([]CommitDetails, error) {
 	if err != nil {
 		return []CommitDetails{}, err
 	}
-	
+
 	commitsList, err := repo.Handler.Log(&git.LogOptions{From: ref.Hash()})
 	if err != nil {
 		return []CommitDetails{}, err
 	}
 
 	var tmpResults []CommitDetails
-	commitsList.ForEach(func(c *object.Commit) error {
+	if err := commitsList.ForEach(func(c *object.Commit) error {
 		tmpResults = append(tmpResults, CommitDetails{
 			Hash:      c.Hash.String(),
 			Author:    c.Author.String(),
@@ -123,17 +129,19 @@ func ListCommits(repo *GitRepository) ([]CommitDetails, error) {
 			return tmpResults[i].Timestamp.Unix() < tmpResults[j].Timestamp.Unix()
 		})
 		return nil
-	})
+	}); err != nil {
+		return []CommitDetails{}, err
+	}
 
 	Debug("Listing commits", map[string]interface{}{"commits": tmpResults})
-	
+
 	// Filter commits starting from the specified commit if provided
 	if repo.StartCommit != "" {
 		for commitId, cmt := range tmpResults {
 			if cmt.Hash == repo.StartCommit {
 				Debug("Found commit match", map[string]interface{}{
 					"commit": cmt.Hash,
-					"index": commitId,
+					"index":  commitId,
 				})
 				repo.Commits = tmpResults[commitId:]
 				break
@@ -150,30 +158,30 @@ func ListCommits(repo *GitRepository) ([]CommitDetails, error) {
 // ListExistingTags lists all tags in the repository
 func ListExistingTags(repo *GitRepository) {
 	Debug("Listing existing tags", nil)
-	
+
 	// Check if Handler is nil to avoid panic
 	if repo.Handler == nil {
 		Debug("Repository handler is nil, skipping tag listing", nil)
 		return
 	}
-	
+
 	refs, err := repo.Handler.Tags()
 	if err != nil {
 		Error("Unable to list tags", map[string]interface{}{"error": err.Error()})
 		return
 	}
-	
+
 	if err := refs.ForEach(func(ref *plumbing.Reference) error {
 		repo.Tags = append(repo.Tags, TagDetails{
 			Name: ref.Name().Short(),
 			Hash: ref.Hash().String(),
 		})
-		
+
 		Debug("Found tag", map[string]interface{}{
-			"tag": ref.Name().Short(),
+			"tag":  ref.Name().Short(),
 			"hash": ref.Hash().String(),
 		})
-		
+
 		return nil
 	}); err != nil {
 		Error("Error iterating tags", map[string]interface{}{"error": err.Error()})

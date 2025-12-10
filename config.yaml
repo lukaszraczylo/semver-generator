@@ -8,6 +8,10 @@ blacklist:
   - "Merge pull request"
   - "feature/"
   - "feature:"
+tag_prefixes:
+  # Note: "v" prefix is stripped automatically, no need to include it here
+  - "app-"
+  - "infra-"
 wording:
   patch:
     - update

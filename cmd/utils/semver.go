@@ -13,6 +13,7 @@ func CalculateSemver(
 	initialSemver SemVer,
 	respectExisting bool,
 	strictMode bool,
+	tagPrefixes []string,
 ) SemVer {
 	semver := initialSemver
 
@@ -22,10 +23,10 @@ func CalculateSemver(
 			for _, tagHash := range tags {
 				if commit.Hash == tagHash.Hash {
 					Debug("Found existing tag", map[string]interface{}{
-						"tag": tagHash.Name, 
+						"tag":    tagHash.Name,
 						"commit": strings.TrimSuffix(commit.Message, "\n"),
 					})
-					semver = ParseExistingSemver(tagHash.Name, semver)
+					semver = ParseExistingSemver(tagHash.Name, semver, tagPrefixes)
 					continue
 				}
 			}
@@ -35,7 +36,7 @@ func CalculateSemver(
 		if !strictMode {
 			semver.Patch++
 			Debug("Incrementing patch (DEFAULT)", map[string]interface{}{
-				"commit": strings.TrimSuffix(commit.Message, "\n"), 
+				"commit": strings.TrimSuffix(commit.Message, "\n"),
 				"semver": FormatSemver(semver),
 			})
 		}
@@ -55,44 +56,44 @@ func CalculateSemver(
 			semver.EnableReleaseCandidate = false
 			semver.Release = 0
 			Debug("Incrementing major (WORDING)", map[string]interface{}{
-				"commit": strings.TrimSuffix(commit.Message, "\n"), 
+				"commit": strings.TrimSuffix(commit.Message, "\n"),
 				"semver": FormatSemver(semver),
 			})
 			continue
 		}
-		
+
 		if matchMinor {
 			semver.Minor++
 			semver.Patch = 1
 			semver.EnableReleaseCandidate = false
 			semver.Release = 0
 			Debug("Incrementing minor (WORDING)", map[string]interface{}{
-				"commit": strings.TrimSuffix(commit.Message, "\n"), 
+				"commit": strings.TrimSuffix(commit.Message, "\n"),
 				"semver": FormatSemver(semver),
 			})
 			continue
 		}
-		
+
 		if matchReleaseCandidate {
 			semver.Release++
 			semver.Patch = 1
 			semver.EnableReleaseCandidate = true
 			Debug("Incrementing release candidate (WORDING)", map[string]interface{}{
-				"commit": strings.TrimSuffix(commit.Message, "\n"), 
+				"commit": strings.TrimSuffix(commit.Message, "\n"),
 				"semver": FormatSemver(semver),
 			})
 			continue
 		}
-		
+
 		if matchPatch {
 			semver.Patch++
 			Debug("Incrementing patch (WORDING)", map[string]interface{}{
-				"commit": strings.TrimSuffix(commit.Message, "\n"), 
+				"commit": strings.TrimSuffix(commit.Message, "\n"),
 				"semver": FormatSemver(semver),
 			})
 			continue
 		}
 	}
-	
+
 	return semver
 }

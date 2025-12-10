@@ -219,20 +219,23 @@ func downloadBinary(url string) (string, error) {
 	if strings.HasSuffix(url, ".tar.gz") {
 		// For tar.gz, we need to extract the binary
 		if err := extractTarGz(resp.Body, tempFile); err != nil {
-			tempFile.Close()
-			os.Remove(tempPath)
+			_ = tempFile.Close()
+			_ = os.Remove(tempPath)
 			return "", err
 		}
 	} else {
 		// Direct binary download
 		if _, err := io.Copy(tempFile, resp.Body); err != nil {
-			tempFile.Close()
-			os.Remove(tempPath)
+			_ = tempFile.Close()
+			_ = os.Remove(tempPath)
 			return "", err
 		}
 	}
 
-	tempFile.Close()
+	if err := tempFile.Close(); err != nil {
+		_ = os.Remove(tempPath)
+		return "", err
+	}
 	return tempPath, nil
 }
 
@@ -250,10 +253,12 @@ func extractTarGz(r io.Reader, destFile *os.File) error {
 	defer os.Remove(archivePath)
 
 	if _, err := io.Copy(archiveFile, r); err != nil {
-		archiveFile.Close()
+		_ = archiveFile.Close()
 		return err
 	}
-	archiveFile.Close()
+	if err := archiveFile.Close(); err != nil {
+		return err
+	}
 
 	// Extract using tar command
 	extractDir, err := os.MkdirTemp("", "semver-generator-extract-*")
@@ -336,6 +341,7 @@ var runCommandFunc = func(cmdStr string) error {
 // replaceBinary replaces the current binary with the new one
 func replaceBinary(newBinary, currentBinary string) error {
 	// Make the new binary executable
+	// #nosec G302 -- 0755 is required for executable binaries
 	if err := os.Chmod(newBinary, 0755); err != nil {
 		return err
 	}
@@ -350,13 +356,17 @@ func replaceBinary(newBinary, currentBinary string) error {
 }
 
 // copyFile copies a file from src to dst
+// Note: This function is only called internally with controlled paths from
+// os.CreateTemp and os.Executable, not with user-supplied paths.
 func copyFile(src, dst string) error {
+	// #nosec G304 -- src is from os.CreateTemp, not user input
 	srcFile, err := os.Open(src)
 	if err != nil {
 		return err
 	}
 	defer srcFile.Close()
 
+	// #nosec G304 -- dst is from os.Executable, not user input
 	dstFile, err := os.Create(dst)
 	if err != nil {
 		return err
@@ -368,6 +378,7 @@ func copyFile(src, dst string) error {
 	}
 
 	// Make executable
+	// #nosec G302 -- 0755 is required for executable binaries
 	return os.Chmod(dst, 0755)
 }
 
@@ -409,7 +420,10 @@ func parseVersionParts(v string) []int {
 
 	for _, p := range parts {
 		var num int
-		fmt.Sscanf(p, "%d", &num)
+		if _, err := fmt.Sscanf(p, "%d", &num); err != nil {
+			// If parsing fails, use 0 for this part
+			num = 0
+		}
 		result = append(result, num)
 	}
 

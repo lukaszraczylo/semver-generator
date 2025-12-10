@@ -19,7 +19,7 @@ func TestCalculateSemver(t *testing.T) {
 		// More sophisticated mock implementation for testing
 		for _, h := range haystack {
 			// Check for substring match to better simulate fuzzy search
-			if h == needle || (len(h) >= 3 && len(needle) >= 3 && 
+			if h == needle || (len(h) >= 3 && len(needle) >= 3 &&
 				(h[:3] == needle[:3] || h[len(h)-3:] == needle[len(needle)-3:])) {
 				return []string{h}
 			}
@@ -29,7 +29,7 @@ func TestCalculateSemver(t *testing.T) {
 
 	// Test data
 	now := time.Now()
-	
+
 	// Common wording and blacklist for all tests
 	wording := Wording{
 		Patch:   []string{"update", "fix", "initial"},
@@ -49,6 +49,7 @@ func TestCalculateSemver(t *testing.T) {
 		initialSemver   SemVer
 		respectExisting bool
 		strictMode      bool
+		tagPrefixes     []string
 		want            SemVer
 	}{
 		{
@@ -76,11 +77,12 @@ func TestCalculateSemver(t *testing.T) {
 			initialSemver:   SemVer{},
 			respectExisting: true,
 			strictMode:      false,
+			tagPrefixes:     []string{},
 			want: SemVer{
-				Major: 2,
-				Minor: 0,
-				Patch: 1, // Initial tag 2.0.0 + one patch increment
-				Release: 1,
+				Major:                  2,
+				Minor:                  0,
+				Patch:                  1, // Initial tag 2.0.0 + one patch increment
+				Release:                1,
 				EnableReleaseCandidate: true,
 			},
 		},
@@ -109,11 +111,12 @@ func TestCalculateSemver(t *testing.T) {
 			initialSemver:   SemVer{},
 			respectExisting: true,
 			strictMode:      true,
+			tagPrefixes:     []string{},
 			want: SemVer{
-				Major: 2,
-				Minor: 0,
-				Patch: 1, // Initial tag 2.0.0 + patch from "update" keyword
-				Release: 1,
+				Major:                  2,
+				Minor:                  0,
+				Patch:                  1, // Initial tag 2.0.0 + patch from "update" keyword
+				Release:                1,
 				EnableReleaseCandidate: true,
 			},
 		},
@@ -142,6 +145,7 @@ func TestCalculateSemver(t *testing.T) {
 			initialSemver:   SemVer{},
 			respectExisting: false,
 			strictMode:      false,
+			tagPrefixes:     []string{},
 			want: SemVer{
 				Major: 0,
 				Minor: 1,
@@ -173,6 +177,7 @@ func TestCalculateSemver(t *testing.T) {
 			initialSemver:   SemVer{Major: 1},
 			respectExisting: false,
 			strictMode:      true,
+			tagPrefixes:     []string{},
 			want: SemVer{
 				Major: 1,
 				Minor: 1,
@@ -199,6 +204,7 @@ func TestCalculateSemver(t *testing.T) {
 			initialSemver:   SemVer{},
 			respectExisting: false,
 			strictMode:      false,
+			tagPrefixes:     []string{},
 			want: SemVer{
 				Major: 0,
 				Minor: 0,
@@ -225,12 +231,46 @@ func TestCalculateSemver(t *testing.T) {
 			initialSemver:   SemVer{},
 			respectExisting: false,
 			strictMode:      false,
+			tagPrefixes:     []string{},
 			want: SemVer{
 				Major:                  0,
 				Minor:                  0,
 				Patch:                  1,
 				Release:                1,
 				EnableReleaseCandidate: true,
+			},
+		},
+		{
+			name: "With prefixed tags should not be RC",
+			commits: []CommitDetails{
+				{
+					Hash:      "commit1",
+					Message:   "tagged commit",
+					Timestamp: now.Add(-3 * time.Hour),
+				},
+				{
+					Hash:      "commit2",
+					Message:   "another commit",
+					Timestamp: now.Add(-2 * time.Hour),
+				},
+			},
+			tags: []TagDetails{
+				{
+					Name: "app-0.0.16",
+					Hash: "commit1",
+				},
+			},
+			wording:         wording,
+			blacklist:       blacklist,
+			initialSemver:   SemVer{},
+			respectExisting: true,
+			strictMode:      true, // Use strict mode for predictable results
+			tagPrefixes:     []string{"app-", "infra-"},
+			want: SemVer{
+				Major:                  0,
+				Minor:                  0,
+				Patch:                  16, // From tag, no additional increments in strict mode
+				EnableReleaseCandidate: false,
 			},
 		},
 	}
@@ -245,6 +285,7 @@ func TestCalculateSemver(t *testing.T) {
 				tt.initialSemver,
 				tt.respectExisting,
 				tt.strictMode,
+				tt.tagPrefixes,
 			)
 
 			assert.Equal(t, tt.want.Major, got.Major, "Major version mismatch")
