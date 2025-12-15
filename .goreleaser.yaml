@@ -87,3 +87,23 @@ homebrew_casks:
             system_command "/usr/bin/xattr",
                            args: ["-dr", "com.apple.quarantine", "#{staged_path}/semver-generator"]
           end
+
+signs:
+  - cmd: cosign
+    signature: "${artifact}.sigstore.json"
+    args:
+      - sign-blob
+      - "--bundle=${signature}"
+      - "${artifact}"
+      - "--yes"
+    artifacts: checksum
+    output: true
+
+docker_signs:
+  - cmd: cosign
+    artifacts: manifests
+    output: true
+    args:
+      - sign
+      - "${artifact}@${digest}"
+      - "--yes"

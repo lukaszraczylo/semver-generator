@@ -146,6 +146,25 @@ jobs:
 docker pull ghcr.io/lukaszraczylo/semver-generator:latest
 ```
 
+#### Verifying Release Signatures
+
+All release checksums and Docker images are signed with [cosign](https://github.com/sigstore/cosign) using keyless signing. To verify:
+
+```bash
+# Verify checksum signature
+cosign verify-blob \
+  --certificate-identity-regexp "https://github.com/lukaszraczylo/semver-generator/.*" \
+  --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+  --bundle "<checksums-file>.sigstore.json" \
+  <checksums-file>
+
+# Verify Docker image
+cosign verify \
+  --certificate-identity-regexp "https://github.com/lukaszraczylo/semver-generator/.*" \
+  --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+  ghcr.io/lukaszraczylo/semver-generator:latest
+```
+
 **Docker supported architectures:**
 Linux/arm64, Linux/amd64
 
