@@ -179,14 +179,25 @@ func ListExistingTags(repo *GitRepository) {
 	}
 
 	if err := refs.ForEach(func(ref *plumbing.Reference) error {
+		tagName := ref.Name().Short()
+		commitHash := ref.Hash().String()
+
+		// For annotated tags, dereference to get the actual commit hash
+		tagObj, err := repo.Handler.TagObject(ref.Hash())
+		if err == nil {
+			// This is an annotated tag - get the commit it points to
+			commitHash = tagObj.Target.String()
+		}
+		// If err != nil, it's a lightweight tag - ref.Hash() is already the commit hash
+
 		repo.Tags = append(repo.Tags, TagDetails{
-			Name: ref.Name().Short(),
-			Hash: ref.Hash().String(),
+			Name: tagName,
+			Hash: commitHash,
 		})
 
 		Debug("Found tag", map[string]interface{}{
-			"tag":  ref.Name().Short(),
-			"hash": ref.Hash().String(),
+			"tag":  tagName,
+			"hash": commitHash,
 		})
 
 		return nil
