@@ -34,14 +34,6 @@ type ReleaseAsset struct {
 	BrowserDownloadURL string `json:"browser_download_url"`
 }
 
-// UpdateInfo contains information about an available update
-type UpdateInfo struct {
-	CurrentVersion string
-	LatestVersion  string
-	ReleaseURL     string
-	DownloadURL    string
-}
-
 // httpClient is the HTTP client used for requests (allows mocking in tests)
 var httpClient = &http.Client{
 	Timeout: requestTimeout,
@@ -58,30 +50,6 @@ func CheckLatestRelease() (string, bool) {
 
 	version := normalizeVersion(release.TagName)
 	return version, true
-}
-
-// CheckForUpdate checks if a newer version is available
-// Returns UpdateInfo if an update is available, nil otherwise
-func CheckForUpdate(currentVersion string) *UpdateInfo {
-	release, err := fetchLatestRelease(context.Background())
-	if err != nil {
-		return nil
-	}
-
-	latestVersion := normalizeVersion(release.TagName)
-	current := normalizeVersion(currentVersion)
-
-	if isNewerVersion(latestVersion, current) {
-		downloadURL := findBinaryAsset(release.Assets)
-		return &UpdateInfo{
-			CurrentVersion: current,
-			LatestVersion:  latestVersion,
-			ReleaseURL:     release.HTMLURL,
-			DownloadURL:    downloadURL,
-		}
-	}
-
-	return nil
 }
 
 // UpdatePackage downloads and installs the latest version
@@ -388,50 +356,4 @@ func normalizeVersion(v string) string {
 	v = strings.TrimPrefix(v, "v")
 	v = strings.TrimPrefix(v, "V")
 	return v
-}
-
-// isNewerVersion compares two semver-like versions
-// Returns true if latest is newer than current
-func isNewerVersion(latest, current string) bool {
-	latestParts := parseVersionParts(latest)
-	currentParts := parseVersionParts(current)
-
-	for i := 0; i < len(latestParts) && i < len(currentParts); i++ {
-		if latestParts[i] > currentParts[i] {
-			return true
-		}
-		if latestParts[i] < currentParts[i] {
-			return false
-		}
-	}
-
-	return len(latestParts) > len(currentParts)
-}
-
-// parseVersionParts splits a version string into numeric parts
-func parseVersionParts(v string) []int {
-	// Remove any suffix like -beta, -rc1, etc.
-	if idx := strings.IndexAny(v, "-+"); idx != -1 {
-		v = v[:idx]
-	}
-
-	parts := strings.Split(v, ".")
-	result := make([]int, 0, len(parts))
-
-	for _, p := range parts {
-		var num int
-		if _, err := fmt.Sscanf(p, "%d", &num); err != nil {
-			// If parsing fails, use 0 for this part
-			num = 0
-		}
-		result = append(result, num)
-	}
-
-	return result
-}
-
-// FormatUpdateMessage formats a user-friendly update notification
-func (u *UpdateInfo) FormatUpdateMessage() string {
-	return fmt.Sprintf("New version available: %s (current: %s) - %s",
-		u.LatestVersion, u.CurrentVersion, u.ReleaseURL)
 }

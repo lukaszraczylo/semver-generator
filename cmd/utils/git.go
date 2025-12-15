@@ -135,17 +135,24 @@ func ListCommits(repo *GitRepository) ([]CommitDetails, error) {
 
 	Debug("Listing commits", map[string]interface{}{"commits": tmpResults})
 
-	// Filter commits starting from the specified commit if provided
+	// Filter commits starting after the specified commit if provided
 	if repo.StartCommit != "" {
+		found := false
 		for commitId, cmt := range tmpResults {
 			if cmt.Hash == repo.StartCommit {
 				Debug("Found commit match", map[string]interface{}{
 					"commit": cmt.Hash,
 					"index":  commitId,
 				})
-				repo.Commits = tmpResults[commitId:]
+				// Start from the commit AFTER the specified one
+				repo.Commits = tmpResults[commitId+1:]
+				found = true
 				break
 			}
+		}
+		if !found {
+			// If specified commit not found, use all commits
+			repo.Commits = tmpResults
 		}
 	} else {
 		repo.Commits = tmpResults

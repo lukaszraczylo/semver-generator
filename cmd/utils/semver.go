@@ -16,22 +16,37 @@ func CalculateSemver(
 	tagPrefixes []string,
 ) SemVer {
 	semver := initialSemver
+	startIndex := 0
 
-	for _, commit := range commits {
-		// Check for existing tags if enabled
-		if respectExisting {
-			for _, tagHash := range tags {
-				if commit.Hash == tagHash.Hash {
-					Debug("Found existing tag", map[string]interface{}{
-						"tag":    tagHash.Name,
-						"commit": strings.TrimSuffix(commit.Message, "\n"),
-					})
-					semver = ParseExistingSemver(tagHash.Name, semver, tagPrefixes)
-					continue
+	// If respecting existing tags, find the latest tagged commit and start from there
+	if respectExisting && len(tags) > 0 {
+		latestTagIndex := -1
+		var latestTagName string
+
+		// Find the latest tagged commit (highest index since commits are oldest-first)
+		for i, commit := range commits {
+			for _, tag := range tags {
+				if commit.Hash == tag.Hash {
+					if i > latestTagIndex {
+						latestTagIndex = i
+						latestTagName = tag.Name
+					}
 				}
 			}
 		}
 
+		// If we found a tagged commit, use its version and start processing after it
+		if latestTagIndex >= 0 {
+			Debug("Found latest existing tag", map[string]interface{}{
+				"tag":    latestTagName,
+				"commit": strings.TrimSuffix(commits[latestTagIndex].Message, "\n"),
+			})
+			semver = ParseExistingSemver(latestTagName, semver, tagPrefixes)
+			startIndex = latestTagIndex + 1
+		}
+	}
+
+	for _, commit := range commits[startIndex:] {
 		// In non-strict mode, increment patch by default
 		if !strictMode {
 			semver.Patch++
