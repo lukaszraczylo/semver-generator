@@ -1,22 +1,18 @@
 version: 1
 force:
   major: 1
+  minor: 4
   existing: true
   strict: false
-blacklist:
-  - "Merge branch"
-  - "Merge pull request"
-  - "feature/"
-  - "feature:"
+  commit: 960207e4677476ad31a9f389f74eaf9f33d49613
+# tag_prefixes: (optional) prefixes to strip from existing tags
+# Note: "v" prefix is always stripped automatically
+# tag_prefixes:
+#   - "app-"
+#   - "service-"
 wording:
-  patch:
-    - update
-    - initial
-    - fix
   minor:
     - change
     - improve
   major:
     - breaking
-  release:
-    - release-candidate
