@@ -1,11 +1,13 @@
-version: 1
-force:
-  existing: true
-  strict: false
-  commit: 960207e4677476ad31a9f389f74eaf9f33d49613  # ← KEEP THIS!
-wording:
-  minor:
-    - change
-    - improve
-  major:
-    - breaking
+  version: 1
+  force:
+    major: 1
+    minor: 16  # Start from v1.16.x
+    existing: true
+    strict: false
+    commit: 960207e4677476ad31a9f389f74eaf9f33d49613
+  wording:
+    minor:
+      - change
+      - improve
+    major:
+      - breaking
