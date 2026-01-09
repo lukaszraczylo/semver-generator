@@ -2,11 +2,7 @@ version: 1
 force:
   existing: true
   strict: false
-# tag_prefixes: (optional) prefixes to strip from existing tags
-# Note: "v" prefix is always stripped automatically
-# tag_prefixes:
-#   - "app-"
-#   - "service-"
+  commit: 960207e4677476ad31a9f389f74eaf9f33d49613  # ← KEEP THIS!
 wording:
   minor:
     - change
