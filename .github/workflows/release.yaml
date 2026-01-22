@@ -6,7 +6,6 @@ on:
     paths-ignore:
       - '**.md'
       - '**/release.yaml'
-      - 'action.yml'
     branches:
       - main
 
@@ -24,3 +23,34 @@ jobs:
       rolling-release-tag: "v1"
       semver-config: "config-release.yaml"
     secrets: inherit
+
+  update-action-version:
+    needs: release
+    runs-on: ubuntu-latest
+    if: needs.release.outputs.version != ''
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update action.yml with release version
+        env:
+          VERSION: ${{ needs.release.outputs.version }}
+        run: |
+          echo "Updating action.yml to version: ${VERSION}"
+          sed -i "s|ghcr.io/lukaszraczylo/semver-generator:[^\"]*|ghcr.io/lukaszraczylo/semver-generator:${VERSION}|" action.yml
+          echo "Updated action.yml:"
+          grep "image:" action.yml
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add action.yml
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: pin action.yml Docker image to v${{ needs.release.outputs.version }}"
+            git push
+          fi
