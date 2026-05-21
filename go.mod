@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	github.com/go-git/go-git/v5 v5.19.1
 	github.com/lithammer/fuzzysearch v1.1.8
-	github.com/lukaszraczylo/graphql-monitoring-proxy v0.44.1
+	github.com/lukaszraczylo/graphql-monitoring-proxy v0.45.1
 	github.com/lukaszraczylo/oss-telemetry v0.0.0-20260521005811-e02d51419c52
 	github.com/lukaszraczylo/pandati v0.0.29
 	github.com/spf13/cobra v1.10.2

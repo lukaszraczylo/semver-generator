@@ -67,6 +67,8 @@ github.com/lithammer/fuzzysearch v1.1.8 h1:/HIuJnjHuXS8bKaiTMeeDlW2/AyIWk2brx1V8
 github.com/lithammer/fuzzysearch v1.1.8/go.mod h1:IdqeyBClc3FFqSzYq/MXESsS4S0FsZ5ajtkr5xPLts4=
 github.com/lukaszraczylo/graphql-monitoring-proxy v0.44.1 h1:m1UEegVMXzVWS6J7C7zEc9NuaECIdTDlXLlnw4EfLAw=
 github.com/lukaszraczylo/graphql-monitoring-proxy v0.44.1/go.mod h1:hcDGfA782DZcly4qCGqaFMPMT71TnWy+2QhHeRS4ciU=
+github.com/lukaszraczylo/graphql-monitoring-proxy v0.45.1 h1:NBRubpm7P+Z0iOgqPFAM6HHVPnUs8Qm1BZqpJBKL81Q=
+github.com/lukaszraczylo/graphql-monitoring-proxy v0.45.1/go.mod h1:oL4NfPtHhKcHUUzQpfAqMLUkQDLwkwqzAZFfyhZW3+0=
 github.com/lukaszraczylo/oss-telemetry v0.0.0-20260521005811-e02d51419c52 h1:HAm1OV/1uYN3VA/HdDNFjwh8KerTLwl1SoxF+IiNf/M=
 github.com/lukaszraczylo/oss-telemetry v0.0.0-20260521005811-e02d51419c52/go.mod h1:+Cn78qZo8rc3T9eZt0v3oICYRdd75wORtSidc8lNjDQ=
 github.com/lukaszraczylo/pandati v0.0.29 h1:WUEWm1+hWjE5KJbIL8OctG00x2dk4XKGJSlrjhxZ55k=
