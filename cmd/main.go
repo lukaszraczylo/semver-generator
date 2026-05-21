@@ -129,7 +129,7 @@ func main() {
 
 		// List existing tags if needed
 		if params.varExisting || repo.Config.Force.Existing {
-			utils.ListExistingTags(&repo.GitRepo)
+			utils.ListExistingTags(&repo.GitRepo, repo.Config.TagPrefixes)
 		}
 
 		// Apply forced versioning

@@ -83,6 +83,29 @@ func StripTagPrefix(tagName string, prefixes []string) string {
 	return result
 }
 
+// IsParseableSemverTag reports whether tagName looks like a proper semver tag
+// (X.Y.Z, optionally vX.Y.Z, optionally with -rc.N suffix) after configured
+// prefixes are stripped. Rolling tags like "v1" or "latest" return false so the
+// calculator can skip them when picking the latest existing tag — preventing a
+// rolling tag tied to the same commit as a real semver tag from "winning" the
+// alphabetical iteration in go-git and resetting the baseline to 0.0.0.
+func IsParseableSemverTag(tagName string, prefixes []string) bool {
+	clean := StripTagPrefix(tagName, prefixes)
+	if idx := strings.Index(clean, "-rc."); idx != -1 {
+		clean = clean[:idx]
+	}
+	parts := strings.Split(clean, ".")
+	if len(parts) < 3 {
+		return false
+	}
+	for _, p := range parts[:3] {
+		if len(extractNumber.FindAllString(p, -1)) == 0 {
+			return false
+		}
+	}
+	return true
+}
+
 // ParseExistingSemver parses a semantic version from a tag name
 func ParseExistingSemver(tagName string, currentSemver SemVer, prefixes []string) SemVer {
 	Debug("Parsing existing semver", map[string]interface{}{"tag": tagName})

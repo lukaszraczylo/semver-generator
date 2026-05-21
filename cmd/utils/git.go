@@ -163,10 +163,13 @@ func ListCommits(repo *GitRepository) ([]CommitDetails, error) {
 }
 
 // ListExistingTags lists all tags in the repository
-func ListExistingTags(repo *GitRepository) {
+// ListExistingTags lists all tags in the repository.
+// Tags that don't parse as proper semver (rolling tags like "v1" or "latest")
+// are skipped so they can't out-rank real semver tags pointing to the same
+// commit during latest-tag selection.
+func ListExistingTags(repo *GitRepository, tagPrefixes []string) {
 	Debug("Listing existing tags", nil)
 
-	// Check if Handler is nil to avoid panic
 	if repo.Handler == nil {
 		Debug("Repository handler is nil, skipping tag listing", nil)
 		return
@@ -180,15 +183,17 @@ func ListExistingTags(repo *GitRepository) {
 
 	if err := refs.ForEach(func(ref *plumbing.Reference) error {
 		tagName := ref.Name().Short()
-		commitHash := ref.Hash().String()
 
-		// For annotated tags, dereference to get the actual commit hash
+		if !IsParseableSemverTag(tagName, tagPrefixes) {
+			Debug("Skipping non-semver tag", map[string]interface{}{"tag": tagName})
+			return nil
+		}
+
+		commitHash := ref.Hash().String()
 		tagObj, err := repo.Handler.TagObject(ref.Hash())
 		if err == nil {
-			// This is an annotated tag - get the commit it points to
 			commitHash = tagObj.Target.String()
 		}
-		// If err != nil, it's a lightweight tag - ref.Hash() is already the commit hash
 
 		repo.Tags = append(repo.Tags, TagDetails{
 			Name: tagName,

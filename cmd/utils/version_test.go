@@ -189,6 +189,34 @@ func TestParseExistingSemver(t *testing.T) {
 		})
 	}
 }
+func TestIsParseableSemverTag(t *testing.T) {
+	InitLogger(false)
+
+	tests := []struct {
+		name     string
+		tag      string
+		prefixes []string
+		want     bool
+	}{
+		{name: "plain x.y.z", tag: "1.2.3", want: true},
+		{name: "v prefix", tag: "v1.16.5", want: true},
+		{name: "v prefix with rc", tag: "v2.0.0-rc.3", want: true},
+		{name: "configured app- prefix", tag: "app-1.2.3", prefixes: []string{"app-"}, want: true},
+
+		{name: "rolling v1 tag", tag: "v1", want: false},
+		{name: "rolling latest tag", tag: "latest", want: false},
+		{name: "two-component", tag: "1.2", want: false},
+		{name: "empty", tag: "", want: false},
+		{name: "non-numeric major", tag: "vX.Y.Z", want: false},
+		{name: "just text", tag: "release-day", want: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, IsParseableSemverTag(tt.tag, tt.prefixes))
+		})
+	}
+}
 
 func TestCheckMatches(t *testing.T) {
 	// Initialize logger for tests

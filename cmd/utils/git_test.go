@@ -142,7 +142,7 @@ func TestListExistingTags(t *testing.T) {
 		repo := &GitRepository{}
 
 		// Now we can safely call ListExistingTags since we've added a nil check
-		ListExistingTags(repo)
+		ListExistingTags(repo, nil)
 
 		// Verify no tags were added
 		assert.Empty(t, repo.Tags, "Should have no tags after calling with nil Handler")
