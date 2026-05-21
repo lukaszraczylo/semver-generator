@@ -15,13 +15,21 @@ limitations under the License.
 */
 package main
 
-import "github.com/lukaszraczylo/semver-generator/cmd"
+import (
+	"time"
+
+	telemetry "github.com/lukaszraczylo/oss-telemetry"
+	"github.com/lukaszraczylo/semver-generator/cmd"
+)
 
 var (
 	PKG_VERSION string
 )
 
 func main() {
+	telemetry.Send("semver-generator", PKG_VERSION)
+	defer telemetry.Wait(2 * time.Second)
+
 	cmd.PKG_VERSION = PKG_VERSION
 	cmd.Execute()
 }
