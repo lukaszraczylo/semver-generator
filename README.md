@@ -11,14 +11,19 @@ Project created overnight, to prove that management of semantic versioning is NO
   - [Usage](#usage)
     - [Authentication](#authentication)
     - [As a binary](#as-a-binary)
+      - [Homebrew (macOS)](#homebrew-macos)
+      - [Manual Download](#manual-download)
+      - [Self-Update](#self-update)
     - [As a github action](#as-a-github-action)
     - [As a docker container](#as-a-docker-container)
+    - [Verifying Release Signatures](#verifying-release-signatures)
     - [Calculations example \[standard\]](#calculations-example-standard)
     - [Calculations example \[strict matching\]](#calculations-example-strict-matching)
     - [Release candidates](#release-candidates)
     - [Tag prefix stripping](#tag-prefix-stripping)
     - [Example configuration](#example-configuration)
-  - [Good to know](#good-to-know)
+  - [Good to knows](#good-to-knows)
+  - [Telemetry](#telemetry)
 
 ### How does it work
 
@@ -279,7 +284,7 @@ wording:
 * I do not recommend using common words ( like "the" from the example configuration )
 * You can specify env variable `LOG_LEVEL=debug` to see what exactly happens during the calculations
 
-## Telemetry
+### Telemetry
 
 On startup this binary sends a single anonymous adoption ping — project name,
 version, timestamp; no identifiers, no commit content, no repository data.
