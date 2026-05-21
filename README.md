@@ -278,3 +278,15 @@ wording:
 * Word matching uses fuzzy search AND is case INSENSITIVE
 * I do not recommend using common words ( like "the" from the example configuration )
 * You can specify env variable `LOG_LEVEL=debug` to see what exactly happens during the calculations
+
+## Telemetry
+
+On startup this binary sends a single anonymous adoption ping — project name,
+version, timestamp; no identifiers, no commit content, no repository data.
+Fire-and-forget with a 2-second timeout; cannot block startup or panic.
+
+See **[oss-telemetry — Disabling telemetry](https://github.com/lukaszraczylo/oss-telemetry#disabling-telemetry)**
+for the exact wire format, source, and full opt-out documentation.
+
+Quick opt-out: set any of `DO_NOT_TRACK=1`, `OSS_TELEMETRY_DISABLED=1`,
+or `SEMVER_GENERATOR_DISABLE_TELEMETRY=1`.
