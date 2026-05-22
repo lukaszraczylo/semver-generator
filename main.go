@@ -27,7 +27,7 @@ var (
 )
 
 func main() {
-	telemetry.Send("semver-generator", PKG_VERSION)
+	telemetry.SendForModule("semver-generator", "github.com/lukaszraczylo/semver-generator", PKG_VERSION)
 	defer telemetry.Wait(2 * time.Second)
 
 	cmd.PKG_VERSION = PKG_VERSION
