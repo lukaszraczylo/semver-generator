@@ -3,7 +3,7 @@ module github.com/lukaszraczylo/semver-generator
 go 1.25.0
 
 require (
-	github.com/go-git/go-git/v5 v5.19.1
+	github.com/go-git/go-git/v5 v5.19.2
 	github.com/lithammer/fuzzysearch v1.1.8
 	github.com/lukaszraczylo/graphql-monitoring-proxy v1.0.10
 	github.com/lukaszraczylo/oss-telemetry v0.2.3
