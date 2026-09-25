@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/lithammer/fuzzysearch/fuzzy"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -281,6 +282,7 @@ func TestCalculateSemver(t *testing.T) {
 				tt.commits,
 				tt.tags,
 				tt.wording,
+				FuzzyMatcher{},
 				tt.blacklist,
 				tt.initialSemver,
 				tt.respectExisting,
@@ -295,4 +297,149 @@ func TestCalculateSemver(t *testing.T) {
 			assert.Equal(t, tt.want.EnableReleaseCandidate, got.EnableReleaseCandidate, "EnableReleaseCandidate mismatch")
 		})
 	}
+}
+
+// TestCalculateSemverRegexModeEndToEnd exercises the whole config->matcher->
+// CalculateSemver path in regex mode, with anchored conventional-commit
+// patterns and a "Semver-Major:" trailer.
+func TestCalculateSemverRegexModeEndToEnd(t *testing.T) {
+	InitLogger(false)
+
+	wording := Wording{
+		Patch:   []string{`^fix:`},
+		Minor:   []string{`(?m)^feat(\([^)]*\))?!?:`},
+		Major:   []string{`(?mi)^semver-major:`},
+		Release: []string{},
+	}
+
+	matcher, err := NewKeywordMatcher(MatchingRegex, wording)
+	assert.NoError(t, err)
+
+	// c4 ("fix(delegation): ...") is placed AFTER the major commit (c5) on
+	// purpose: the anchored minor pattern `(?m)^feat(\([^)]*\))?!?:` must not
+	// match a message that starts with "fix", so c4 contributes no version
+	// bump at all under correct regex matching. If a future regression made
+	// RegexMatcher match per-word instead of against the full raw message
+	// (the false positive fuzzy mode has, see matcher_test.go's
+	// "full-message anchoring" cases), c4 would wrongly bump Minor. With c4
+	// last, nothing runs after it to reset that spurious bump back to 0, so
+	// the final assertions below would catch it. (With c4 before c5, as it
+	// used to be, the major commit's Minor=0 reset would mask the same bug.)
+	now := time.Now()
+	commits := []CommitDetails{
+		{Hash: "c1", Message: "chore: init repo", Timestamp: now.Add(-5 * time.Hour)},
+		{Hash: "c2", Message: "fix: correct off-by-one", Timestamp: now.Add(-4 * time.Hour)},
+		{Hash: "c3", Message: "feat: add widget\n\nsome body text", Timestamp: now.Add(-3 * time.Hour)},
+		{Hash: "c5", Message: "docs: update README\n\nSemver-Major: breaking storage format", Timestamp: now.Add(-2 * time.Hour)},
+		{Hash: "c4", Message: "fix(delegation): route around dead worker", Timestamp: now.Add(-1 * time.Hour)},
+	}
+
+	got := CalculateSemver(
+		commits,
+		nil,
+		wording,
+		matcher,
+		nil,
+		SemVer{},
+		false,
+		true, // strict mode: only wording matches move the version
+		nil,
+	)
+
+	assert.Equal(t, 1, got.Major, "Major version mismatch")
+	assert.Equal(t, 0, got.Minor, "Minor version mismatch")
+	assert.Equal(t, 1, got.Patch, "Patch version mismatch")
+	assert.Equal(t, 0, got.Release, "Release version mismatch")
+	assert.False(t, got.EnableReleaseCandidate)
+}
+
+// TestCalculateSemverRegexModeReleaseCandidateEndToEnd exercises
+// wording.Release in regex mode end to end: a commit matching the release
+// pattern must bump the release-candidate counter, exactly like fuzzy mode
+// does for wording.Release matches.
+func TestCalculateSemverRegexModeReleaseCandidateEndToEnd(t *testing.T) {
+	InitLogger(false)
+
+	wording := Wording{
+		Patch:   []string{`^fix:`},
+		Minor:   []string{`(?m)^feat(\([^)]*\))?!?:`},
+		Major:   []string{`(?mi)^semver-major:`},
+		Release: []string{`(?m)^release-candidate:`},
+	}
+
+	matcher, err := NewKeywordMatcher(MatchingRegex, wording)
+	assert.NoError(t, err)
+
+	now := time.Now()
+	commits := []CommitDetails{
+		{Hash: "c1", Message: "fix: correct off-by-one", Timestamp: now.Add(-2 * time.Hour)},
+		{Hash: "c2", Message: "release-candidate: cut rc for QA", Timestamp: now.Add(-1 * time.Hour)},
+	}
+
+	got := CalculateSemver(
+		commits,
+		nil,
+		wording,
+		matcher,
+		nil,
+		SemVer{},
+		false,
+		true, // strict mode: only wording matches move the version
+		nil,
+	)
+
+	assert.Equal(t, 0, got.Major, "Major version mismatch")
+	assert.Equal(t, 0, got.Minor, "Minor version mismatch")
+	assert.Equal(t, 1, got.Patch, "Patch version mismatch")
+	assert.Equal(t, 1, got.Release, "Release version mismatch")
+	assert.True(t, got.EnableReleaseCandidate)
+}
+
+// TestCalculateSemverFuzzyModeUnchanged runs CalculateSemver with the real
+// fuzzy.FindNormalizedFold implementation (the same one main.go wires up) to
+// confirm fuzzy mode's results are unchanged by the matcher refactor.
+func TestCalculateSemverFuzzyModeUnchanged(t *testing.T) {
+	InitLogger(false)
+
+	originalFuzzyFind := FuzzyFind
+	defer func() { FuzzyFind = originalFuzzyFind }()
+	FuzzyFind = fuzzy.FindNormalizedFold
+
+	wording := Wording{
+		Patch: []string{"fix"},
+		Minor: []string{"feat"},
+		Major: []string{"breaking"},
+	}
+	blacklist := []string{"skip-ci"}
+
+	now := time.Now()
+	commits := []CommitDetails{
+		{Hash: "c1", Message: "chore: init", Timestamp: now.Add(-6 * time.Hour)},
+		{Hash: "c2", Message: "fix: correct bug", Timestamp: now.Add(-5 * time.Hour)},
+		{Hash: "c3", Message: "feat: add widget", Timestamp: now.Add(-4 * time.Hour)},
+		{Hash: "c4", Message: "docs: update readme", Timestamp: now.Add(-3 * time.Hour)},
+		{Hash: "c5", Message: "breaking: change api contract", Timestamp: now.Add(-2 * time.Hour)},
+		{Hash: "c6", Message: "fix: cleanup skip-ci", Timestamp: now.Add(-1 * time.Hour)},
+	}
+
+	matcher, err := NewKeywordMatcher(MatchingFuzzy, wording)
+	assert.NoError(t, err)
+
+	got := CalculateSemver(
+		commits,
+		nil,
+		wording,
+		matcher,
+		blacklist,
+		SemVer{},
+		false,
+		false, // non-strict: default patch increment applies too
+		nil,
+	)
+
+	assert.Equal(t, 1, got.Major, "Major version mismatch")
+	assert.Equal(t, 0, got.Minor, "Minor version mismatch")
+	assert.Equal(t, 2, got.Patch, "Patch version mismatch")
+	assert.Equal(t, 0, got.Release, "Release version mismatch")
+	assert.False(t, got.EnableReleaseCandidate)
 }

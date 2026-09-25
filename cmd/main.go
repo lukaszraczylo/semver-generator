@@ -18,6 +18,7 @@ limitations under the License.
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -96,6 +97,15 @@ func main() {
 		// Read configuration
 		config, err := utils.ReadConfig(repo.LocalConfigFile)
 		if err != nil {
+			// A bad "matching" value or an invalid regex keyword is a real
+			// misconfiguration, not a missing-file situation: fail loudly
+			// instead of silently falling back to fuzzy matching.
+			if errors.Is(err, utils.ErrInvalidMatchingConfig) {
+				utils.Critical("Invalid matching configuration", map[string]interface{}{
+					"error": err.Error(),
+				})
+				os.Exit(1)
+			}
 			utils.Error("Unable to find config file. Using defaults and flags.", map[string]interface{}{
 				"file": repo.LocalConfigFile,
 			})
@@ -140,6 +150,7 @@ func main() {
 			repo.GitRepo.Commits,
 			repo.GitRepo.Tags,
 			repo.Config.Wording,
+			repo.Config.Matcher,
 			repo.Config.Blacklist,
 			repo.Semver,
 			params.varExisting || repo.Config.Force.Existing,

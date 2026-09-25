@@ -166,6 +166,27 @@ func ParseExistingSemver(tagName string, currentSemver SemVer, prefixes []string
 	return semanticVersion
 }
 
+// isBlacklisted reports whether contentStr contains any blacklist term
+// (case-insensitive substring match), logging the same way every caller used
+// to log it inline. Both matching modes call this so blacklist semantics stay
+// identical between fuzzy and regex matching.
+func isBlacklisted(contentStr string, blacklist []string) bool {
+	if len(blacklist) == 0 {
+		return false
+	}
+	lowerContent := strings.ToLower(contentStr)
+	for _, blacklistTerm := range blacklist {
+		if strings.Contains(lowerContent, strings.ToLower(blacklistTerm)) {
+			Debug("Blacklisted term detected, ignoring commit", map[string]interface{}{
+				"content":        contentStr,
+				"blacklist_term": blacklistTerm,
+			})
+			return true
+		}
+	}
+	return false
+}
+
 // CheckMatches checks if any of the targets match the content
 func CheckMatches(content []string, targets []string, blacklist []string) bool {
 	contentStr := strings.Join(content, " ")
@@ -186,16 +207,8 @@ func CheckMatches(content []string, targets []string, blacklist []string) bool {
 	}
 
 	// If we have a match, check against blacklist
-	if hasMatch && len(blacklist) > 0 {
-		for _, blacklistTerm := range blacklist {
-			if strings.Contains(strings.ToLower(contentStr), strings.ToLower(blacklistTerm)) {
-				Debug("Blacklisted term detected, ignoring commit", map[string]interface{}{
-					"content":        contentStr,
-					"blacklist_term": blacklistTerm,
-				})
-				return false
-			}
-		}
+	if hasMatch && isBlacklisted(contentStr, blacklist) {
+		return false
 	}
 
 	return hasMatch

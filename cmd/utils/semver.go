@@ -9,12 +9,19 @@ func CalculateSemver(
 	commits []CommitDetails,
 	tags []TagDetails,
 	wording Wording,
+	matcher KeywordMatcher,
 	blacklist []string,
 	initialSemver SemVer,
 	respectExisting bool,
 	strictMode bool,
 	tagPrefixes []string,
 ) SemVer {
+	// Default-preserving: callers that don't select a matcher get today's
+	// fuzzy behaviour rather than a nil-pointer panic.
+	if matcher == nil {
+		matcher = FuzzyMatcher{}
+	}
+
 	semver := initialSemver
 	startIndex := 0
 
@@ -57,11 +64,10 @@ func CalculateSemver(
 		}
 
 		// Check for keyword matches
-		commitSlice := strings.Fields(commit.Message)
-		matchPatch := CheckMatches(commitSlice, wording.Patch, blacklist)
-		matchMinor := CheckMatches(commitSlice, wording.Minor, blacklist)
-		matchMajor := CheckMatches(commitSlice, wording.Major, blacklist)
-		matchReleaseCandidate := CheckMatches(commitSlice, wording.Release, blacklist)
+		matchPatch := matcher.Matches(commit.Message, wording.Patch, blacklist)
+		matchMinor := matcher.Matches(commit.Message, wording.Minor, blacklist)
+		matchMajor := matcher.Matches(commit.Message, wording.Major, blacklist)
+		matchReleaseCandidate := matcher.Matches(commit.Message, wording.Release, blacklist)
 
 		// Apply version changes based on matches
 		if matchMajor {

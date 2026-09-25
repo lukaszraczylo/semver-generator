@@ -21,6 +21,7 @@ Project created overnight, to prove that management of semantic versioning is NO
     - [Calculations example \[strict matching\]](#calculations-example-strict-matching)
     - [Release candidates](#release-candidates)
     - [Tag prefix stripping](#tag-prefix-stripping)
+    - [Matching modes](#matching-modes)
     - [Example configuration](#example-configuration)
   - [Good to knows](#good-to-knows)
   - [Telemetry](#telemetry)
@@ -238,6 +239,30 @@ This is particularly useful when:
 - Your CI/CD creates tags with component prefixes
 - You want to track versions separately for different parts of your codebase
 
+#### Matching modes
+
+Config key `matching` controls how each keyword in `wording` is checked against a commit message. Allowed values are `fuzzy` (the default, also used when the key is absent) and `regex`. Any other value is a config error and `semver-gen` exits non-zero rather than silently falling back to `fuzzy`.
+
+**`fuzzy` (default):** the commit message is split on whitespace into words, and a keyword matches as soon as one word contains the keyword's letters *in order*, case-insensitive — it does not need to be a whole word or an exact substring. This is convenient but has a real false-positive risk: keyword `feat` also matches the word `fix(delegation):` (f-e-a-t appear in order inside "fix(delegation):"), and keyword `major` matches `deps(majors):`. Short, generic keywords are the most likely to over-match; test your wording list against real commit messages before relying on it.
+
+**`regex`:** every keyword in `wording.patch` / `wording.minor` / `wording.major` / `wording.release` is a Go RE2 regular expression (the standard library `regexp` package). Patterns are compiled once when the config is loaded — an invalid pattern makes `semver-gen` exit non-zero immediately, naming the wording list and the keyword. Each pattern is matched with `MatchString` against the **full raw commit message** (subject and body, with the original newlines, not the whitespace-split words `fuzzy` uses), so `(?m)^feat(\([^)]*\))?!?:` anchors to the start of a line. Matching is case-sensitive unless the pattern itself uses `(?i)`. The blacklist works exactly the same way in both modes.
+
+Regex patterns must be quoted in YAML (for example `'(?m)^fix:'`), since unquoted `^`, `:` and other YAML-significant characters can break the file's syntax; a YAML syntax error makes the tool fall back to its defaults, the same as it already does for any unreadable config file.
+
+```yaml
+matching: regex
+wording:
+  patch:
+    - '^fix(\([^)]*\))?:'
+  minor:
+    - '(?m)^feat(\([^)]*\))?!?:'
+  major:
+    # a trailer line anywhere in the commit body, e.g. "Semver-Major: dropped the v1 API"
+    - '(?mi)^semver-major:'
+```
+
+With this config, a subject line of `fix: correct off-by-one` bumps patch, `feat: add widget` bumps minor, and a body trailer of `Semver-Major: ...` bumps major regardless of case. `fix(delegation): route around dead worker` bumps patch too — the patch pattern's `(\([^)]*\))?` group allows an optional scope — but it does NOT bump minor, unlike `fuzzy` mode, where keyword `feat` matches it (see above).
+
 #### Example configuration
 
 ```yaml
@@ -276,11 +301,12 @@ wording:
 * `force.commit`: allows you to set commit hash from which the calculations should start
 * `blacklist`: terms to ignore when processing commits. Any commit containing these terms will be skipped in version calculations. Useful for ignoring merge commits, feature branch names, and other unwanted triggers.
 * `tag_prefixes`: prefixes to strip from existing tags before parsing version numbers. Useful for monorepos where tags are prefixed with component names (e.g., `app-1.2.3`, `infra-0.5.0`). The `v` prefix is always stripped automatically.
+* `matching`: how `wording` keywords are matched against commit messages — `fuzzy` (default) or `regex`. See [Matching modes](#matching-modes).
 * `wording`: words the program should look for in the git commits to increment (patch|minor|major)
 
 ### Good to knows
 
-* Word matching uses fuzzy search AND is case INSENSITIVE
+* Word matching uses fuzzy search AND is case INSENSITIVE by default; set `matching: regex` for anchored, case-sensitive regular expression matching instead — see [Matching modes](#matching-modes)
 * I do not recommend using common words ( like "the" from the example configuration )
 * You can specify env variable `LOG_LEVEL=debug` to see what exactly happens during the calculations
 
