@@ -14,6 +14,10 @@ permissions:
   contents: write
   packages: write
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   release:
     uses: lukaszraczylo/shared-actions/.github/workflows/go-release.yaml@main
@@ -27,11 +31,11 @@ jobs:
   update-action-version:
     needs: release
     runs-on: ubuntu-latest
-    if: needs.release.outputs.version != ''
+    if: github.ref == 'refs/heads/main' && needs.release.outputs.version != ''
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.sha }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update action.yml with release version
@@ -52,5 +56,17 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "chore: pin action.yml Docker image to v${{ needs.release.outputs.version }}"
-            git push
+            # Push the pin commit onto main explicitly (not just "git push"):
+            # this checkout started from the released commit (github.sha), not
+            # main's tip, so if main moved in the meantime this push is a
+            # non-fast-forward and fails safely instead of overwriting it.
+            git push origin HEAD:main
+            # Only move the rolling tag once the pin commit is confirmed on
+            # main. The "release" job above already moved it to the release
+            # commit, but this job then commits action.yml's image pin on top
+            # of that, so without this the rolling tag would always be one
+            # commit behind, pinning the PREVIOUS image.
+            # "v1" must match the release job's rolling-release-tag input.
+            git tag -f v1 HEAD
+            git push -f origin refs/tags/v1
           fi
