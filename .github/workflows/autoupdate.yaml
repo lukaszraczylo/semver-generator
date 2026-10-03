@@ -1,4 +1,4 @@
-name: Autoupdate go.mod and go.sum
+name: Update dependencies
 
 on:
   workflow_dispatch:
@@ -6,14 +6,15 @@ on:
     - cron: "0 3 * * *"
 
 permissions:
-  contents: write
   actions: write
+  contents: write
+  issues: write
   pull-requests: write
 
 jobs:
-  autoupdate:
-    uses: lukaszraczylo/shared-actions/.github/workflows/go-autoupdate.yaml@main
+  update:
+    uses: lukaszraczylo/shared-actions/.github/workflows/renovate-autoupdate.yaml@main
     with:
       go-version: ">=1.27"
-      release-workflow: "release.yaml"
-    secrets: inherit
+      node: false
+      release-workflow: release.yaml
